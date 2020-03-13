@@ -10,12 +10,18 @@ router.get('/', async (req, res) => {
     const tickets = await loadTicketsCollection();
     res.send(await tickets.find({}).toArray());
 })
+// Get a single ticket
+router.get('/:id', async (req, res) => {
+    const tickets = await loadTicketsCollection();
+    res.send(await tickets.findOne({_id: new mongodb.ObjectID(req.params.id)}));
+})
 
 // Add ticket
 router.post('/', async (req, res) => {
     const tickets = await loadTicketsCollection();
     await tickets.insertOne({
         text: req.body.text,
+        title: req.body.title,
         createdAt: new Date()
     });
     res.status(201).send();

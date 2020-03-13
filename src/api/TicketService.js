@@ -8,9 +8,9 @@ class TicketService {
         return new Promise((resolve, reject) => {
             axios.get(url).then((res) => {
                 const data = res.data;
-                resolve(data.map(post => ({
-                    ...post,
-                    createdAt: new Date(post.createdAt)
+                resolve(data.map(ticket => ({
+                    ...ticket,
+                    createdAt: new Date(ticket.createdAt)
                 })));
             }).catch((err) => {
                 reject(err);
@@ -18,15 +18,31 @@ class TicketService {
         });
     }
 
+    // Get a single ticket
+    static getTicket(id) {
+        return new Promise((resolve, reject) => {
+            axios.get(url + `/${id}`).then((res) => {
+                const ticket = res.data;
+                resolve({
+                    ...ticket,
+                    createdAt: new Date(ticket.createdAt)
+                });
+            }).catch((err) => {
+                reject(err);
+            })
+        });
+    }
+
     // Create tickets
-    static insertPost(text) {
+    static insertTicket(ticket) {
         return axios.post(url, {
-            text
+            title: ticket.title,
+            text: ticket.text
         });
     }
 
     // Delete tickets
-    static deletePost(id) {
+    static deleteTicket(id) {
         return axios.delete(`${url}/${id}`);
     }
 }

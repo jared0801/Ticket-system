@@ -28,5 +28,21 @@ export default new Router({
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "ticket" */ './views/CreateTicket.vue'),
     },
+    {
+      path: '/tickets/:id',
+      name: 'view-ticket',
+      // route level code-splitting
+      // this generates a separate chunk (ticket.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import(/* webpackChunkName: "ticket" */ './views/ViewTicket.vue'),
+    },
+    {
+      path: '/register',
+      name: 'register',
+      // route level code-splitting
+      // this generates a separate chunk (ticket.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import(/* webpackChunkName: "ticket" */ './views/Register.vue'),
+    },
   ],
 });
