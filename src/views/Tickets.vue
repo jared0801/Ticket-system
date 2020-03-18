@@ -6,7 +6,7 @@
         <Header title="Latest Tickets" backlink="/" backlinkText="Go home" />
 
         <div class="content">
-            <router-link class="button" to="tickets/create">Create a ticket</router-link>
+            <router-link class="button" to="/tickets/create">Create a ticket</router-link>
             <TicketList />
         </div>
         
@@ -18,7 +18,7 @@ import TicketList from '../components/TicketList';
 import Header from '../components/Header';
 
 export default {
-    name: 'home',
+    name: 'Tickets',
     components: {
         TicketList,
         Header

@@ -1,28 +1,34 @@
 <template>
     <div>
-        <Header title="Create a ticket" backlink="/tickets" backlinkText="View Tickets" />
+        <Header title="Profile" backlinkText="Go back" />
         
         <p class="error" v-if="error">{{ error }}</p>
 
         <div class="content">
 
             <div class="field">
-                <label class="label">Ticket Title</label>
+                <label class="label">Username</label>
                 <div class="control">
-                    <input class="input" type="text" v-model="title" placeholder="Ticket title">
+                    <input class="input" type="text" v-model="username" placeholder="Username">
                 </div>
             </div>
 
             <div class="field">
-                <label class="label">Ticket Details</label>
+                <label class="label">Email</label>
                 <div class="control">
-                    <textarea class="textarea" type="text" id="create-ticket" v-model="text" placeholder="Ticket details" />
+                    <input class="input" type="text" id="create-ticket" v-model="email" placeholder="Email" />
                 </div>
             </div>
             
             <div class="field">
                 <div class="control">
-                    <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="createTicket">Create</button>
+                    <button class="button">Change Password</button>
+                </div>
+            </div>
+            
+            <div class="field">
+                <div class="control">
+                    <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="updateProfile">Update Profile</button>
                 </div>
             </div>
             
@@ -32,15 +38,14 @@
 
 <script>
 import Header from '../components/Header';
-import TicketService from '../api/TicketService';
 import { mapGetters } from 'vuex';
 
 export default {
-    name: 'CreateTicket',
+    name: 'Profile',
     data() {
         return {
-            title: '',
-            text: '',
+            username: '',
+            email: '',
             error: '',
             loading: false
         }
@@ -48,10 +53,14 @@ export default {
     components: {
         Header
     },
+    created() {
+        this.username = this.getUser().username;
+        this.email = this.getUser().email;
+    },
     methods: {
         ...mapGetters(['getUser']),
-        createTicket() {
-            this.loading = true;
+        updateProfile() {
+            /*this.loading = true;
             const ticket = {
                 title: this.title,
                 text: this.text,
@@ -65,7 +74,7 @@ export default {
             }).catch((err) => {
                 this.loading = false;
                 this.error = err;
-            });
+            });*/
         }
     }
 };

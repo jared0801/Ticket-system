@@ -1,72 +1,76 @@
 const express = require('express');
-const mongodb = require('mongodb');
 const bcrypt = require('bcrypt');
+const passport = require('passport');
 const { body, validationResult } = require('express-validator');
-
-require('dotenv').config();
 
 const saltRounds = 10;
 
-const router = express.Router();
-const mongoUrl = process.env.DB_PATH;
+function loadRouter(client) {
+    const router = express.Router();
 
-// Get a single user
-router.get('/:id', async (req, res) => {
-    const users = await loadUsersCollection();
-    res.send(await users.findOne({_id: new mongodb.ObjectID(req.params.id)}));
-})
+    // Login a user
+    router.post('/login', (req, res, next) => {
+        passport.authenticate('local', (err, user, info) => {
+            if(err) return next(err);
+            if(!user) return res.status(401).json(info);
+            req.session.user = user;
+            res.json(user);
+        })(req, res, next);
+    });
 
-// Add a user
-router.post('/', [
-    body('email').isEmail().withMessage("Not a valid email.").normalizeEmail().not().isEmpty().trim().escape(),
-    body('username').isLength({ min: 4, max: 32 }).withMessage("Username length must be between 4 and 32 characters.").trim().escape(),
-    body('password').isLength({ min: 6, max: 32 }).withMessage("Password length must be between 6 and 32 characters.").trim().escape()
-], async (req, res) => {
+    // Validate a user session
+    router.get('/user', (req, res) => {
+        res.send(req.session.user);
+    });
+    
+    // Logout a user
+    router.get('/logout', (req, res) => {
+        req.logout();
+        req.session.destroy();
+        res.redirect('/');
+    });
 
-    const errors = validationResult(req);
-    if(!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+    // Add a user
+    router.post('/register', [
+        body('email').isEmail().withMessage("Not a valid email.").normalizeEmail().not().isEmpty().trim().escape(),
+        body('username').isLength({ min: 4, max: 32 }).withMessage("Username length must be between 4 and 32 characters.").trim().escape(),
+        body('password').isLength({ min: 6, max: 32 }).withMessage("Password length must be between 6 and 32 characters.").trim().escape()
+    ], async (req, res) => {
 
-    const user = {
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password
-    }
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
 
-    const users = await loadUsersCollection();
-    bcrypt.hash(user.password, saltRounds, async (err, hash) => {
-        if(err) throw err;
-        user.password = hash;
-        try {
+        const user = {
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password
+        }
+
+        const users = await loadUsersCollection();
+        bcrypt.hash(user.password, saltRounds, async (err, hash) => {
+            if(err) throw err;
+            user.password = hash;
             await users.insertOne({
                 ...user
+            }).catch((e) => {
+                if(e.errmsg.includes("duplicate"))
+                    return res.status(409).json({ errors: e });
+            }).then((newUser) => {
+                req.login(newUser.insertedId, (err) => {
+                    res.status(201).send();
+                });
             })
-            res.status(201).send();
-        } catch(e) {
-            res.status(409).json({ errors: e });
-        }
-    })
-    /*await users.insertOne({
-        text: req.body.text,
-        title: req.body.title,
-        createdAt: new Date()
+        })
     });
-    res.status(201).send();*/
-})
 
-// Remove a user
-router.delete('/:id', async (req, res) => {
-    const users = await loadUsersCollection();
-    await users.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+    function loadUsersCollection() {
+        return client.db('ticket-system').collection('users');
+    }
 
-    res.status(200).send();
-})
-
-async function loadUsersCollection() {
-    const client = await mongodb.MongoClient.connect(mongoUrl, { useNewUrlParser: true});
-
-    return client.db('ticket-system').collection('users');
+    return router;
 }
 
-module.exports = router;
+
+module.exports = loadRouter;

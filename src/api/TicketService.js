@@ -36,8 +36,7 @@ class TicketService {
     // Create tickets
     static insertTicket(ticket) {
         return axios.post(url, {
-            title: ticket.title,
-            text: ticket.text
+            ...ticket
         });
     }
 

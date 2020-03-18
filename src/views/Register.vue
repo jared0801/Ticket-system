@@ -63,7 +63,7 @@
                         <input type="submit" value="Submit" class="button is-link" />
                     </div>
                     <div class="control">
-                        <button class="button is-link is-light">Cancel</button>
+                        <a href="/" role="button" class="button is-link is-light">Cancel</a>
                     </div>
                 </div>
             </form>
@@ -78,7 +78,7 @@ import UserService from '../api/UserService';
 import Header from '../components/Header';
 
 export default {
-    name: 'home',
+    name: 'Register',
     components: {
         Header
     },

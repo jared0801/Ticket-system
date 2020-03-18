@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <p class="error" v-if="error">{{ error }}</p>
+        <div class="notification is-danger" v-if="error">{{ error }}</div>
 
         <div class="ticket-container">
             <table class="table is-bordered is-striped is-hoverable is-fullwidth">
@@ -9,6 +9,7 @@
                         <th>Ticket ID</th>
                         <th>Ticket Title</th>
                         <th>Ticket Description</th>
+                        <th>Submitter</th>
                         <th>Ticket Created</th>
                     </tr>
                 </thead>
@@ -16,9 +17,10 @@
                     <tr v-for="(ticket, index) in tickets" v-bind:key="ticket._id">
                         <th>{{ index }}</th>
                         <th>
-                            <router-link :to="`tickets/${ticket._id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
+                            <router-link :to="`/tickets/${ticket._id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
                         </th>
-                        <th>{{ ticket.text }}</th>
+                        <th class="ticket-description">{{ ticket.text }}</th>
+                        <th>{{ ticket.user ? ticket.user : 'User' }}</th>
                         <th>{{ `${ticket.createdAt.getMonth()+1}/${ticket.createdAt.getDate()}/${ticket.createdAt.getFullYear()}` }}</th>
                     </tr>
                 </tbody>
@@ -62,5 +64,12 @@ export default {
 
 .ticket-container {
     margin: 20px 0;
+}
+
+.ticket-description {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 30vw;
 }
 </style>
