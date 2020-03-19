@@ -17,13 +17,13 @@ function loadRouter(client, middleware) {
     }
     
     // Get tickets
-    router.get('/', async (req, res) => {
+    router.get('/:projId', async (req, res) => {
         const tickets = await loadTicketsCollection();
-        res.send(await tickets.find({}).toArray());
+        res.send(await tickets.find({ projId: new mongodb.ObjectID(req.params.projId) }).toArray());
     });
 
     // Get a single ticket
-    router.get('/:id', async (req, res) => {
+    router.get('/ticket/:id', async (req, res) => {
         const tickets = await loadTicketsCollection();
         res.send(await tickets.findOne({_id: new mongodb.ObjectID(req.params.id)}));
     });
@@ -35,6 +35,7 @@ function loadRouter(client, middleware) {
             text: req.body.text,
             title: req.body.title,
             user: req.body.user,
+            projId: new mongodb.ObjectID(req.body.projId),
             createdAt: new Date()
         });
         res.status(201).send();

@@ -1,7 +1,7 @@
 <template>
     <div class="ticket">
         
-        <Header :title="`Ticket: ${ticket.title}`" backlink="/tickets" backlinkText="Go home" />
+        <Header :title="`Ticket: ${ticket.title}`" backlinkText="Back" />
 
         <div class="content">
             
@@ -11,6 +11,7 @@
                 </span>
                 <div v-else>
                     <p>Description: {{ ticket.text }}</p>
+                    <CommentForm />
                 </div>
             </div>
         </div>
@@ -19,13 +20,15 @@
 </template>
 
 <script>
-import TicketService from '../api/TicketService';
-import Header from '../components/Header';
+import TicketService from '@/api/TicketService';
+import CommentForm from '@/components/Comments/CommentForm'
+import Header from '@/components/Header';
 
 export default {
     name: 'ViewTicket',
     components: {
-        Header
+        Header,
+        CommentForm
     },
     data() {
         return {

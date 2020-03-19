@@ -4,9 +4,9 @@ const url = process.env.VUE_APP_API + '/tickets';
 
 class TicketService {
     // Get tickets
-    static getTickets() {
+    static getTickets(projId) {
         return new Promise((resolve, reject) => {
-            axios.get(url).then((res) => {
+            axios.get(`${url}/${projId}`).then((res) => {
                 const data = res.data;
                 resolve(data.map(ticket => ({
                     ...ticket,
@@ -21,7 +21,7 @@ class TicketService {
     // Get a single ticket
     static getTicket(id) {
         return new Promise((resolve, reject) => {
-            axios.get(url + `/${id}`).then((res) => {
+            axios.get(`${url}/ticket/${id}`).then((res) => {
                 const ticket = res.data;
                 resolve({
                     ...ticket,
@@ -34,7 +34,7 @@ class TicketService {
     }
 
     // Create tickets
-    static insertTicket(ticket) {
+    static createTicket(ticket) {
         return axios.post(url, {
             ...ticket
         });

@@ -4,7 +4,7 @@
 
         <div class="content">
             
-            <router-link v-if="isLoggedIn" class="button" to="/tickets">View Tickets</router-link>
+            <router-link v-if="isLoggedIn" class="button" to="/projects">View Projects</router-link>
             
         </div>
 
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import Header from '../components/Header';
+import Header from '@/components/Header';
 import { mapState } from 'vuex';
 
 export default {

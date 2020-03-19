@@ -21,34 +21,44 @@ const router = new Router({
             // route level code-splitting
             // this generates a separate chunk (ticket.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import(/* webpackChunkName: "auth" */ './views/Register.vue'),
+            component: () => import(/* webpackChunkName: "auth" */ './views/Auth/Register.vue'),
             meta: { public: true }
         },
         {
             path: '/login',
             name: 'login',
-            component: () => import(/* webpackChunkName: "auth" */ './views/Login.vue'),
+            component: () => import(/* webpackChunkName: "auth" */ './views/Auth/Login.vue'),
             meta: { public: true }
         },
         {
             path: '/profile',
             name: 'profile',
-            component: () => import(/* webpackChunkName: "profile" */ './views/Profile.vue')
+            component: () => import(/* webpackChunkName: "profile" */ './views/User/Profile.vue')
         },
         {
-            path: '/tickets',
-            name: 'tickets',
-            component: () => import(/* webpackChunkName: "ticket" */ './views/Tickets.vue'),
+            path: '/projects',
+            name: 'projects',
+            component: () => import(/* webpackChunkName: "project" */ './views/Projects/Projects.vue')
         },
         {
-            path: '/tickets/create',
+            path: '/projects/create',
+            name: 'create-project',
+            component: () => import(/* webpackChunkName: "project" */ './views/Projects/CreateProject.vue')
+        },
+        {
+            path: '/projects/:id',
+            name: 'view-project',
+            component: () => import(/* webpackChunkName: "project" */ './views/Projects/Tickets/Tickets.vue')
+        },
+        {
+            path: '/projects/:id/create',
             name: 'create-ticket',
-            component: () => import(/* webpackChunkName: "ticket" */ './views/CreateTicket.vue'),
+            component: () => import(/* webpackChunkName: "project" */ './views/Projects/Tickets/CreateTicket.vue')
         },
         {
             path: '/tickets/:id',
             name: 'view-ticket',
-            component: () => import(/* webpackChunkName: "ticket" */ './views/ViewTicket.vue')
+            component: () => import(/* webpackChunkName: "project" */ './views/Projects/Tickets/ViewTicket.vue')
         }
     ],
 });

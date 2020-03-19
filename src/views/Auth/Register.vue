@@ -74,8 +74,8 @@
 </template>
 
 <script>
-import UserService from '../api/UserService';
-import Header from '../components/Header';
+import UserService from '@/api/UserService';
+import Header from '@/components/Header';
 
 export default {
     name: 'Register',
@@ -150,7 +150,6 @@ export default {
                 })
             }
             event.preventDefault();
-
         }
     }
 };

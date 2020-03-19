@@ -1,10 +1,10 @@
 <template>
     <div>
         <Header title="Create a ticket" backlink="/tickets" backlinkText="View Tickets" />
-        
-        <p class="error" v-if="error">{{ error }}</p>
 
         <div class="content">
+
+            <div class="notification is-danger" v-if="error">{{ error }}</div>
 
             <div class="field">
                 <label class="label">Ticket Title</label>
@@ -25,14 +25,14 @@
                     <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="createTicket">Create</button>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </template>
 
 <script>
-import Header from '../components/Header';
-import TicketService from '../api/TicketService';
+import Header from '@/components/Header';
+import TicketService from '@/api/TicketService';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -55,9 +55,10 @@ export default {
             const ticket = {
                 title: this.title,
                 text: this.text,
-                user: this.getUser().username
+                user: this.getUser().username,
+                projId: this.$route.params.id
             }
-            TicketService.insertTicket(ticket).then(() => {
+            TicketService.createTicket(ticket).then(() => {
                 this.loading = false;
                 this.text = '';
                 this.title = '';

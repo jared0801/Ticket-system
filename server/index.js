@@ -91,9 +91,13 @@ let client;
     // API routes
     const tickets = require('./routes/api/tickets')(client, [authMiddleware]);
     const users = require('./routes/api/users')(client);
+    const projects = require('./routes/api/projects')(client);
+    const comments = require('./routes/api/comments')(client);
 
     app.use('/api/tickets', tickets);
     app.use('/api/users', users);
+    app.use('/api/projects', projects);
+    app.use('/api/comments', comments);
 
 
     // Static folder

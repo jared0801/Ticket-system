@@ -52,8 +52,8 @@
 </template>
 
 <script>
-import UserService from '../api/UserService';
-import Header from '../components/Header';
+import UserService from '@/api/UserService';
+import Header from '@/components/Header';
 import { mapState, mapMutations } from 'vuex';
 
 export default {
@@ -92,7 +92,7 @@ export default {
                     if(res.status === 200) {
                         this.$store.commit('storeUser', res.data);
                         this.clearFields();
-                        this.$router.push('/tickets');
+                        this.$router.push('/');
                     }
                 }).catch(err => {
                     if(err.response.status === 401) {

@@ -2,33 +2,29 @@
     <div class="container">
         <div class="notification is-danger" v-if="error">{{ error }}</div>
 
-        <div class="ticket-container">
+        <div class="project-container">
             <table class="table is-bordered is-striped is-hoverable is-fullwidth">
                 <thead>
                     <tr>
-                        <th>Ticket ID</th>
-                        <th>Ticket Title</th>
-                        <th>Ticket Description</th>
-                        <th>Submitter</th>
-                        <th>Ticket Created</th>
+                        <th>Project ID</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Lead</th>
+                        <th>Created</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(ticket, index) in tickets" v-bind:key="ticket._id">
+                    <tr v-for="(project, index) in projects" v-bind:key="project._id">
                         <th>{{ index+1 }}</th>
                         <th>
-                            <router-link :to="`/tickets/${ticket._id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
+                            <router-link :to="`/projects/${project._id}`">{{ project.title }}</router-link>
                         </th>
-                        <th class="ticket-description">{{ ticket.text }}</th>
-                        <th>{{ ticket.user ? ticket.user : 'User' }}</th>
-                        <th>{{ `${ticket.createdAt.getMonth()+1}/${ticket.createdAt.getDate()}/${ticket.createdAt.getFullYear()}` }}</th>
+                        <th class="project-description">{{ project.description }}</th>
+                        <th>{{ project.lead }}</th>
+                        <th>{{ `${project.createdAt.getMonth()+1}/${project.createdAt.getDate()}/${project.createdAt.getFullYear()}` }}</th>
                     </tr>
                 </tbody>
             </table>
-
-            <div v-if="!loading && tickets.length === 0" class="notification">
-                <p>This project doesn't have any tickets yet</p>
-            </div>
 
             <div v-if="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>
         </div>
@@ -36,13 +32,13 @@
 </template>
 
 <script>
-import TicketService from '../api/TicketService';
+import ProjectService from '../api/ProjectService';
 
 export default {
-    name: "TicketList",
+    name: "ProjectList",
     data() {
         return {
-            tickets: [],
+            projects: [],
             error: '',
             loading: false
         }
@@ -50,7 +46,7 @@ export default {
     async created() {
         this.loading = true;
         try {
-            this.tickets = await TicketService.getTickets(this.$route.params.id);
+            this.projects = await ProjectService.getProjects();
             this.loading = false;
         } catch(err) {
             this.error = err.message;
@@ -66,11 +62,11 @@ export default {
     text-align: center;
 }
 
-.ticket-container {
+.project-container {
     margin: 20px 0;
 }
 
-.ticket-description {
+.project-description {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
