@@ -25,4 +25,25 @@ export default {
 html, body, #app {
   height: 100%;
 }
+
+.content {
+    margin: auto;
+    width: 80%;
+}
+
+.content ul {
+    list-style: none;
+    margin: 0 0 1em 0;
+}
+
+// Styling for vue-autosuggest cannot be scoped
+.suggestion-item {
+    display: block;
+    width: 100%;
+}
+
+.result-container {
+    overflow-y: scroll;
+    max-height: 150px;
+}
 </style>

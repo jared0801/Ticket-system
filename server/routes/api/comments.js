@@ -13,7 +13,7 @@ function loadRouter(client, middleware) {
 
     // Apply middleware
     if(middleware) {
-        //middleware.forEach(mw => router.use(mw));
+        middleware.forEach(mw => router.use(mw));
     }
 
     // Get a single comment

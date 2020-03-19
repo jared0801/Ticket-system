@@ -10,7 +10,17 @@
                     <i class="fas fa-spinner fa-pulse"></i> Loading...
                 </span>
                 <div v-else>
-                    <p>Description: {{ ticket.text }}</p>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-info editButton" v-on:click="editTicket">Edit Ticket</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <p>Description: {{ ticket.text }}</p>
+                    </div>
+                    <div class="field">
+                        <p>Assigned Users: <span v-for="user in ticket.assignedUsers" :key="user">{{ user }}</span></p>
+                    </div>
                     <CommentForm />
                 </div>
             </div>
@@ -45,13 +55,18 @@ export default {
             this.error = err.message;
             this.loading = false;
         }
+    },
+    methods: {
+        editTicket() {
+            
+        }
     }
 };
 </script>
 
 <style scoped>
-.content {
-    margin: auto;
-    width: 80%;
+
+.editButton {
+    float: right;
 }
 </style>

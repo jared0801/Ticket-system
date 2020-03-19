@@ -110,8 +110,4 @@ export default {
 </script>
 
 <style scoped>
-.content {
-    margin: auto;
-    width: 80%;
-}
 </style>

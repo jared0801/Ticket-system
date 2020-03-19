@@ -9,28 +9,32 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const mongoUrl = process.env.DB_PATH;
-
-const app = express();
-
-app.use(express.json());
-app.use(cors());
-
-console.log(`Starting server in ${process.env.NODE_ENV} mode.`);
-
 let client;
+
+
+// Redirects users who aren't logged in
+const authMiddleware = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        res.redirect('/');
+    } else {
+        return next()
+    }
+}
 
 (async function() {
     // Uses a single connection for all 
     client = await mongodb.MongoClient.connect(mongoUrl, { useNewUrlParser: true });
 })().then(() => {
+    const app = express();
 
-    const authMiddleware = (req, res, next) => {
-        if (!req.isAuthenticated()) {
-            res.redirect('/');
-        } else {
-            return next()
-        }
-    }
+    app.use(express.json());
+    app.use(cors());
+
+    console.log(`Starting server in ${process.env.NODE_ENV} mode.`);
+
+    const cookieExpirationDate = new Date();
+    const cookieExpirationDays = 14;
+    cookieExpirationDate.setDate(cookieExpirationDate.getDate() + cookieExpirationDays);
 
     // Configuring express session & passport
     const sess = {
@@ -38,7 +42,9 @@ let client;
         resave: false,
         saveUninitialized: false,
         store: new MongoStore({ client, dbName: 'sessions' }),
-        cookie: {}
+        cookie: {
+            expires: cookieExpirationDate,
+        }
     }
 
     if(process.env.NODE_ENV === 'production') {
@@ -90,9 +96,9 @@ let client;
 
     // API routes
     const tickets = require('./routes/api/tickets')(client, [authMiddleware]);
-    const users = require('./routes/api/users')(client);
-    const projects = require('./routes/api/projects')(client);
-    const comments = require('./routes/api/comments')(client);
+    const users = require('./routes/api/users')(client, [authMiddleware]);
+    const projects = require('./routes/api/projects')(client, [authMiddleware]);
+    const comments = require('./routes/api/comments')(client, [authMiddleware]);
 
     app.use('/api/tickets', tickets);
     app.use('/api/users', users);
@@ -105,6 +111,7 @@ let client;
 
     //Forward routing to Vue
     app.get(/.*/, (req, res) => {
+        
         res.sendFile(__dirname + '/public/index.html');
     });
 

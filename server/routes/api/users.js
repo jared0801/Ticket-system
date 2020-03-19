@@ -5,22 +5,50 @@ const { body, validationResult } = require('express-validator');
 
 const saltRounds = 10;
 
-function loadRouter(client) {
+function loadRouter(client, middleware) {
     const router = express.Router();
+    
+    /* Protected Routes - use all middleware passed to this router */
+
+    // Get users
+    router.get('/', (req, res, next) => {
+        if(middleware) {
+            middleware.forEach(mw => mw(req, res, next));
+        } else {
+            next();
+        }
+    }, async (req, res) => {
+        const users = await loadUsersCollection();
+        let userArray = await users.find({}).toArray();
+        userArray = userArray.map(user => user.username); // IMPORTANT: Only pass the username
+        res.send(userArray);
+    });
+
+    // Validate a user session
+    router.get('/user', (req, res, next) => {
+        if(middleware) {
+            middleware.forEach(mw => mw(req, res, next));
+        } else {
+            next();
+        }
+    }, (req, res) => {
+        res.send(req.session.user);
+        console.log(req.session.user);
+        console.log(req.user);
+    });
+
+
+    /* Public Routes - accessible to all */
 
     // Login a user
     router.post('/login', (req, res, next) => {
         passport.authenticate('local', (err, user, info) => {
             if(err) return next(err);
             if(!user) return res.status(401).json(info);
-            req.session.user = user;
-            res.json(user);
+            req.login(user, (err) => {
+                res.json(user);
+            });
         })(req, res, next);
-    });
-
-    // Validate a user session
-    router.get('/user', (req, res) => {
-        res.send(req.session.user);
     });
     
     // Logout a user
@@ -57,10 +85,8 @@ function loadRouter(client) {
             }).catch((e) => {
                 if(e.errmsg.includes("duplicate"))
                     return res.status(409).json({ errors: e });
-            }).then((newUser) => {
-                req.login(newUser.insertedId, (err) => {
-                    res.status(201).send();
-                });
+            }).then(() => {
+                res.status(201).send();
             })
         })
     });

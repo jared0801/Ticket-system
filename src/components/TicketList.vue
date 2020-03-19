@@ -64,6 +64,7 @@ export default {
 <style scoped>
 .container {
     text-align: center;
+    max-width: none;
 }
 
 .ticket-container {

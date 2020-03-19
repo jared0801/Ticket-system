@@ -70,7 +70,7 @@ router.beforeEach((to, from, next) => {
         // This route doesn't require auth
         next();
     } else {
-        UserService.getUser().then(res => {
+        UserService.getCurrentUser().then(res => {
             const user = res.data;
             if(user) {
                 // User session is recognized

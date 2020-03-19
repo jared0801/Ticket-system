@@ -11,9 +11,9 @@ const mongodb = require('mongodb');
 function loadRouter(client, middleware) {
     const router = express.Router();
 
-    // Apply middleware
+    // Apply middleware to all subroutes
     if(middleware) {
-        //middleware.forEach(mw => router.use(mw));
+        middleware.forEach(mw => router.use(mw));
     }
     
     // Get tickets
@@ -35,6 +35,7 @@ function loadRouter(client, middleware) {
             text: req.body.text,
             title: req.body.title,
             user: req.body.user,
+            assignedUsers: req.body.assignedUsers,
             projId: new mongodb.ObjectID(req.body.projId),
             createdAt: new Date()
         });
