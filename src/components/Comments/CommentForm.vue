@@ -8,8 +8,8 @@
                 <div class="control">
                     <textarea class="textarea" type="text" id="create-ticket" v-model="text" placeholder="Leave a comment on this ticket" />
                 </div>
-                <div class="control">
-                    <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="createComment">Create</button>
+                <div class="control submit-control">
+                    <button class="button is-primary submit-button" :class="{ 'is-loading' : loading }" v-on:click="createComment">Submit</button>
                 </div>
             </div>
             
@@ -78,5 +78,10 @@ export default {
 .container {
     text-align: center;
     margin: auto;
+}
+
+.submit-control {
+    text-align: right;
+    margin: 1em 0;
 }
 </style>

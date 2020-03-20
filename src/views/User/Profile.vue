@@ -1,10 +1,14 @@
 <template>
     <div>
         <Header title="Profile" backlinkText="Go back" />
-        
-        <p class="error" v-if="error">{{ error }}</p>
 
         <div class="content">
+
+            <div class="notification is-danger" v-if="error">{{ error }}</div>
+        
+            <div v-if="success" class="notification is-success">
+                {{ success }}
+            </div>
 
             <div class="field">
                 <label class="label">Username</label>
@@ -38,7 +42,8 @@
 
 <script>
 import Header from '@/components/Header';
-import { mapGetters } from 'vuex';
+import UserService from '@/api/UserService';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default {
     name: 'Profile',
@@ -59,22 +64,33 @@ export default {
     },
     methods: {
         ...mapGetters(['getUser']),
+        ...mapMutations(['updateUser']),
         updateProfile() {
-            /*this.loading = true;
-            const ticket = {
-                title: this.title,
-                text: this.text,
-                user: this.getUser().username
+            this.loading = true;
+            if(!this.email || !this.username) {
+                this.error = "A username and email are required at all times.";
+                return;
             }
-            TicketService.insertTicket(ticket).then(() => {
+            if(this.email === this.getUser().email && this.username === this.getUser().username) {
+                // No changes were made
+                return;
+            }
+            const newProfile = {
+                id: this.getUser().id,
+                username: this.username,
+                email: this.email
+            }
+            UserService.updateUser(newProfile).then((res) => {
+                if(res.status === 200) {
+                    this.updateUser(res.data);
+                    this.success = "Your profile was succesfully updated.";
+                }
                 this.loading = false;
-                this.text = '';
-                this.title = '';
-                this.$router.push('/');
+                this.error = '';
             }).catch((err) => {
                 this.loading = false;
                 this.error = err;
-            });*/
+            });
         }
     }
 };

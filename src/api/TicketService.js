@@ -8,10 +8,15 @@ class TicketService {
         return new Promise((resolve, reject) => {
             axios.get(`${url}/${projId}`).then((res) => {
                 const data = res.data;
-                resolve(data.map(ticket => ({
+                data.resolved = data.resolved.map(ticket => ({
                     ...ticket,
                     createdAt: new Date(ticket.createdAt)
-                })));
+                }));
+                data.unresolved = data.unresolved.map(ticket => ({
+                    ...ticket,
+                    createdAt: new Date(ticket.createdAt)
+                }));
+                resolve(data);
             }).catch((err) => {
                 reject(err);
             })
@@ -37,6 +42,32 @@ class TicketService {
     static createTicket(ticket) {
         return axios.post(url, {
             ...ticket
+        });
+    }
+
+    static resolveTicket(id) {
+        return new Promise((resolve, reject) => {
+            axios.get(`${url}/res/${id}`).then((res) => {
+                const ticket = res.data;
+                resolve({
+                    ...ticket,
+                });
+            }).catch((err) => {
+                reject(err);
+            })
+        });
+    }
+
+    static unresolveTicket(id) {
+        return new Promise((resolve, reject) => {
+            axios.get(`${url}/unres/${id}`).then((res) => {
+                const ticket = res.data;
+                resolve({
+                    ...ticket,
+                });
+            }).catch((err) => {
+                reject(err);
+            })
         });
     }
 

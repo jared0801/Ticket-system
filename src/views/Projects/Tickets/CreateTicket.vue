@@ -28,7 +28,7 @@
                     :input-props="{id:'autosuggest__input', placeholder:'Assign to', class: 'input'}"
                     @selected="selectHandler"
                     @input="inputChangeHandler"
-                    componentAttrClassAutosuggestResults="result-container"
+                    componentAttrClassAutosuggestResults="result-container dropdown-content"
                     >
                         <template slot-scope="{suggestion}">
                             <span class="suggestion-item button">{{suggestion.item}}</span>
@@ -109,7 +109,8 @@ export default {
                 text: this.text,
                 user: this.getUser().username,
                 assignedUsers: this.assignedUsers,
-                projId: this.$route.params.id
+                projId: this.$route.params.id,
+                resolved: false
             }
             TicketService.createTicket(ticket).then(() => {
                 this.loading = false;

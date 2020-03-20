@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+const mongodb = require('mongodb');
 const { body, validationResult } = require('express-validator');
 
 const saltRounds = 10;
@@ -10,7 +11,7 @@ function loadRouter(client, middleware) {
     
     /* Protected Routes - use all middleware passed to this router */
 
-    // Get users
+    // Returns a list of all usernames
     router.get('/', (req, res, next) => {
         if(middleware) {
             middleware.forEach(mw => mw(req, res, next));
@@ -18,7 +19,7 @@ function loadRouter(client, middleware) {
             next();
         }
     }, async (req, res) => {
-        const users = await loadUsersCollection();
+        const users = loadUsersCollection();
         let userArray = await users.find({}).toArray();
         userArray = userArray.map(user => user.username); // IMPORTANT: Only pass the username
         res.send(userArray);
@@ -32,23 +33,57 @@ function loadRouter(client, middleware) {
             next();
         }
     }, (req, res) => {
-        res.send(req.session.user);
-        console.log(req.session.user);
-        console.log(req.user);
+        res.send(req.user);
+    });
+
+    // Validate a user session
+    router.post('/update', (req, res, next) => {
+        if(middleware) {
+            middleware.forEach(mw => mw(req, res, next));
+        } else {
+            next();
+        }
+    }, (req, res) => {
+        if(req.body.id !== req.user.id) {
+            res.status(403).send({ message: 'You can only update your own profile.' });
+        } else {
+            const users = loadUsersCollection();
+            const query = { _id: new mongodb.ObjectID(req.body.id) };
+            const newValues = { $set: {username: req.body.username, email: req.body.email} };
+            users.updateOne(query, newValues, function(err, obj) {
+                if(err) {
+                    if(err.errmsg.includes("duplicate"))
+                    return res.status(409).json({ errors: err });
+                }
+                if(obj.modifiedCount === 1) res.send(req.body);
+                else res.status(400).send();
+            });
+        }
     });
 
 
     /* Public Routes - accessible to all */
 
     // Login a user
-    router.post('/login', (req, res, next) => {
+    /*router.post('/login', 
+    (req, res, next) => {
         passport.authenticate('local', (err, user, info) => {
             if(err) return next(err);
             if(!user) return res.status(401).json(info);
+            console.log(user);
+            console.log(info);
             req.login(user, (err) => {
+                if(err) next(err);
                 res.json(user);
             });
         })(req, res, next);
+    });*/
+
+    router.post('/login', passport.authenticate('local'), (req, res) => {
+        req.login(req.user, err => {
+            if(err) res.status(400).send(err);
+            res.json(req.user);
+        })
     });
     
     // Logout a user
@@ -76,7 +111,7 @@ function loadRouter(client, middleware) {
             password: req.body.password
         }
 
-        const users = await loadUsersCollection();
+        const users = loadUsersCollection();
         bcrypt.hash(user.password, saltRounds, async (err, hash) => {
             if(err) throw err;
             user.password = hash;

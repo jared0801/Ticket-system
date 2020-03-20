@@ -55,7 +55,9 @@ export default {
         ...mapMutations(['removeUser']),
         logout() {
             this.removeUser();
-            UserService.logoutUser();
+            UserService.logoutUser().then(() => {
+                this.$router.push('/');
+            })
         }
     }
 }
@@ -63,7 +65,7 @@ export default {
 
 <style scoped>
 .header {
-    padding-top: 60px;
+    padding-top: 1.5em;
     text-align: center;
 }
 

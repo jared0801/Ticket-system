@@ -58,14 +58,26 @@ const authMiddleware = (req, res, next) => {
     app.use(passport.session());
 
     passport.serializeUser(function(user, done) {
-        done(null, user);
+        done(null, user.id);
     });
 
-    passport.deserializeUser(function(user, done) {
+    passport.deserializeUser(function(user_id, done) {
         /*User.findById(id, function(err, user) {
             done(err, user);
         });*/
-        done(null, user);
+        const users = client.db('ticket-system').collection('users');
+        users.findOne({ _id: new mongodb.ObjectID(user_id) }, (err, user) => {
+            if(err) {
+                done(err, false);
+            } else if(user) {
+                const userDto = {
+                    id: user._id.toString(),
+                    username: user.username,
+                    email: user.email
+                }
+                done(null, userDto);
+            }
+        });
     });
 
     passport.use(new LocalStrategy(
@@ -82,11 +94,12 @@ const authMiddleware = (req, res, next) => {
                 bcrypt.compare(password, user.password, (err, response) => {
                     if(err) return done(err);
                     if(response === true) {
-                        return done(null, { 
-                            user_id: user._id,
+                        const userDto = {
+                            id: user._id,
                             username: user.username,
                             email: user.email
-                        });
+                        }
+                        return done(null, userDto);
                     }
                     return done(null, false);
                 });
@@ -111,7 +124,6 @@ const authMiddleware = (req, res, next) => {
 
     //Forward routing to Vue
     app.get(/.*/, (req, res) => {
-        
         res.sendFile(__dirname + '/public/index.html');
     });
 

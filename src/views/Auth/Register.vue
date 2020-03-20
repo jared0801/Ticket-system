@@ -134,7 +134,6 @@ export default {
                     email: this.email
                 }).then(res => {
                     if(res.status === 201) {
-                        console.log(res.status);
                         this.clearFields();
                         this.success = "Your account was succesfully created!";
                     }

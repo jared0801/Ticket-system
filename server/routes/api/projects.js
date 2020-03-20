@@ -18,19 +18,19 @@ function loadRouter(client, middleware) {
     
     // Get list of all projects
     router.get('/', async (req, res) => {
-        const projects = await loadProjectsCollection();
+        const projects = loadProjectsCollection();
         res.send(await projects.find({}).toArray());
     });
 
     // Get a single project
     router.get('/:id', async (req, res) => {
-        const projects = await loadProjectsCollection();
+        const projects = loadProjectsCollection();
         res.send(await projects.findOne({_id: new mongodb.ObjectID(req.params.id)}));
     });
     
     // Add a project
     router.post('/', async (req, res) => {
-        const projects = await loadProjectsCollection();
+        const projects = loadProjectsCollection();
         const newProject = {
             title: req.body.title,
             description: req.body.description,
@@ -48,7 +48,7 @@ function loadRouter(client, middleware) {
     
     // Delete a project
     router.delete('/:id', async (req, res) => {
-        const projects = await loadProjectsCollection();
+        const projects = loadProjectsCollection();
         await projects.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
     
         res.status(200).send();

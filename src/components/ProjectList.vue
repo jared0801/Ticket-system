@@ -49,6 +49,7 @@ export default {
             this.projects = await ProjectService.getProjects();
             this.loading = false;
         } catch(err) {
+            console.log(err);
             this.error = err.message;
             this.loading = false;
         }
@@ -60,6 +61,7 @@ export default {
 <style scoped>
 .container {
     text-align: center;
+    max-width: none;
 }
 
 .project-container {

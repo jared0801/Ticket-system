@@ -33,7 +33,7 @@ html, body, #app {
 
 .content ul {
     list-style: none;
-    margin: 0 0 1em 0;
+    margin: 0;
 }
 
 // Styling for vue-autosuggest cannot be scoped
@@ -45,5 +45,6 @@ html, body, #app {
 .result-container {
     overflow-y: scroll;
     max-height: 150px;
+    padding: 10px;
 }
 </style>

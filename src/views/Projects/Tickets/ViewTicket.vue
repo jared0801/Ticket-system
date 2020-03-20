@@ -10,17 +10,23 @@
                     <i class="fas fa-spinner fa-pulse"></i> Loading...
                 </span>
                 <div v-else>
-                    <div class="field">
-                        <div class="control">
-                            <button class="button is-info editButton" v-on:click="editTicket">Edit Ticket</button>
+                    <section class="card section">
+                        <div class="field button-div">
+                            <div class="control">
+                                <button class="button is-info editButton" v-on:click="editTicket">Edit Ticket</button>
+                            </div>
+                            <div class="control">
+                                <button v-if="ticket.resolved" class="button is-danger resolveButton" v-on:click="unresolveTicket">Mark As Incomplete</button>
+                                <button v-else class="button is-success resolveButton" v-on:click="resolveTicket">Mark As Complete</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="field">
-                        <p>Description: {{ ticket.text }}</p>
-                    </div>
-                    <div class="field">
-                        <p>Assigned Users: <span v-for="user in ticket.assignedUsers" :key="user">{{ user }}</span></p>
-                    </div>
+                        <div class="field">
+                            <p>Description: {{ ticket.text }}</p>
+                        </div>
+                        <div class="field">
+                            <p>Assigned Users: <span v-for="user in ticket.assignedUsers" :key="user">{{ user }}</span></p>
+                        </div>
+                    </section>
                     <CommentForm />
                 </div>
             </div>
@@ -58,7 +64,25 @@ export default {
     },
     methods: {
         editTicket() {
-            
+
+        },
+        resolveTicket() {
+            if(!this.ticket.resolved) {
+                TicketService.resolveTicket(this.ticket._id).then(() => {
+                    this.$router.go(-1);
+                }).catch(err => {
+                    this.error = err;
+                });
+            }
+        },
+        unresolveTicket() {
+            if(this.ticket.resolved) {
+                TicketService.unresolveTicket(this.ticket._id).then(() => {
+                    this.$router.go(-1);
+                }).catch(err => {
+                    this.error = err;
+                });
+            }
         }
     }
 };
@@ -66,7 +90,20 @@ export default {
 
 <style scoped>
 
-.editButton {
-    float: right;
+.ticket-container {
+    border: 1px solid black;
+}
+
+.button-div {
+    display: flex;
+    justify-content: flex-end;
+}
+.button-div .control {
+    margin-left: 1em;
+}
+
+.section {
+    margin-bottom: 1em;
+    padding: 1.5em 1.5em;
 }
 </style>

@@ -18,13 +18,13 @@ function loadRouter(client, middleware) {
 
     // Get a single comment
     router.get('/:id', async (req, res) => {
-        const comments = await loadCommentsCollection();
+        const comments = loadCommentsCollection();
         res.send(await comments.find({ticket: new mongodb.ObjectID(req.params.id)}).toArray());
     });
     
     // Add a comment
     router.post('/', async (req, res) => {
-        const comments = await loadCommentsCollection();
+        const comments = loadCommentsCollection();
         const newComment = {
             text: req.body.text,
             user: req.body.user,
@@ -42,7 +42,7 @@ function loadRouter(client, middleware) {
     
     // Delete a comment
     router.delete('/:id', async (req, res) => {
-        const comments = await loadCommentsCollection();
+        const comments = loadCommentsCollection();
         await comments.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
     
         res.status(200).send();

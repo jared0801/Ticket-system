@@ -28,6 +28,16 @@ class UserService {
         });
     }
 
+    // Create users
+    static updateUser(user) {
+        const updateUrl = `${url}/update`;
+        return axios.post(updateUrl, {
+            id: user.id,
+            username: user.username,
+            email: user.email
+        });
+    }
+
     static loginUser(user) {
         const loginUrl = `${url}/login`;
         return axios.post(loginUrl, {
@@ -54,9 +64,7 @@ class UserService {
 
     static logoutUser() {
         const logoutUrl = `${url}/logout`;
-        axios.get(logoutUrl).then(res => {
-            window.location.href = res.request.responseURL;
-        })
+        return axios.get(logoutUrl);
         
     }
 }
