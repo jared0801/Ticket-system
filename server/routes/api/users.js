@@ -36,7 +36,7 @@ function loadRouter(client, middleware) {
         res.send(req.user);
     });
 
-    // Validate a user session
+    // Update a user profile
     router.post('/update', (req, res, next) => {
         if(middleware) {
             middleware.forEach(mw => mw(req, res, next));
@@ -46,6 +46,8 @@ function loadRouter(client, middleware) {
     }, (req, res) => {
         if(req.body.id !== req.user.id) {
             res.status(403).send({ message: 'You can only update your own profile.' });
+        } else if(!req.body.username || !req.body.email) {
+            res.status(400).send({ message: 'A username and an email are required at all times.' });
         } else {
             const users = loadUsersCollection();
             const query = { _id: new mongodb.ObjectID(req.body.id) };
@@ -65,20 +67,6 @@ function loadRouter(client, middleware) {
     /* Public Routes - accessible to all */
 
     // Login a user
-    /*router.post('/login', 
-    (req, res, next) => {
-        passport.authenticate('local', (err, user, info) => {
-            if(err) return next(err);
-            if(!user) return res.status(401).json(info);
-            console.log(user);
-            console.log(info);
-            req.login(user, (err) => {
-                if(err) next(err);
-                res.json(user);
-            });
-        })(req, res, next);
-    });*/
-
     router.post('/login', passport.authenticate('local'), (req, res) => {
         req.login(req.user, err => {
             if(err) res.status(400).send(err);

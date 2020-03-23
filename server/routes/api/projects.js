@@ -46,16 +46,48 @@ function loadRouter(client, middleware) {
         }
     });
     
+    // Update a project
+    router.post('/:id', async (req, res) => {
+        const projects = loadProjectsCollection();
+        const query = { _id: new mongodb.ObjectID(req.params.id) };
+        const newValues = { $set: { title: req.body.title,
+                                    description: req.body.description
+                                  }
+        };
+        if(!req.body.title) {
+            res.status(400).send({ message: "A project is required to have a title."})
+        } else {
+            projects.updateOne(query, newValues, function(err, obj) {
+                if(err) {
+                    return res.status(400).json({ errors: err });
+                }
+                console.log(obj);
+                console.log(query._id);
+                if(obj.modifiedCount === 1) res.send(req.body);
+                else res.status(400).send();
+            });
+        }
+    });
+    
     // Delete a project
     router.delete('/:id', async (req, res) => {
         const projects = loadProjectsCollection();
-        await projects.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
-    
-        res.status(200).send();
+        const tickets = loadTicketsCollection();
+        try {
+            await projects.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+            await tickets.deleteMany({ projId: new mongodb.ObjectID(req.params.id) });
+            res.status(200).send();
+        } catch(err) {
+            res.status(400).send({ error: err });
+        }
     });
     
     function loadProjectsCollection() {
         return client.db('ticket-system').collection('projects');
+    }
+    
+    function loadTicketsCollection() {
+        return client.db('ticket-system').collection('tickets');
     }
 
     return router;

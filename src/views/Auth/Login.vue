@@ -90,8 +90,6 @@ export default {
                     password: this.password
                 }).then(res => {
                     if(res.status === 200) {
-                        console.log("Login: ");
-                        console.log(res.data);
                         this.$store.commit('storeUser', res.data);
                         this.clearFields();
                         this.$router.push('/');

@@ -10,11 +10,13 @@ class TicketService {
                 const data = res.data;
                 data.resolved = data.resolved.map(ticket => ({
                     ...ticket,
-                    createdAt: new Date(ticket.createdAt)
+                    createdAt: new Date(ticket.createdAt),
+                    resolvedAt: new Date(ticket.resolvedAt)
                 }));
                 data.unresolved = data.unresolved.map(ticket => ({
                     ...ticket,
-                    createdAt: new Date(ticket.createdAt)
+                    createdAt: new Date(ticket.createdAt),
+                    resolvedAt: ''
                 }));
                 resolve(data);
             }).catch((err) => {
@@ -30,7 +32,8 @@ class TicketService {
                 const ticket = res.data;
                 resolve({
                     ...ticket,
-                    createdAt: new Date(ticket.createdAt)
+                    createdAt: new Date(ticket.createdAt),
+                    resolvedAt: ticket.resolvedAt ? new Date(ticket.resolvedAt) : ''
                 });
             }).catch((err) => {
                 reject(err);
@@ -38,9 +41,16 @@ class TicketService {
         });
     }
 
-    // Create tickets
+    // Create a ticket
     static createTicket(ticket) {
         return axios.post(url, {
+            ...ticket
+        });
+    }
+
+    // Update a ticket
+    static updateTicket(ticket) {
+        return axios.post(`${url}/${ticket.id}`, {
             ...ticket
         });
     }

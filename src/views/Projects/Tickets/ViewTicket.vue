@@ -10,13 +10,13 @@
                     <i class="fas fa-spinner fa-pulse"></i> Loading...
                 </span>
                 <div v-else>
-                    <section class="card section">
+                    <section v-if="!editting" class="card section">
                         <div class="field button-div">
-                            <div class="control">
+                            <div v-if="isSubmitter" class="control">
                                 <button class="button is-info editButton" v-on:click="editTicket">Edit Ticket</button>
                             </div>
                             <div class="control">
-                                <button v-if="ticket.resolved" class="button is-danger resolveButton" v-on:click="unresolveTicket">Mark As Incomplete</button>
+                                <button v-if="ticket.resolvedAt" class="button is-danger resolveButton" v-on:click="unresolveTicket">Mark As Incomplete</button>
                                 <button v-else class="button is-success resolveButton" v-on:click="resolveTicket">Mark As Complete</button>
                             </div>
                         </div>
@@ -26,6 +26,9 @@
                         <div class="field">
                             <p>Assigned Users: <span v-for="user in ticket.assignedUsers" :key="user">{{ user }}</span></p>
                         </div>
+                    </section>
+                    <section class="card section" v-else>
+                        <EditTicket :ticket="ticket" v-on:close-ticket="editTicket" />
                     </section>
                     <CommentForm />
                 </div>
@@ -37,19 +40,28 @@
 
 <script>
 import TicketService from '@/api/TicketService';
-import CommentForm from '@/components/Comments/CommentForm'
+import EditTicket from '@/components/EditTicket';
+import CommentForm from '@/components/Comments/CommentForm';
 import Header from '@/components/Header';
+import { mapGetters } from 'vuex';
 
 export default {
     name: 'ViewTicket',
     components: {
         Header,
-        CommentForm
+        CommentForm,
+        EditTicket
     },
     data() {
         return {
             loading: false,
-            ticket: {}
+            ticket: {},
+            editting: false
+        }
+    },
+    computed: {
+        isSubmitter() {
+            return this.ticket.user === this.getUser().username;
         }
     },
     async created() {
@@ -63,11 +75,12 @@ export default {
         }
     },
     methods: {
+        ...mapGetters(['getUser']),
         editTicket() {
-
+            this.editting = !this.editting;
         },
         resolveTicket() {
-            if(!this.ticket.resolved) {
+            if(!this.ticket.resolvedAt) {
                 TicketService.resolveTicket(this.ticket._id).then(() => {
                     this.$router.go(-1);
                 }).catch(err => {
@@ -76,7 +89,7 @@ export default {
             }
         },
         unresolveTicket() {
-            if(this.ticket.resolved) {
+            if(this.ticket.resolvedAt) {
                 TicketService.unresolveTicket(this.ticket._id).then(() => {
                     this.$router.go(-1);
                 }).catch(err => {
@@ -92,14 +105,6 @@ export default {
 
 .ticket-container {
     border: 1px solid black;
-}
-
-.button-div {
-    display: flex;
-    justify-content: flex-end;
-}
-.button-div .control {
-    margin-left: 1em;
 }
 
 .section {

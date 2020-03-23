@@ -29,7 +29,8 @@
                         <th>Ticket Title</th>
                         <th>Ticket Description</th>
                         <th>Submitter</th>
-                        <th>Ticket Created</th>
+                        <th v-if="resolved_tab">Ticket Completed</th>
+                        <th v-else>Ticket Created</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,13 +41,15 @@
                         </th>
                         <th class="ticket-description">{{ ticket.text }}</th>
                         <th>{{ ticket.user ? ticket.user : 'User' }}</th>
-                        <th>{{ `${ticket.createdAt.getMonth()+1}/${ticket.createdAt.getDate()}/${ticket.createdAt.getFullYear()}` }}</th>
+                        <th v-if="resolved_tab">{{ `${ticket.resolvedAt.getMonth()+1}/${ticket.resolvedAt.getDate()}/${ticket.resolvedAt.getFullYear()}` }}</th>
+                        <th v-else>{{ `${ticket.createdAt.getMonth()+1}/${ticket.createdAt.getDate()}/${ticket.createdAt.getFullYear()}` }}</th>
                     </tr>
                 </tbody>
             </table>
 
             <div v-if="!loading && (resolved_tab ? resolved_tickets : unresolved_tickets).length === 0" class="notification">
-                <p>This project doesn't have any tickets yet</p>
+                <p v-if="resolved_tab">This project doesn't have any completed tickets yet.</p>
+                <p v-else>This project doesn't have any tickets yet.</p>
             </div>
 
             <div v-if="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>

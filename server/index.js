@@ -14,7 +14,7 @@ let client;
 
 // Redirects users who aren't logged in
 const authMiddleware = (req, res, next) => {
-    if (!req.isAuthenticated()) {
+    if (!req.isAuthenticated() && process.env.NODE_ENV === 'production') {
         res.redirect('/');
     } else {
         return next()

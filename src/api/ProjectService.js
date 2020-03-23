@@ -18,9 +18,31 @@ class ProjectService {
         });
     }
 
+    // Get a single project
+    static getProject(id) {
+        return new Promise((resolve, reject) => {
+            axios.get(`${url}/${id}`).then((res) => {
+                const project = res.data;
+                resolve({
+                    ...project,
+                    createdAt: new Date(project.createdAt)
+                });
+            }).catch((err) => {
+                reject(err);
+            })
+        });
+    }
+
     // Create a project
     static createProject(project) {
         return axios.post(url, {
+            ...project
+        });
+    }
+
+    // Create a project
+    static updateProject(project) {
+        return axios.post(`${url}/${project.id}`, {
             ...project
         });
     }

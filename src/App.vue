@@ -36,6 +36,19 @@ html, body, #app {
     margin: 0;
 }
 
+.button-div {
+    display: flex;
+    justify-content: flex-end;
+}
+.button-div .control {
+    margin-left: 1em;
+}
+.button-div .delete-control {
+    justify-self: flex-start;
+    width: 100%;
+    margin: 0;
+}
+
 // Styling for vue-autosuggest cannot be scoped
 .suggestion-item {
     display: block;

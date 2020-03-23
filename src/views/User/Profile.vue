@@ -52,6 +52,7 @@ export default {
             username: '',
             email: '',
             error: '',
+            success: '',
             loading: false
         }
     },
