@@ -65,7 +65,6 @@ class UserService {
     static logoutUser() {
         const logoutUrl = `${url}/logout`;
         return axios.get(logoutUrl);
-        
     }
 }
 

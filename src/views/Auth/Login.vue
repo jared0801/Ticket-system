@@ -98,7 +98,7 @@ export default {
                     if(err.response.status === 401) {
                         this.error = "Username or password is invalid.";
                     } else {
-                        this.error = err.message;
+                        this.error = err.error;
                     }
                 })
             }

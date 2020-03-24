@@ -3,6 +3,8 @@ import App from './App.vue';
 import store from './store';
 import router from './router';
 
+require('./assets/styles/styles.scss');
+
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 

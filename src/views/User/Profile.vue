@@ -90,7 +90,11 @@ export default {
                 this.error = '';
             }).catch((err) => {
                 this.loading = false;
-                this.error = err;
+                if(err.response.data.error) {
+                    this.error = err.response.data.error;
+                } else {
+                    this.error = err;
+                }
             });
         }
     }

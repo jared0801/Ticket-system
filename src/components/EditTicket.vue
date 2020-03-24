@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="notification is-danger" v-if="error">{{ error }}</div>
+        <div class="notification is-danger" v-if="serverError">{{ serverError }}</div>
 
         <div class="field">
             <label class="label">Ticket Title</label>
@@ -47,12 +47,26 @@
             </div>
         </div>
         
-        <div class="field">
-            <div v-if="ticket" class="control">
-                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="updateTicket">Update</button>
-                <button class="button is-danger" style="margin-left: 1em" :class="{ 'is-loading' : loading }" v-on:click="closeTicket">Cancel</button>
+        <div v-if="ticket" class="field button-div">
+            <div class="control delete-control">
+                <button class="button is-danger" v-on:click="toggleModal">Delete Ticket</button>
+                <Modal v-if="activeModal"
+                    content="Are you sure you would like to delete this ticket? This action cannot be undone."
+                    buttonText="Delete"
+                    aria="Confirm deletion"
+                    v-on:toggle-modal="toggleModal"
+                    v-on:confirm="deleteTicket"
+                    classType="is-danger" />
             </div>
-            <div v-else class="control">
+            <div class="control">
+                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="updateTicket">Update</button>
+            </div>
+            <div class="control">
+                <button class="button is-warning" v-on:click="closeTicket">Cancel</button>
+            </div>
+        </div>
+        <div v-else class="form button-div">
+            <div class="control">
                 <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="createTicket">Create</button>
             </div>
         </div>
@@ -62,6 +76,7 @@
 <script>
 import TicketService from '@/api/TicketService';
 import UserService from '@/api/UserService';
+import Modal from '@/components/Modal';
 import { VueAutosuggest } from 'vue-autosuggest';
 import { mapGetters } from 'vuex';
 
@@ -72,11 +87,12 @@ export default {
             title: '',
             text: '',
             usertext: '',
-            error: '',
+            serverError: '',
             assignedUsers: [],
             users: [],
             filteredUsers: [],
-            loading: false
+            loading: false,
+            activeModal: false
         }
     },
     props: {
@@ -85,7 +101,8 @@ export default {
         }
     },
     components: {
-        VueAutosuggest
+        VueAutosuggest,
+        Modal
     },
     async created() {
         this.loading = true;
@@ -102,18 +119,25 @@ export default {
             this.filteredUsers = this.users;
             this.loading = false;
         } catch(err) {
-            this.error = err.message;
             this.loading = false;
+            if(err.response.data.error) {
+                this.serverError = err.response.data.error;
+            } else {
+                this.serverError = err;
+            }
         }
     },
     methods: {
         ...mapGetters(['getUser']),
+        toggleModal() {
+            this.activeModal = !this.activeModal;
+        },
         createTicket() {
             this.loading = true;
             const ticket = {
                 title: this.title,
                 text: this.text,
-                user: this.getUser().username,
+                userId: this.getUser().id,
                 assignedUsers: this.assignedUsers,
                 projId: this.$route.params.id,
                 resolved: ''
@@ -125,7 +149,11 @@ export default {
                 this.$router.go(-1);
             }).catch((err) => {
                 this.loading = false;
-                this.error = err;
+                if(err.response.data.error) {
+                    this.serverError = err.response.data.error;
+                } else {
+                    this.serverError = err;
+                }
             });
         },
         updateTicket() {
@@ -142,10 +170,28 @@ export default {
                 this.loading = false;
                 this.text = '';
                 this.title = '';
+                this.$router.go(0);
+            }).catch((err) => {
+                this.loading = false;
+                if(err.response.data.error) {
+                    this.serverError = err.response.data.error;
+                } else {
+                    this.serverError = err;
+                }
+            });
+        },
+        deleteTicket() {
+            this.loading = true;
+            TicketService.deleteTicket(this.ticket._id).then(() => {
+                this.loading = false;
                 this.$router.go(-1);
             }).catch((err) => {
                 this.loading = false;
-                this.error = err;
+                if(err.response.data.error) {
+                    this.serverError = err.response.data.error;
+                } else {
+                    this.serverError = err;
+                }
             });
         },
         closeTicket() {

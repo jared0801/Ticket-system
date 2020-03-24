@@ -21,16 +21,13 @@
         <div v-if="project" class="button-div field">
             <div class="control delete-control">
                 <button class="button is-danger" v-on:click="toggleModal">Delete Project</button>
-                <div class="modal" :class="{ 'is-active' : activeModal }">
-                    <div @click="toggleModal" class="modal-background"></div>
-                    <div class="modal-content">
-                        <div class="notification is-danger" style="text-align: center;">
-                            <p>Are you sure you would like to delete this project? This will delete all tickets associated with this project.</p>
-                            <button class="button" aria-label="Delete project" v-on:click="deleteProject">Confirm Deletion</button>
-                        </div>
-                    </div>
-                    <button class="modal-close is-large" aria-label="close" v-on:click="toggleModal"></button>
-                </div>
+                <Modal v-if="activeModal"
+                    content="Are you sure you would like to delete this project? This will delete all tickets associated with this project."
+                    buttonText="Delete"
+                    aria="Confirm deletion"
+                    v-on:toggle-modal="toggleModal"
+                    v-on:confirm="deleteProject"
+                    classType="is-danger" />
             </div>
             <div class="control">
                 <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="updateProject">Update</button>
@@ -49,6 +46,7 @@
 
 <script>
 import ProjectService from '@/api/ProjectService';
+import Modal from '@/components/Modal';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -63,6 +61,9 @@ export default {
             loading: false,
             activeModal: false
         }
+    },
+    components: {
+        Modal
     },
     props: {
         project: {
@@ -82,7 +83,7 @@ export default {
             const project = {
                 title: this.title,
                 description: this.description,
-                lead: this.getUser().username,
+                userId: this.getUser().id,
                 users: this.users
             }
             if(!project.title) {
@@ -95,11 +96,11 @@ export default {
                 this.title = '';
                 this.description = '';
                 this.users = [];
-                this.$router.push('/');
+                this.$router.go(-1);
             }).catch((err) => {
                 this.loading = false;
-                if(err.response.data.message) {
-                    this.serverError = err.response.data.message;
+                if(err.response.data.error) {
+                    this.serverError = err.response.data.error;
                 } else {
                     this.serverError = err;
                 }
@@ -111,7 +112,7 @@ export default {
             const project = {
                 title: this.title,
                 description: this.description,
-                lead: this.project.username,
+                userId: this.project.userId,
                 users: this.project.users,
                 id: this.project._id
             }
@@ -128,8 +129,8 @@ export default {
                 this.$router.go(0);
             }).catch((err) => {
                 this.loading = false;
-                if(err.response.data.message) {
-                    this.serverError = err.response.data.message;
+                if(err.response.data.error) {
+                    this.serverError = err.response.data.error;
                 } else {
                     this.serverError = err;
                 }

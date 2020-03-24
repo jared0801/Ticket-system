@@ -95,7 +95,7 @@ const authMiddleware = (req, res, next) => {
                     if(err) return done(err);
                     if(response === true) {
                         const userDto = {
-                            id: user._id,
+                            id: user._id.toString(),
                             username: user.username,
                             email: user.email
                         }

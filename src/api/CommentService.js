@@ -10,7 +10,8 @@ class CommentService {
                 const data = res.data;
                 resolve(data.map(comment => ({
                     ...comment,
-                    createdAt: new Date(comment.createdAt)
+                    createdAt: new Date(comment.createdAt),
+                    lastEdit: comment.lastEdit ? new Date(comment.lastEdit) : ''
                 })));
             }).catch((err) => {
                 reject(err);
@@ -21,6 +22,14 @@ class CommentService {
     // Create comments
     static createComment(comment) {
         return axios.post(url, {
+            ...comment
+        });
+    }
+
+    
+    // Update a comment
+    static updateComment(comment) {
+        return axios.post(`${url}/${comment.id}`, {
             ...comment
         });
     }

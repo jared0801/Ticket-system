@@ -34,12 +34,12 @@ function loadRouter(client, middleware) {
         const newProject = {
             title: req.body.title,
             description: req.body.description,
-            lead: req.body.lead,
+            userId: req.body.userId,
             users: req.body.users,
             createdAt: new Date()
         }
-        if(!newProject.title || !newProject.lead) {
-            res.status(400).send({ message: "A title and lead are required to create a new project." });
+        if(!newProject.title || !newProject.userId) {
+            res.status(400).send({ error: "A title and lead are required to create a new project." });
         } else {
             await projects.insertOne(newProject);
             res.status(201).send();
@@ -55,17 +55,24 @@ function loadRouter(client, middleware) {
                                   }
         };
         if(!req.body.title) {
-            res.status(400).send({ message: "A project is required to have a title."})
+            res.status(400).send({ error: "A project is required to have a title."})
         } else {
-            projects.updateOne(query, newValues, function(err, obj) {
-                if(err) {
-                    return res.status(400).json({ errors: err });
+            try {
+                const project = await projects.findOne({ _id: new mongodb.ObjectID(req.params.id) });
+                if(project.userId === req.user.id) {
+                    projects.updateOne(query, newValues, function(err, obj) {
+                        if(err) {
+                            return res.status(400).json({ errors: err });
+                        }
+                        if(obj.modifiedCount === 1) res.send(req.body);
+                        else res.status(400).send();
+                    });
+                } else {
+                    res.status(403).json({ error: 'You can only update a project that you lead.' });
                 }
-                console.log(obj);
-                console.log(query._id);
-                if(obj.modifiedCount === 1) res.send(req.body);
-                else res.status(400).send();
-            });
+            } catch(err) {
+                res.status(400).send({ error: err.message });
+            }
         }
     });
     
@@ -74,11 +81,16 @@ function loadRouter(client, middleware) {
         const projects = loadProjectsCollection();
         const tickets = loadTicketsCollection();
         try {
-            await projects.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
-            await tickets.deleteMany({ projId: new mongodb.ObjectID(req.params.id) });
-            res.status(200).send();
+            const project = await projects.findOne({ _id: new mongodb.ObjectID(req.params.id) });
+            if(project.userId === req.user.id) {
+                await projects.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+                await tickets.deleteMany({ projId: new mongodb.ObjectID(req.params.id) });
+                res.status(200).send();
+            } else {
+                res.status(403).json({ error: 'You can only delete a project that you lead.' });
+            }
         } catch(err) {
-            res.status(400).send({ error: err });
+            res.status(400).send({ error: err.message });
         }
     });
     

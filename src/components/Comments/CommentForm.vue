@@ -57,13 +57,13 @@ export default {
             this.loading = true;
             const comment = {
                 text: this.text,
-                user: this.getUser().username,
+                userId: this.getUser().id,
                 ticket: this.$route.params.id
             }
             CommentService.createComment(comment).then(() => {
                 this.loading = false;
                 this.text = '';
-                this.$router.go(-1);
+                this.$router.go(0);
             }).catch((err) => {
                 this.loading = false;
                 this.error = err;
@@ -76,8 +76,7 @@ export default {
 
 <style scoped>
 .container {
-    text-align: center;
-    margin: auto;
+    margin-top: 2em;
 }
 
 .submit-control {

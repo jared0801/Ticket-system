@@ -40,7 +40,7 @@ function loadRouter(client, middleware) {
         await tickets.insertOne({
             text: req.body.text,
             title: req.body.title,
-            user: req.body.user,
+            userId: req.body.userId,
             assignedUsers: req.body.assignedUsers,
             projId: new mongodb.ObjectID(req.body.projId),
             resolvedAt: req.body.resolvedAt,
@@ -58,16 +58,25 @@ function loadRouter(client, middleware) {
                                     assignedUsers: req.body.assignedUsers
                                   }
         }
-        if(!req.title) {
-            res.status(400).send({ message: 'A ticket is required to have a title.' });
+        if(!req.body.title) {
+            res.status(400).send({ error: 'A ticket is required to have a title.' });
         } else {
-            tickets.updateOne(query, newValues, function(err, obj) {
-                if(err) {
-                    return res.status(400).json({ errors: err });
+            try {
+                const ticket = await tickets.findOne({ _id: new mongodb.ObjectID(req.params.id) });
+                if(ticket.userId === req.user.id) {
+                    tickets.updateOne(query, newValues, function(err, obj) {
+                        if(err) {
+                            return res.status(400).json({ errors: err });
+                        }
+                        if(obj.modifiedCount === 1) res.send(req.body);
+                        else res.status(400).send();
+                    });
+                } else {
+                    res.status(403).json({ error: 'You can only update your own tickets.' });
                 }
-                if(obj.modifiedCount === 1) res.send(req.body);
-                else res.status(400).send();
-            });
+            } catch(err) {
+                return res.status(400).json({ error: err.message });
+            }
         }
     });
 
@@ -108,11 +117,16 @@ function loadRouter(client, middleware) {
         const tickets = loadTicketsCollection();
         const comments = loadCommentsCollection();
         try {
-            await tickets.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
-            await comments.deleteMany({ ticket: new mongodb.ObjectID(req.params.id) });
-            res.status(200).send();
+            const ticket = await tickets.findOne({ _id: new mongodb.ObjectID(req.params.id) });
+            if(ticket.userId === req.user.id) {
+                await tickets.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+                await comments.deleteMany({ ticket: new mongodb.ObjectID(req.params.id) });
+                res.status(200).send();
+            } else {
+                res.status(403).json({ error: 'You can only delete your own tickets.' });
+            }
         } catch(err) {
-            res.status(400).send({ error: err });
+            return res.status(400).json({ error: err.message });
         }
     });
     

@@ -55,9 +55,8 @@ export default {
         ...mapMutations(['removeUser']),
         logout() {
             this.removeUser();
-            UserService.logoutUser().then(() => {
-                this.$router.push('/');
-            })
+            UserService.logoutUser();
+            this.$router.push('/');
         }
     }
 }

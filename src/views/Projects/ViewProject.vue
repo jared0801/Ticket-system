@@ -54,7 +54,7 @@ export default {
     },
     computed: {
         isLead() {
-            return this.project.lead === this.getUser().username;
+            return this.project.userId === this.getUser().id;
         }
     },
     methods: {

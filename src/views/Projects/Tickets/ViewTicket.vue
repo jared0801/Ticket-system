@@ -10,7 +10,7 @@
                     <i class="fas fa-spinner fa-pulse"></i> Loading...
                 </span>
                 <div v-else>
-                    <section v-if="!editting" class="card section">
+                    <section v-if="!editting" class="box section">
                         <div class="field button-div">
                             <div v-if="isSubmitter" class="control">
                                 <button class="button is-info editButton" v-on:click="editTicket">Edit Ticket</button>
@@ -27,7 +27,7 @@
                             <p>Assigned Users: <span v-for="user in ticket.assignedUsers" :key="user">{{ user }}</span></p>
                         </div>
                     </section>
-                    <section class="card section" v-else>
+                    <section class="box section" v-else>
                         <EditTicket :ticket="ticket" v-on:close-ticket="editTicket" />
                     </section>
                     <CommentForm />
@@ -61,7 +61,7 @@ export default {
     },
     computed: {
         isSubmitter() {
-            return this.ticket.user === this.getUser().username;
+            return this.ticket.userId === this.getUser().id;
         }
     },
     async created() {
@@ -70,7 +70,7 @@ export default {
             this.ticket = await TicketService.getTicket(this.$route.params.id);
             this.loading = false;
         } catch(err) {
-            this.error = err.message;
+            this.error = err.error;
             this.loading = false;
         }
     },
@@ -84,7 +84,7 @@ export default {
                 TicketService.resolveTicket(this.ticket._id).then(() => {
                     this.$router.go(-1);
                 }).catch(err => {
-                    this.error = err;
+                    this.error = err.error;
                 });
             }
         },
