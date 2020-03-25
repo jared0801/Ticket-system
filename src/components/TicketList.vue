@@ -102,9 +102,8 @@ export default {
     white-space: nowrap;
     max-width: 30vw;
 }
-@media 
-only screen and (max-width: 760px),
-(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+@media only screen and (max-width: 760px) {
 
     .ticket-description {
         max-width: none;

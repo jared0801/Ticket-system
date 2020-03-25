@@ -28,12 +28,8 @@ html, body, #app {
     margin: 0;
 }
 
+// Styling for vue-autosuggest (cannot be scoped)
 
-tbody>tr:hover {
-    box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)
-}
-
-// Styling for vue-autosuggest cannot be scoped
 .suggestion-item {
     display: block;
     width: 100%;
@@ -45,12 +41,14 @@ tbody>tr:hover {
     padding: 10px;
 }
 
+
 // Global table styling
 
+tbody>tr:hover {
+    box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)
+}
 
-@media 
-only screen and (max-width: 760px),
-(min-device-width: 768px) and (max-device-width: 1024px)  {
+@media only screen and (max-width: 760px)  {
 
         
     .content table tbody tr:last-child td, .content table tbody tr:last-child th {
@@ -60,12 +58,12 @@ only screen and (max-width: 760px),
         border-bottom-width: 0;
     }
 
-	/* Force table to not be like tables anymore */
+	// Force table to not be like tables anymore
 	table, thead, tbody, th, td, tr { 
 		display: block; 
 	}
 	
-	/* Hide table headers (but not display: none;, for accessibility) */
+	// Hide table headers (but not display: none;, for accessibility)
 	thead tr { 
 		position: absolute;
 		top: -9999px;
@@ -76,19 +74,18 @@ only screen and (max-width: 760px),
         border: 1px solid #ccc;
         margin-bottom: 5px;
     }
-	
-	td { 
-		/* Behave  like a "row" */
+    
+    // Behave  like a "row"
+	td {
 		border: none;
 		border-bottom: 1px solid #eee; 
 		position: relative;
 		padding-left: 50% !important;
 	}
-	
-	td:before { 
-		/* Now like a table header */
+    
+    // Now like a table header
+	td:before {
 		position: absolute;
-		/* Top/left values mimic padding */
 		top: 6px;
 		left: 6px;
 		width: 45%; 
