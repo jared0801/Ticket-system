@@ -2,6 +2,7 @@
 
 html, body, #app {
   height: 100%;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 .content {
@@ -27,6 +28,11 @@ html, body, #app {
     margin: 0;
 }
 
+
+tbody>tr:hover {
+    box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)
+}
+
 // Styling for vue-autosuggest cannot be scoped
 .suggestion-item {
     display: block;
@@ -37,4 +43,56 @@ html, body, #app {
     overflow-y: scroll;
     max-height: 150px;
     padding: 10px;
+}
+
+// Global table styling
+
+
+@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+        
+    .content table tbody tr:last-child td, .content table tbody tr:last-child th {
+        border-bottom-width: inherit;
+    }
+    .content table tbody tr td:last-child, .content table tbody tr th:last-child {
+        border-bottom-width: 0;
+    }
+
+	/* Force table to not be like tables anymore */
+	table, thead, tbody, th, td, tr { 
+		display: block; 
+	}
+	
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	tr {
+        border: 1px solid #ccc;
+        margin-bottom: 5px;
+    }
+	
+	td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50% !important;
+	}
+	
+	td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+	}
 }

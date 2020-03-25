@@ -24,6 +24,9 @@
                             <p>Description: {{ ticket.text }}</p>
                         </div>
                         <div class="field">
+                            <p>Submitter: {{ ticket.user.username }}</p>
+                        </div>
+                        <div class="field">
                             <p>Assigned Users: <span v-for="user in ticket.assignedUsers" :key="user">{{ user }}</span></p>
                         </div>
                     </section>

@@ -1,5 +1,6 @@
 const express = require('express');
 const mongodb = require('mongodb');
+const { body, validationResult } = require('express-validator');
 
 
 /**
@@ -29,25 +30,38 @@ function loadRouter(client, middleware) {
     });
     
     // Add a project
-    router.post('/', async (req, res) => {
+    router.post('/', [
+        body('title').not().isEmpty().withMessage("A title is required to create a project.").trim().escape(),
+        body('description').not().isEmpty().withMessage("A description is required to create a project.").trim().escape(),
+        body('userId').not().isEmpty().withMessage("A userId is required to create a project.").trim().escape()
+    ], async (req, res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const projects = loadProjectsCollection();
         const newProject = {
             title: req.body.title,
             description: req.body.description,
-            userId: req.body.userId,
+            userId: new mongodb.ObjectID(req.body.userId),
             users: req.body.users,
             createdAt: new Date()
         }
-        if(!newProject.title || !newProject.userId) {
-            res.status(400).send({ error: "A title and lead are required to create a new project." });
-        } else {
-            await projects.insertOne(newProject);
-            res.status(201).send();
-        }
+        await projects.insertOne(newProject);
+        res.status(201).send();
     });
     
     // Update a project
-    router.post('/:id', async (req, res) => {
+    router.post('/:id', [
+        body('title').not().isEmpty().withMessage("A title is required to for a project at all times.").trim().escape(),
+        body('description').not().isEmpty().withMessage("A description is required for a project at all times.").trim().escape(),
+    ], async (req, res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const projects = loadProjectsCollection();
         const query = { _id: new mongodb.ObjectID(req.params.id) };
         const newValues = { $set: { title: req.body.title,

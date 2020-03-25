@@ -22,27 +22,25 @@
         </div>
 
         <div class="ticket-container">
-            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <table class="table is-hoverable is-fullwidth">
                 <thead>
                     <tr>
-                        <th>Ticket ID</th>
-                        <th>Ticket Title</th>
-                        <th>Ticket Description</th>
+                        <th>Title</th>
+                        <th>Description</th>
                         <th>Submitter</th>
-                        <th v-if="resolved_tab">Ticket Completed</th>
-                        <th v-else>Ticket Created</th>
+                        <th v-if="resolved_tab">Completed</th>
+                        <th v-else>Created</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(ticket, index) in (resolved_tab ? resolved_tickets : unresolved_tickets)" v-bind:key="ticket._id">
-                        <th>{{ index+1 }}</th>
-                        <th>
+                    <tr v-for="ticket in (resolved_tab ? resolved_tickets : unresolved_tickets)" v-bind:key="ticket._id">
+                        <td>
                             <router-link :to="`/tickets/${ticket._id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
-                        </th>
-                        <th class="ticket-description">{{ ticket.text }}</th>
-                        <th>{{ ticket.user ? ticket.user : 'User' }}</th>
-                        <th v-if="resolved_tab">{{ `${ticket.resolvedAt.getMonth()+1}/${ticket.resolvedAt.getDate()}/${ticket.resolvedAt.getFullYear()}` }}</th>
-                        <th v-else>{{ `${ticket.createdAt.getMonth()+1}/${ticket.createdAt.getDate()}/${ticket.createdAt.getFullYear()}` }}</th>
+                        </td>
+                        <td class="ticket-description">{{ ticket.text }}</td>
+                        <td>{{ ticket.user.username ? ticket.user.username : 'User' }}</td>
+                        <td class="completed" v-if="resolved_tab">{{ `${ticket.resolvedAt.getMonth()+1}/${ticket.resolvedAt.getDate()}/${ticket.resolvedAt.getFullYear()}` }}</td>
+                        <td class="created" v-else>{{ `${ticket.createdAt.getMonth()+1}/${ticket.createdAt.getDate()}/${ticket.createdAt.getFullYear()}` }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -103,5 +101,22 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     max-width: 30vw;
+}
+@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+    .ticket-description {
+        max-width: none;
+    }
+	
+	/*
+	Label the data
+	*/
+	td:nth-of-type(1):before { content: "Title"; }
+	td:nth-of-type(2):before { content: "Description"; }
+	td:nth-of-type(3):before { content: "Submitter"; }
+	td.created:nth-of-type(4):before { content: "Created"; }
+	td.completed:nth-of-type(4):before { content: "Completed"; }
 }
 </style>

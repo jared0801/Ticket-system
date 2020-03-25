@@ -3,10 +3,9 @@
         <div class="notification is-danger" v-if="error">{{ error }}</div>
 
         <div class="project-container">
-            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <table class="table is-hoverable is-fullwidth">
                 <thead>
                     <tr>
-                        <th>Project ID</th>
                         <th>Title</th>
                         <th>Description</th>
                         <th>Lead</th>
@@ -14,14 +13,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(project, index) in projects" v-bind:key="project._id">
-                        <th>{{ index+1 }}</th>
-                        <th>
+                    <tr v-for="project in projects" v-bind:key="project._id">
+                        <td>
                             <router-link :to="`/projects/${project._id}`">{{ project.title }}</router-link>
-                        </th>
-                        <th class="project-description">{{ project.description }}</th>
-                        <th>{{ project.lead }}</th>
-                        <th>{{ `${project.createdAt.getMonth()+1}/${project.createdAt.getDate()}/${project.createdAt.getFullYear()}` }}</th>
+                        </td>
+                        <td class="project-description">{{ project.description }}</td>
+                        <td>{{ project.lead }}</td>
+                        <td>{{ `${project.createdAt.getMonth()+1}/${project.createdAt.getDate()}/${project.createdAt.getFullYear()}` }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -49,7 +47,6 @@ export default {
             this.projects = await ProjectService.getProjects();
             this.loading = false;
         } catch(err) {
-            console.log(err);
             this.error = err.message;
             this.loading = false;
         }
@@ -73,5 +70,20 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     max-width: 30vw;
+}
+
+@media only screen and (max-width: 760px) {
+
+    .project-description {
+        max-width: none;
+    }
+	
+	/*
+	Label the data
+	*/
+	td:nth-of-type(1):before { content: "Title"; }
+	td:nth-of-type(2):before { content: "Description"; }
+	td:nth-of-type(3):before { content: "Lead"; }
+	td:nth-of-type(4):before { content: "Created"; }
 }
 </style>

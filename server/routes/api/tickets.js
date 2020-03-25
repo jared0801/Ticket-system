@@ -1,6 +1,6 @@
 const express = require('express');
 const mongodb = require('mongodb');
-
+const { body, validationResult } = require('express-validator');
 
 /**
    * Creates an api subroute
@@ -20,7 +20,13 @@ function loadRouter(client, middleware) {
     router.get('/:projId', async (req, res) => {
         const tickets = loadTicketsCollection();
         const groupedTickets = { resolved: [], unresolved: [] };
-        const ticketArr = await tickets.find({ projId: new mongodb.ObjectID(req.params.projId) }).toArray();
+        //const ticketArr = await tickets.find({ projId: new mongodb.ObjectID(req.params.projId) }).toArray();
+        const ticketArr = await tickets.aggregate([ { $match: { 'projId': new mongodb.ObjectID(req.params.projId) } }, // Find tickets based on projId in URL
+                                                    { $lookup: { from: 'users', localField: 'userId', foreignField: '_id', as: 'user' } }, // Lookup users in User collection with userId foreign key
+                                                    { $unwind: '$user' }, // Only one user will match, so user should refer to an object rather than an array of objects
+                                                    { $project: { user: { password: 0, email: 0 }, userId: 0 } } // Remove the password and email fields from user
+                                                ]).toArray();
+
         ticketArr.forEach(doc => {
             if(doc.resolvedAt) groupedTickets.resolved.push(doc);
             else groupedTickets.unresolved.push(doc);
@@ -31,16 +37,32 @@ function loadRouter(client, middleware) {
     // Get a single ticket
     router.get('/ticket/:id', async (req, res) => {
         const tickets = loadTicketsCollection();
-        res.send(await tickets.findOne({_id: new mongodb.ObjectID(req.params.id)}));
+        //const ticket = await tickets.findOne({_id: new mongodb.ObjectID(req.params.id)});
+        const ticket = await tickets.aggregate([ { $match: { '_id': new mongodb.ObjectID(req.params.id) } }, // Find ticket based on id in URL
+                                                 { $lookup: { from: 'users', localField: 'userId', foreignField: '_id', as: 'user' } }, // Lookup users in User collection with userId foreign key
+                                                 { $unwind: '$user' }, // Only one user will match, so user should refer to an object rather than an array of objects
+                                                 { $project: { user: { password: 0, email: 0 }, userId: 0 } } // Remove the password and email fields from user
+                                            ]).toArray();
+        res.send(ticket[0]);
     });
     
     // Add a ticket
-    router.post('/', async (req, res) => {
+    router.post('/', [
+        body('title').not().isEmpty().withMessage("A title is required to create a ticket.").trim().escape(),
+        body('text').not().isEmpty().withMessage("Text is required to create a ticket.").trim().escape(),
+        body('userId').not().isEmpty().withMessage("A userId is required to create a ticket.").trim().escape(),
+        body('projId').not().isEmpty().withMessage("A projId is required to create a ticket.").trim().escape(),
+    ],async (req, res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const tickets = loadTicketsCollection();
         await tickets.insertOne({
             text: req.body.text,
             title: req.body.title,
-            userId: req.body.userId,
+            userId: new mongodb.ObjectID(req.body.userId),
             assignedUsers: req.body.assignedUsers,
             projId: new mongodb.ObjectID(req.body.projId),
             resolvedAt: req.body.resolvedAt,
@@ -50,7 +72,15 @@ function loadRouter(client, middleware) {
     });
     
     // Update a ticket
-    router.post('/:id', async (req, res) => {
+    router.post('/:id', [
+        body('title').not().isEmpty().withMessage("A title is required to create a ticket.").trim().escape(),
+        body('text').not().isEmpty().withMessage("Text is required to create a ticket.").trim().escape(),
+    ],async (req, res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         const tickets = loadTicketsCollection();
         const query = { _id: new mongodb.ObjectID(req.params.id) };
         const newValues = { $set: { title: req.body.title,
