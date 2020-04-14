@@ -1,8 +1,9 @@
 <template>
     <div class="home">
-        <Header title="Login" backlink="/" backlinkText="Go home" />
 
         <div class="content">
+            
+            <Header title="Login" backlink="/" backlinkText="Go home" />
 
             <form
                 id="loginForm"
@@ -90,7 +91,7 @@ export default {
                     password: this.password
                 }).then(res => {
                     if(res.status === 200) {
-                        this.$store.commit('storeUser', res.data);
+                        this.storeUser(res.data);
                         this.clearFields();
                         this.$router.push('/');
                     }
@@ -110,4 +111,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>

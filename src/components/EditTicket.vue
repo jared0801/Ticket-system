@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <form>
         <div class="notification is-danger" v-if="serverError">{{ serverError }}</div>
 
         <div class="field">
@@ -67,10 +67,10 @@
         </div>
         <div v-else class="form button-div">
             <div class="control">
-                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="createTicket">Create</button>
+                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click.prevent="createTicket">Create</button>
             </div>
         </div>
-    </div>    
+    </form>    
 </template>
 
 <script>
@@ -140,7 +140,8 @@ export default {
                 userId: this.getUser().id,
                 assignedUsers: this.assignedUsers,
                 projId: this.$route.params.id,
-                resolved: ''
+                resolved: '',
+                username: this.getUser().username
             }
             TicketService.createTicket(ticket).then(() => {
                 this.loading = false;

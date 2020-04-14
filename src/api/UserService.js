@@ -46,6 +46,14 @@ class UserService {
         });
     }
 
+    static loginDevUser() {
+        const loginUrl = `${url}/login`;
+        return axios.post(loginUrl, {
+            username: 'dev1',
+            password: 'dev123'
+        });
+    }
+
     static getCurrentUser() {
         const loginUrl = `${url}/user`;
         return axios.get(loginUrl);

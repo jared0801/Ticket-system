@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <form>
         <div class="notification is-danger" v-if="serverError">{{ serverError }}</div>
 
 
@@ -38,10 +38,10 @@
         </div>
         <div v-else class="field button-div">
             <div class="control">
-                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="createProject">Create</button>
+                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click.prevent="createProject">Create</button>
             </div>
         </div>
-    </div>
+    </form>
 </template>
 
 <script>
@@ -84,7 +84,8 @@ export default {
                 title: this.title,
                 description: this.description,
                 userId: this.getUser().id,
-                users: this.users
+                users: this.users,
+                username: this.getUser().username
             }
             if(!project.title) {
                 this.errors['title'] = "A title is required to create a project.";

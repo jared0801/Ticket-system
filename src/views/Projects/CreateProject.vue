@@ -1,8 +1,8 @@
 <template>
     <div>
-        <Header title="Create a project" backlink="/" backlinkText="Go Home" />
-
         <div class="content">
+            
+            <Header title="Create a project" backlink="/" backlinkText="Go Home" />
 
             <EditProject />
             

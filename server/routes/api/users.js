@@ -52,6 +52,9 @@ function loadRouter(client, middleware) {
         if(!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
         }
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot update the dev user." })
+        }
         try {
             const users = loadUsersCollection();
             const query = { _id: new mongodb.ObjectID(req.body.id) };

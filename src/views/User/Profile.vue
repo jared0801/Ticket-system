@@ -1,8 +1,9 @@
 <template>
     <div>
-        <Header title="Profile" backlinkText="Go back" />
 
         <div class="content">
+
+            <Header title="Profile" backlinkText="Go back" />
 
             <div class="notification is-danger" v-if="error">{{ error }}</div>
         
@@ -10,31 +11,33 @@
                 {{ success }}
             </div>
 
-            <div class="field">
-                <label class="label">Username</label>
-                <div class="control">
-                    <input class="input" type="text" v-model="username" placeholder="Username">
+            <form>
+                <div class="field">
+                    <label class="label">Username</label>
+                    <div class="control">
+                        <input class="input" type="text" v-model="username" placeholder="Username">
+                    </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label class="label">Email</label>
-                <div class="control">
-                    <input class="input" type="text" id="create-ticket" v-model="email" placeholder="Email" />
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control">
+                        <input class="input" type="text" id="create-ticket" v-model="email" placeholder="Email" />
+                    </div>
                 </div>
-            </div>
-            
-            <div class="field">
-                <div class="control">
-                    <button class="button">Change Password</button>
+                
+                <div class="field">
+                    <div class="control">
+                        <button class="button">Change Password</button>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="field">
-                <div class="control">
-                    <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="updateProfile">Update Profile</button>
+                
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click.prevent="updateProfile">Update Profile</button>
+                    </div>
                 </div>
-            </div>
+            </form>
             
         </div>
     </div>
@@ -95,6 +98,8 @@ export default {
                 } else {
                     this.error = err;
                 }
+                this.username = this.getUser().username;
+                this.email = this.getUser().email;
             });
         }
     }

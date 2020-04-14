@@ -24,6 +24,9 @@ function loadRouter(client, middleware) {
     
     // Add a comment
     router.post('/', async (req, res) => {
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot create a comment as the dev user." })
+        }
         const comments = loadCommentsCollection();
         const newComment = {
             text: req.body.text,
@@ -42,6 +45,9 @@ function loadRouter(client, middleware) {
     
     // Update a comment
     router.post('/:id', async (req, res) => {
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot update a comment as the dev user." })
+        }
         const comments = loadCommentsCollection();
         const query = { _id: new mongodb.ObjectID(req.params.id) };
         const newValues = { $set: { text: req.body.text, lastEdit: new Date() }};
@@ -69,11 +75,13 @@ function loadRouter(client, middleware) {
     
     // Delete a comment
     router.delete('/:id', async (req, res) => {
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot delete a comment as the dev user." })
+        }
         const comments = loadCommentsCollection();
         const query = { _id: new mongodb.ObjectID(req.params.id) };
         try {
             const comment = await comments.findOne(query);
-            console.log(comment);
             if(comment.userId.toString() === req.user.id) {
                 await comments.deleteOne(query);
                 res.status(200).send();

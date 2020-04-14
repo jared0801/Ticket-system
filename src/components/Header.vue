@@ -1,40 +1,26 @@
 <template>
-    <header class="header">
+    <section class="page-header">
+
+        <router-link v-if="backlink" class="button back-button" :to="backlink">
+            <i class="fas fa-arrow-left"></i>
+            <span style="padding-left: 10px">{{ backlinkText }}</span>
+        </router-link>
+
+        <a v-else-if="backlinkText" role="button" class="button back-button" @click="$router.go(-1)">
+            <i class="fas fa-arrow-left"></i>
+            <span style="padding-left: 10px">{{ backlinkText }}</span>
+        </a>
+
+
+
         <h1 class="title">{{ title }}</h1>
 
-        <div class="header-menu">
-
-            <router-link v-if="backlink" class="button back-button" :to="backlink">
-                <i class="fas fa-arrow-left"></i>
-                <span style="padding-left: 10px">{{ backlinkText }}</span>
-            </router-link>
-
-            <a v-else-if="backlinkText" role="button" class="button back-button" @click="$router.go(-1)">
-                <i class="fas fa-arrow-left"></i>
-                <span style="padding-left: 10px">{{ backlinkText }}</span>
-            </a>
-
-            <span class="button-group" :class="{ 'is-centered' : !backlink && !backlinkText }" v-if="isLoggedIn">
-                <p>Welcome back, {{ username }}</p>
-                <router-link class="button" to="/profile">Profile</router-link>
-                <button @click="logout" class="button" href="/logout">Logout</button>
-            </span>
-            <span class="button-group" :class="{ 'is-centered' : !backlink && !backlinkText }" v-else>
-                <router-link class="button" to="/login">Login</router-link>
-                <router-link class="button" to="/register">Register</router-link>
-            </span>
-
-        </div>
-        <hr>
-    </header>    
+    </section>    
 </template>
 
 <script>
-import UserService from '../api/UserService';
-import { mapState, mapMutations } from 'vuex';
-
 export default {
-    name: "TicketHeader",
+    name: "PageHeader",
     props: {
         title: {
             type: String,
@@ -47,24 +33,13 @@ export default {
         backlinkText: {
             type: String
         }
-    },
-    computed: {
-        ...mapState(['isLoggedIn', 'username']),
-    },
-    methods: {
-        ...mapMutations(['removeUser']),
-        logout() {
-            this.removeUser();
-            UserService.logoutUser();
-            this.$router.push('/');
-        }
     }
 }
 </script>
 
 <style scoped>
-.header {
-    padding-top: 1.5em;
+.page-header {
+    padding: 1.5em 0;
     text-align: center;
 }
 
@@ -74,7 +49,6 @@ export default {
 }
 
 .back-button {
-    margin-left: 10%;
 }
 
 .button-group {
@@ -87,7 +61,11 @@ export default {
     margin: 0 5px;
 }
 
-.is-centered {
-    margin: auto;
+@media only screen and (max-width: 600px)  {
+    .back-button {
+        position: relative;
+        left: 0;
+        margin-bottom: 20px;
+    }
 }
 </style>

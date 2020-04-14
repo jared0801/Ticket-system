@@ -71,8 +71,8 @@ router.beforeEach((to, from, next) => {
         else {
             // Dev user
             const devUser = {
-                username: 'dev',
-                password: 'dev',
+                username: 'dev1',
+                password: 'dev123',
                 email: 'dev@dev.com'
             }
             store.commit('storeUser', devUser);

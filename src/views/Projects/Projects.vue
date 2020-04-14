@@ -1,9 +1,12 @@
 <template>
     <div class="projects">
-        <Header title="Projects" backlink="/" backlinkText="Go home" />
 
         <div class="content">
-            <router-link class="button" to="/projects/create">Create a new project</router-link>
+            
+            <Header title="Projects" backlink="/" backlinkText="Go home" />
+            <div class="right-align">
+                <router-link class="button" to="/projects/create">Create a new project</router-link>
+            </div>
             <ProjectList />
         </div>
         
@@ -24,4 +27,8 @@ export default {
 </script>
 
 <style scoped>
+.right-align {
+    width: 100%;
+    text-align: right;
+}
 </style>

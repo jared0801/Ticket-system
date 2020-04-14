@@ -52,10 +52,13 @@ function loadRouter(client, middleware) {
         body('text').not().isEmpty().withMessage("Text is required to create a ticket.").trim().escape(),
         body('userId').not().isEmpty().withMessage("A userId is required to create a ticket.").trim().escape(),
         body('projId').not().isEmpty().withMessage("A projId is required to create a ticket.").trim().escape(),
-    ],async (req, res) => {
+    ], async (req, res) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
+        }
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot create a ticket as the dev user." })
         }
 
         const tickets = loadTicketsCollection();
@@ -79,6 +82,9 @@ function loadRouter(client, middleware) {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
+        }
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot update a ticket as the dev user." })
         }
 
         const tickets = loadTicketsCollection();
@@ -113,6 +119,9 @@ function loadRouter(client, middleware) {
     // Resolve ticket
     router.get('/res/:id', async (req, res) => {
         // TODO: validate user has access to this ticket/project
+        if(req.user.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot resolve a ticket as the dev user." })
+        }
         const tickets = loadTicketsCollection();
         const query = { _id: new mongodb.ObjectID(req.params.id) };
         const newValues = { $set: { resolvedAt: new Date() } };
@@ -129,6 +138,9 @@ function loadRouter(client, middleware) {
     // Unresolve ticket
     router.get('/unres/:id', async (req, res) => {
         // TODO: validate user has access to this ticket/project
+        if(req.user.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot unresolve a ticket as the dev user." })
+        }
         const tickets = loadTicketsCollection();
         const query = { _id: new mongodb.ObjectID(req.params.id) };
         const newValues = { $set: { resolvedAt: '' } };
@@ -144,6 +156,9 @@ function loadRouter(client, middleware) {
     
     // Remove ticket
     router.delete('/:id', async (req, res) => {
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot delete a ticket as the dev user." })
+        }
         const tickets = loadTicketsCollection();
         const comments = loadCommentsCollection();
         try {

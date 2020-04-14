@@ -55,12 +55,15 @@ class TicketService {
         });
     }
 
-    static resolveTicket(id) {
+    static resolveTicket(ticket) {
+        const id = ticket._id;
         return new Promise((resolve, reject) => {
             axios.get(`${url}/res/${id}`).then((res) => {
-                const ticket = res.data;
+                const ticketInfo = res.data;
+                console.log('infoooo');
+                console.log(ticketInfo);
                 resolve({
-                    ...ticket,
+                    ...ticketInfo,
                 });
             }).catch((err) => {
                 reject(err);
@@ -68,12 +71,14 @@ class TicketService {
         });
     }
 
-    static unresolveTicket(id) {
+    static unresolveTicket(ticket) {
+        const id = ticket._id;
         return new Promise((resolve, reject) => {
             axios.get(`${url}/unres/${id}`).then((res) => {
-                const ticket = res.data;
+                const ticketInfo = res.data;
+                console.log(ticketInfo);
                 resolve({
-                    ...ticket,
+                    ...ticketInfo,
                 });
             }).catch((err) => {
                 reject(err);

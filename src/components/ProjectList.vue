@@ -58,7 +58,7 @@ export default {
 <style scoped>
 .container {
     text-align: center;
-    max-width: none;
+    width: 100%;
 }
 
 .project-container {

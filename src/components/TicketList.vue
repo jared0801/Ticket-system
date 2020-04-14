@@ -6,13 +6,13 @@
 
         <div class="tabs is-boxed">
             <ul>
-                <li :class="{'is-active' : resolved_tab === false}">
+                <li class="tab" :class="{'is-active' : resolved_tab === false}">
                     <a @click="resolved_tab = false">
                         <span class="icon is-small"><i class="fas fa-ticket-alt" aria-hidden="true"></i></span>
                         <span>Open Tickets</span>
                     </a>
                 </li>
-                <li :class="{'is-active' : resolved_tab === true}">
+                <li class="tab" :class="{'is-active' : resolved_tab === true}">
                     <a @click="resolved_tab = true">
                         <span class="icon is-small"><i class="far fa-check-square" aria-hidden="true"></i></span>
                         <span>Completed Tickets</span>
@@ -88,7 +88,7 @@ export default {
 <style scoped>
 .container {
     text-align: center;
-    max-width: none;
+    width: 100%;
     margin-top: 1em;
 }
 
@@ -101,6 +101,21 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     max-width: 30vw;
+}
+
+.tabs > ul {
+    margin: 0;
+    padding: 5px 0;
+}
+.tab {
+    box-shadow: 0px 1px 1px #888888;
+    border-radius: 5px;
+}
+.tab:hover {
+    background: white;
+}
+.tab.is-active {
+    box-shadow: none;
 }
 
 @media only screen and (max-width: 760px) {

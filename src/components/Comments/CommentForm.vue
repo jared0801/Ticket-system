@@ -9,7 +9,7 @@
                     <textarea class="textarea" type="text" id="create-ticket" v-model="text" placeholder="Leave a comment on this ticket" />
                 </div>
                 <div class="control submit-control">
-                    <button class="button is-primary submit-button" :class="{ 'is-loading' : loading }" v-on:click="createComment">Submit</button>
+                    <button class="button is-primary submit-button" :class="{ 'is-loading' : loading }" v-on:click.prevent="createComment">Submit</button>
                 </div>
             </div>
             
@@ -47,7 +47,7 @@ export default {
             this.comments = await CommentService.getComments(this.$route.params.id);
             this.loading = false;
         } catch(err) {
-            this.error = err.message;
+            this.error = err.response.data.error;
             this.loading = false;
         }
     },
@@ -58,7 +58,8 @@ export default {
             const comment = {
                 text: this.text,
                 userId: this.getUser().id,
-                ticket: this.$route.params.id
+                ticket: this.$route.params.id,
+                username: this.getUser().username
             }
             CommentService.createComment(comment).then(() => {
                 this.loading = false;
@@ -66,7 +67,7 @@ export default {
                 this.$router.go(0);
             }).catch((err) => {
                 this.loading = false;
-                this.error = err;
+                this.error = err.response.data.error;
             });
         }
     }

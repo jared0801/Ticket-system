@@ -1,11 +1,12 @@
 <template>
     <div class="ticket">
-        
-        <Header :title="`Ticket: ${ticket.title}`" backlinkText="Back" />
 
         <div class="content">
             
+            <Header :title="`Ticket: ${ticket.title}`" backlinkText="Back" />
+            
             <div class="box">
+                <div class="notification is-danger" v-if="error">{{ error }}</div>
                 <span v-if="loading">
                     <i class="fas fa-spinner fa-pulse"></i> Loading...
                 </span>
@@ -20,8 +21,8 @@
                                 <button v-else class="button is-success resolveButton" v-on:click="resolveTicket">Mark As Complete</button>
                             </div>
                         </div>
-                        <div class="field">
-                            <p>Description: {{ ticket.text }}</p>
+                        <div class="field desc-field">
+                            <p>{{ ticket.text }}</p>
                         </div>
                         <div class="field">
                             <p>Submitter: {{ ticket.user.username }}</p>
@@ -59,7 +60,8 @@ export default {
         return {
             loading: false,
             ticket: {},
-            editting: false
+            editting: false,
+            error: ''
         }
     },
     computed: {
@@ -73,7 +75,7 @@ export default {
             this.ticket = await TicketService.getTicket(this.$route.params.id);
             this.loading = false;
         } catch(err) {
-            this.error = err.error;
+            this.error = err.response.data.error;
             this.loading = false;
         }
     },
@@ -84,19 +86,27 @@ export default {
         },
         resolveTicket() {
             if(!this.ticket.resolvedAt) {
-                TicketService.resolveTicket(this.ticket._id).then(() => {
+                const ticket = {
+                    _id: this.ticket._id,
+                    username: this.getUser().username
+                }
+                TicketService.resolveTicket(ticket).then(() => {
                     this.$router.go(-1);
                 }).catch(err => {
-                    this.error = err.error;
+                    this.error = err.response.data.error;
                 });
             }
         },
         unresolveTicket() {
             if(this.ticket.resolvedAt) {
-                TicketService.unresolveTicket(this.ticket._id).then(() => {
+                const ticket = {
+                    _id: this.ticket._id,
+                    username: this.getUser().username
+                }
+                TicketService.unresolveTicket(ticket).then(() => {
                     this.$router.go(-1);
                 }).catch(err => {
-                    this.error = err;
+                    this.error = err.response.data.error;
                 });
             }
         }
@@ -113,5 +123,13 @@ export default {
 .section {
     margin-bottom: 1em;
     padding: 1.5em 1.5em;
+}
+
+.desc-field {
+    margin-bottom: 3em;
+}
+
+.ticket > .content > .box {
+    min-width: 90%;
 }
 </style>

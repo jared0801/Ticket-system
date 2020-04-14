@@ -1,8 +1,9 @@
 <template>
     <div>
-        <Header title="Create a ticket" backlinkText="View Tickets" />
 
         <div class="content">
+            
+            <Header title="Create a ticket" backlinkText="View Tickets" />
 
             <EditTicket />
 

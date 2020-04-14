@@ -1,8 +1,10 @@
 <template>
     <div class="home">
-        <Header title="Registration" backlink="/" backlinkText="Go home" />
 
         <div class="content">
+
+            
+            <Header title="Registration" backlink="/" backlinkText="Go home" />
 
             <form
                 id="registrationForm"
@@ -155,4 +157,7 @@ export default {
 </script>
 
 <style scoped>
+#registrationForm {
+    margin-bottom: 2em;
+}
 </style>

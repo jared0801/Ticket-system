@@ -39,6 +39,9 @@ function loadRouter(client, middleware) {
         if(!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
         }
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot create a project as the dev user." })
+        }
 
         const projects = loadProjectsCollection();
         const newProject = {
@@ -60,6 +63,9 @@ function loadRouter(client, middleware) {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
+        }
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot update a project as the dev user." })
         }
 
         const projects = loadProjectsCollection();
@@ -92,6 +98,9 @@ function loadRouter(client, middleware) {
     
     // Delete a project
     router.delete('/:id', async (req, res) => {
+        if(req.body.username.includes('dev1')) {
+            return res.status(403).json({ error: "You cannot delete a project as the dev user." })
+        }
         const projects = loadProjectsCollection();
         const tickets = loadTicketsCollection();
         try {

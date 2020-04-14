@@ -1,7 +1,7 @@
 <template>
     <div class="card comment">
         <header class="card-header">
-            <div>{{ comment.user }}</div>
+            <p>{{ comment.user }}</p>
             
             <div v-if="isCommenter" class="card-header-icon">
                 <a @click="toggleEdit" role="button" class="edit" :class="{ 'selected' : editing }"><i class="fas fa-edit"></i></a>
@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </div>
-            <div v-else class="content">
+            <div v-else class="comment-content">
                 {{ comment.text }}
                 <div class="help">
                     <time v-if="comment.lastEdit" :datetime="comment.createdAt">
@@ -88,13 +88,14 @@ export default {
             const comment = {
                 id: this.comment._id,
                 userId: this.getUser.id,
-                text: this.text
+                text: this.text,
+                username: this.getUser().username
             }
             CommentService.updateComment(comment).then(() => {
                 this.loading = false;
                 this.$router.go(0);
             }).catch(err => {
-                this.error = err.error;
+                this.error = err.response.data.error;
                 this.loading = false;
             })
         },
@@ -104,7 +105,7 @@ export default {
                 this.loading = false;
                 this.$router.go(0);
             }).catch(err => {
-                this.error = err.error;
+                this.error = err.response.data.error;
                 this.loading = false;
             })
         },
@@ -145,10 +146,11 @@ export default {
 
 .comment {
     margin-bottom: 10px;
+    background-color: #f3f3f3;
 }
 
-.content {
-    text-align: left;
+.comment-content {
+    text-align: center;
     margin: 0;
     width: 100%;
 }
@@ -160,7 +162,11 @@ export default {
 .card-header {
     display: flex;
     justify-content: space-between;
-    padding: 1em;
+    padding: 1em 1.5em;
+}
+
+.card-header > p {
+    margin: 0;
 }
 
 .card-header-icon {

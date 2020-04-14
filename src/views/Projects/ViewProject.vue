@@ -3,16 +3,14 @@
         <!-- <router-link to="/">Go home</router-link>
         <h1 class="title">Latest Tickets</h1>
         <hr> -->
-        <Header title="Project Tickets" backlinkText="Back" />
 
         <div class="content">
-            <div class="field button-div">      
-                <div class="control">
-                    <router-link class="button" :to="{ name: 'create-ticket' }">Create a ticket</router-link>
-                </div>
-                <div v-if="isLead" class="control">
-                    <button class="button is-info editButton" v-on:click="editProject">Edit Project</button>
-                </div>
+            
+            <Header title="Project Tickets" backlinkText="Back" />
+
+            <div class="right-align">
+                <button v-if="isLead" class="button is-info editButton" v-on:click="editProject">Edit Project</button>
+                <router-link v-else class="button" :to="{ name: 'create-ticket' }">Create a ticket</router-link>
             </div>
             <div v-if="editting" class="project-info">
                 <EditProject :project="project" v-on:close-project="editProject" />
@@ -69,5 +67,11 @@ export default {
 <style scoped>
 .project-info {
     margin: 1em 0;
+    width: 100%;
+}
+
+.right-align {
+    width: 100%;
+    text-align: right;
 }
 </style>
