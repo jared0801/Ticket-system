@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="ticket-list">
         <div class="notification is-danger" v-if="error">{{ error }}</div>
 
         
@@ -33,12 +33,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="ticket in (resolved_tab ? resolved_tickets : unresolved_tickets)" v-bind:key="ticket._id">
+                    <tr v-for="ticket in (resolved_tab ? resolved_tickets : unresolved_tickets)" v-bind:key="ticket.id">
                         <td>
-                            <router-link :to="`/tickets/${ticket._id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
+                            <router-link :to="`/${$route.params.id}/tickets/${ticket.id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
                         </td>
                         <td class="ticket-description">{{ ticket.text }}</td>
-                        <td>{{ ticket.user.username ? ticket.user.username : 'User' }}</td>
+                        <td>{{ ticket.submitter }}</td>
                         <td class="completed" v-if="resolved_tab">{{ `${ticket.resolvedAt.getMonth()+1}/${ticket.resolvedAt.getDate()}/${ticket.resolvedAt.getFullYear()}` }}</td>
                         <td class="created" v-else>{{ `${ticket.createdAt.getMonth()+1}/${ticket.createdAt.getDate()}/${ticket.createdAt.getFullYear()}` }}</td>
                     </tr>
@@ -69,12 +69,14 @@ export default {
             loading: false
         }
     },
-    async created() {
+    async mounted() {
         this.loading = true;
         try {
             const tickets = await TicketService.getTickets(this.$route.params.id);
-            this.resolved_tickets = tickets.resolved;
-            this.unresolved_tickets = tickets.unresolved;
+            if(tickets) {
+                this.resolved_tickets = tickets.resolved;
+                this.unresolved_tickets = tickets.unresolved;
+            }
             this.loading = false;
         } catch(err) {
             this.error = err.message;
@@ -86,8 +88,7 @@ export default {
 </script>
 
 <style scoped>
-.container {
-    text-align: center;
+.ticket-list {
     width: 100%;
     margin-top: 1em;
 }

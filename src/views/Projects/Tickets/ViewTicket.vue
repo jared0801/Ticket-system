@@ -25,10 +25,17 @@
                             <p>{{ ticket.text }}</p>
                         </div>
                         <div class="field">
-                            <p>Submitter: {{ ticket.user.username }}</p>
+                            <p>Submitter: {{ ticket.submitter }}</p>
                         </div>
                         <div class="field">
-                            <p>Assigned Users: <span v-for="user in ticket.assignedUsers" :key="user">{{ user }}</span></p>
+                            <p>Assigned Users: 
+                                <span v-for="(user, i) in ticket.users" :key="user.id">
+                                    {{user.username}}<span v-if="i < ticket.users.length-1">, </span>
+                                </span>
+                                <span v-if="ticket.users.length == 0">
+                                    None
+                                </span>
+                            </p>
                         </div>
                     </section>
                     <section class="box section" v-else>
@@ -66,13 +73,13 @@ export default {
     },
     computed: {
         isSubmitter() {
-            return this.ticket.userId === this.getUser().id;
+            return this.ticket.user_id === this.getUser().id;
         }
     },
     async created() {
         this.loading = true;
         try {
-            this.ticket = await TicketService.getTicket(this.$route.params.id);
+            this.ticket = await TicketService.getTicket(this.$route.params.pid, this.$route.params.tid);
             this.loading = false;
         } catch(err) {
             this.error = err.response.data.error;
@@ -80,14 +87,14 @@ export default {
         }
     },
     methods: {
-        ...mapGetters(['getUser']),
+        ...mapGetters('user', ['getUser']),
         editTicket() {
             this.editting = !this.editting;
         },
         resolveTicket() {
             if(!this.ticket.resolvedAt) {
                 const ticket = {
-                    _id: this.ticket._id,
+                    id: this.ticket.id,
                     username: this.getUser().username
                 }
                 TicketService.resolveTicket(ticket).then(() => {
@@ -100,7 +107,7 @@ export default {
         unresolveTicket() {
             if(this.ticket.resolvedAt) {
                 const ticket = {
-                    _id: this.ticket._id,
+                    id: this.ticket.id,
                     username: this.getUser().username
                 }
                 TicketService.unresolveTicket(ticket).then(() => {

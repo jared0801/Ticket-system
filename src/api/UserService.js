@@ -2,6 +2,8 @@ import axios from 'axios';
 
 const url = process.env.VUE_APP_API + '/users';
 
+axios.defaults.withCredentials = true;
+
 class UserService {
     // Get a single user
     /*static getUser(id) {
@@ -31,11 +33,7 @@ class UserService {
     // Create users
     static updateUser(user) {
         const updateUrl = `${url}/update`;
-        return axios.post(updateUrl, {
-            id: user.id,
-            username: user.username,
-            email: user.email
-        });
+        return axios.post(updateUrl, user);
     }
 
     static loginUser(user) {

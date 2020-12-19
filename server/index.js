@@ -1,138 +1,204 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const session = require('express-session');
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const mongodb = require('mongodb');
-const MongoStore = require('connect-mongo')(session);
-const bcrypt = require('bcrypt');
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 require('dotenv').config();
 
-const mongoUrl = process.env.DB_PATH;
-let client;
+const app = express();
 
+const port = process.env.PORT || 5000;
+// const mongoUrl = process.env.DB_PATH;
+
+
+// Connect MySQL
+const db = require('./connection');
+
+// Use existing connection for session store
+const sessionStore = new MySQLStore({}, db);
+
+db.connect((err) => {
+    if(err) {
+        throw err;
+    }
+    console.log("MySQL is connected.");
+})
+
+// Connect mongoose
+/*mongoose.connect(
+    mongoUrl,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    },
+    () => {
+        console.log("Mongoose is connected");
+    }
+);
+const db = mongoose.connection;*/
+
+// Middleware
 
 // Redirects users who aren't logged in
-const authMiddleware = (req, res, next) => {
-    if (!req.isAuthenticated() && process.env.NODE_ENV === 'production') {
+/*const authMiddleware = (req, res, next) => {
+    if (!req.isAuthenticated()) {
         res.redirect('/');
     } else {
         return next()
     }
-}
+}*/
 
-(async function() {
-    // Uses a single connection for all 
-    client = await mongodb.MongoClient.connect(mongoUrl, { useNewUrlParser: true });
-})().then(() => {
-    const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser(process.env.SESS_SECRET));
+app.use(cors({
+    credentials: true,
+    origin: "http://localhost:8080", // location of frontend app
+}));
 
-    app.use(express.json());
-    app.use(cors());
 
-    console.log(`Starting server in ${process.env.NODE_ENV} mode.`);
+const cookieExpirationDate = new Date();
+const cookieExpirationDays = 14;
+cookieExpirationDate.setDate(cookieExpirationDate.getDate() + cookieExpirationDays);
 
-    const cookieExpirationDate = new Date();
-    const cookieExpirationDays = 14;
-    cookieExpirationDate.setDate(cookieExpirationDate.getDate() + cookieExpirationDays);
+app.use(session({
+    secret: process.env.SESS_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: {
+        expires: cookieExpirationDate,
+        secure: process.env.NODE_ENV === 'production'
+    }
+}));
 
-    // Configuring express session & passport
-    const sess = {
-        secret: process.env.SESS_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        store: new MongoStore({ client, dbName: 'sessions' }),
-        cookie: {
-            expires: cookieExpirationDate,
-        }
+app.use(passport.initialize());
+app.use(passport.session());
+require('./passportConfig')(passport);
+
+
+
+app.use((req, res, next) => {
+    //console.log(req.isAuthenticated());
+    console.log(`${req.user ? req.user.username : 'null'} has accessed: ${req.originalUrl}`);
+    next();
+})
+// API Routes
+const users = require('./controllers/users.js');
+app.use('/api/users', passport.initialize(), users);
+const projects = require('./controllers/projects.js');
+app.use('/api/projects', passport.initialize(), projects);
+const tickets = require('./controllers/tickets.js');
+app.use('/api/tickets', passport.initialize(), tickets);
+
+
+
+// Static folder
+// app.use(express.static(__dirname + '/public'));
+
+//Forward routing to Vue
+// app.get(/.*/, (req, res) => {
+    // res.sendFile(__dirname + '/public/index.html');
+// });*/
+
+
+/*app.get('/createticketstable', (req, res) => {
+    let sql = 'CREATE TABLE tickets(id int AUTO_INCREMENT, title VARCHAR(255), body VARCHAR(255), PRIMARY KEY(id))';
+
+    db.query(sql, (err, result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("Table created!");
+    })
+})
+
+
+app.get('/createuserstable', (req, res) => {
+    let sql = 'CREATE TABLE users(id int AUTO_INCREMENT, username VARCHAR(255), email VARCHAR(320) UNIQUE, password VARCHAR(255), PRIMARY KEY(id))';
+
+    db.query(sql, (err, result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("User table created!");
+    })
+})
+
+app.get('/createprojectstable', (req, res) => {
+    let sql = 'CREATE TABLE projects(id int AUTO_INCREMENT, title VARCHAR(255), description TEXT, PRIMARY KEY(id))';
+
+    db.query(sql, (err, result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("Projects table created!");
+    })
+})*/
+
+
+
+/*
+app.post('/createuser', (req, res) => {
+    console.log(req.body);
+    let user = {
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email
     }
 
-    if(process.env.NODE_ENV === 'production') {
-        // Configure session for production
-        //app.set('trust proxy', 1);
-        //sess.cookie.secure = true;
+    let sql = 'INSERT INTO users SET ?';
+    let query = db.query(sql, user, (err, result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("User successfully created!");
+    })
+
+});*/
+
+/*
+app.post('/createproject', (req, res) => {
+    console.log(req.body);
+    let project = {
+        title: req.body.title,
+        description: req.body.description,
+        lead: req.body.lead
     }
 
-    app.use(session(sess));
-    app.use(passport.initialize());
-    app.use(passport.session());
+    let sql = 'INSERT INTO projects SET ?';
+    let query = db.query(sql, project, (err, result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("Project successfully created!");
+    })
 
-    passport.serializeUser(function(user, done) {
-        done(null, user.id);
-    });
+});*/
 
-    passport.deserializeUser(function(user_id, done) {
-        /*User.findById(id, function(err, user) {
-            done(err, user);
-        });*/
-        const users = client.db('ticket-system').collection('users');
-        users.findOne({ _id: new mongodb.ObjectID(user_id) }, (err, user) => {
-            if(err) {
-                done(err, false);
-            } else if(user) {
-                const userDto = {
-                    id: user._id.toString(),
-                    username: user.username,
-                    email: user.email
-                }
-                done(null, userDto);
-            }
-        });
-    });
+/*
+app.get('/createprojectusersstable', (req, res) => {
+    let sql = 'CREATE TABLE project_users(project_id int, user_id int, PRIMARY KEY(project_id, user_id))';
 
-    passport.use(new LocalStrategy(
-        function(username, password, done) {
-            // Load collection
-            const userCollection = client.db('ticket-system').collection('users');
-            // Find user
-            userCollection.findOne({ username }, (err, user) => {
-                if(err) return done(err);
-                if(!user) {
-                    return done(null, false);
-                }
-                // Compare hashed password
-                bcrypt.compare(password, user.password, (err, response) => {
-                    if(err) return done(err);
-                    if(response === true) {
-                        const userDto = {
-                            id: user._id.toString(),
-                            username: user.username,
-                            email: user.email
-                        }
-                        return done(null, userDto);
-                    }
-                    return done(null, false);
-                });
-            });
-        }
-    ));
+    db.query(sql, (err, result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("User project table created!");
+    })
+})
+*/
 
-    // API routes
-    const tickets = require('./routes/api/tickets')(client, [authMiddleware]);
-    const users = require('./routes/api/users')(client, [authMiddleware]);
-    const projects = require('./routes/api/projects')(client, [authMiddleware]);
-    const comments = require('./routes/api/comments')(client, [authMiddleware]);
+app.get('/createticketuserstable', (req, res) => {
+    let sql = 'CREATE TABLE ticket_users(ticket_id int, user_id int, PRIMARY KEY(ticket_id, user_id))';
 
-    app.use('/api/tickets', tickets);
-    app.use('/api/users', users);
-    app.use('/api/projects', projects);
-    app.use('/api/comments', comments);
+    db.query(sql, (err, result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("User ticket table created!");
+    })
+})
 
 
-    // Static folder
-    app.use(express.static(__dirname + '/public'));
+// Start server
 
-    //Forward routing to Vue
-    app.get(/.*/, (req, res) => {
-        res.sendFile(__dirname + '/public/index.html');
-    });
-
-    const port = process.env.PORT || 5000;
-
-    app.listen(port, (err) => {
-        if(err) return console.log(err);
-        console.log(`Server started on port ${port}`)
-    });
-
+app.listen(port, (err) => {
+    if(err) return console.log(err);
+    console.log(`Server has started on port ${port}...`);
 });
-

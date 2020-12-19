@@ -67,8 +67,8 @@ export default {
         this.email = this.getUser().email;
     },
     methods: {
-        ...mapGetters(['getUser']),
-        ...mapMutations(['updateUser']),
+        ...mapGetters('user', ['getUser']),
+        ...mapMutations('user', ['updateUser']),
         updateProfile() {
             this.loading = true;
             if(!this.email || !this.username) {
@@ -77,14 +77,16 @@ export default {
             }
             if(this.email === this.getUser().email && this.username === this.getUser().username) {
                 // No changes were made
+                this.loading = false;
                 return;
             }
             const newProfile = {
-                id: this.getUser().id,
                 username: this.username,
                 email: this.email
             }
+            console.log('UPDATE')
             UserService.updateUser(newProfile).then((res) => {
+                console.log(res);
                 if(res.status === 200) {
                     this.updateUser(res.data);
                     this.success = "Your profile was succesfully updated.";
@@ -93,6 +95,7 @@ export default {
                 this.error = '';
             }).catch((err) => {
                 this.loading = false;
+                console.log(err);
                 if(err.response.data.error) {
                     this.error = err.response.data.error;
                 } else {

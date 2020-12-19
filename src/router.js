@@ -56,7 +56,7 @@ const router = new Router({
             component: () => import(/* webpackChunkName: "project" */ './views/Projects/Tickets/CreateTicket.vue')
         },
         {
-            path: '/tickets/:id',
+            path: '/:pid/tickets/:tid',
             name: 'view-ticket',
             component: () => import(/* webpackChunkName: "project" */ './views/Projects/Tickets/ViewTicket.vue')
         }
@@ -66,19 +66,7 @@ const router = new Router({
 // Checks that the user is logged in on all routes
 // except those with `meta: { public: true }`
 router.beforeEach((to, from, next) => {
-    if(process.env.NODE_ENV === 'development') {
-        if(store.state.isLoggedIn) next();
-        else {
-            // Dev user
-            const devUser = {
-                username: 'dev1',
-                password: 'dev123',
-                email: 'dev@dev.com'
-            }
-            store.commit('storeUser', devUser);
-            next();
-        }
-    } else if (to.matched.some(record => record.meta.public) || store.state.isLoggedIn === true) {
+    if (to.matched.some(record => record.meta.public) || store.state.isLoggedIn === true) {
         // This route doesn't require auth
         next();
     } else {
@@ -86,7 +74,7 @@ router.beforeEach((to, from, next) => {
             const user = res.data;
             if(user) {
                 // User session is recognized
-                store.commit('storeUser', user);
+                store.commit('user/storeUser', user);
                 next();
             } else next({ path: '/login' });
         }).catch(() => {

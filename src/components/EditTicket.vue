@@ -20,7 +20,7 @@
                 </div> -->
 
                 <vue-autosuggest
-                :suggestions="filteredUsers"
+                :suggestions="[{data: filteredUsers.map(r => r.username)}]"
                 :input-props="{id:'autosuggest__input', placeholder:'Assign to', class: 'input'}"
                 @selected="selectHandler"
                 @input="inputChangeHandler"
@@ -36,7 +36,7 @@
         <div class="field">
             <div>
                 <label class="label">Assigned to: </label>
-                <div v-for="(user, index) in assignedUsers" :key="user">{{ user }} <a class="delete" aria-label="remove assigned user" v-on:click="rmAssignedUser(index)"></a></div>
+                <div v-for="(user, index) in assignedUsers" :key="user.id">{{ user.username }} <a class="delete" aria-label="remove assigned user" v-on:click="rmAssignedUser(index)"></a></div>
             </div>
         </div>
 
@@ -49,7 +49,7 @@
         
         <div v-if="ticket" class="field button-div">
             <div class="control delete-control">
-                <button class="button is-danger" v-on:click="toggleModal">Delete Ticket</button>
+                <button class="button is-danger" v-on:click.prevent="toggleModal">Delete Ticket</button>
                 <Modal v-if="activeModal"
                     content="Are you sure you would like to delete this ticket? This action cannot be undone."
                     buttonText="Delete"
@@ -78,7 +78,7 @@ import TicketService from '@/api/TicketService';
 import UserService from '@/api/UserService';
 import Modal from '@/components/Modal';
 import { VueAutosuggest } from 'vue-autosuggest';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     name: 'EditTicket',
@@ -86,7 +86,6 @@ export default {
         return {
             title: '',
             text: '',
-            usertext: '',
             serverError: '',
             assignedUsers: [],
             users: [],
@@ -107,28 +106,30 @@ export default {
     async created() {
         this.loading = true;
         try {
+            console.log(this.ticket);
             if(this.ticket) {
                 this.title = this.ticket.title;
                 this.text = this.ticket.text;
-                this.assignedUsers = this.ticket.assignedUsers;
+                this.assignedUsers = this.ticket.users;
             }
             const userArray = await UserService.getUsers();
-            this.users = [{
-                data: userArray
-            }];
-            this.filteredUsers = this.users;
+            this.users = userArray;
+            this.filteredUsers = userArray;
+            console.log(this.assignedUsers);
+            if(this.assignedUsers && this.assignedUsers.length) {
+                this.filteredUsers = this.users.filter(item => {
+                    return !this.assignedUsers.some(i => i.id==item.id);
+                });
+            }
             this.loading = false;
         } catch(err) {
             this.loading = false;
-            if(err.response.data.error) {
-                this.serverError = err.response.data.error;
-            } else {
-                this.serverError = err;
-            }
+            this.serverError = err;
         }
     },
     methods: {
-        ...mapGetters(['getUser']),
+        ...mapActions('tickets', ['getAppData']),
+        ...mapGetters('user', ['getUser']),
         toggleModal() {
             this.activeModal = !this.activeModal;
         },
@@ -138,23 +139,22 @@ export default {
                 title: this.title,
                 text: this.text,
                 userId: this.getUser().id,
-                assignedUsers: this.assignedUsers,
+                users: this.assignedUsers,
                 projId: this.$route.params.id,
-                resolved: '',
+                resolvedAt: '',
                 username: this.getUser().username
             }
             TicketService.createTicket(ticket).then(() => {
                 this.loading = false;
                 this.text = '';
                 this.title = '';
-                this.$router.go(-1);
+                this.getAppData().then(res => {
+                    console.log(res);
+                    this.$router.push(`/projects/${this.$route.params.id}`);
+                })
             }).catch((err) => {
                 this.loading = false;
-                if(err.response.data.error) {
-                    this.serverError = err.response.data.error;
-                } else {
-                    this.serverError = err;
-                }
+                this.serverError = err;
             });
         },
         updateTicket() {
@@ -163,36 +163,29 @@ export default {
                 title: this.title,
                 text: this.text,
                 user: this.ticket.user,
-                assignedUsers: this.assignedUsers,
+                users: this.assignedUsers,
                 projId: this.ticket.projId,
-                id: this.ticket._id,
+                id: this.ticket.id,
             }
-            TicketService.updateTicket(ticket).then(() => {
+            TicketService.updateTicket(ticket).then((res) => {
+                console.log(res);
                 this.loading = false;
                 this.text = '';
                 this.title = '';
                 this.$router.go(0);
             }).catch((err) => {
                 this.loading = false;
-                if(err.response.data.error) {
-                    this.serverError = err.response.data.error;
-                } else {
-                    this.serverError = err;
-                }
+                this.serverError = err;
             });
         },
         deleteTicket() {
             this.loading = true;
-            TicketService.deleteTicket(this.ticket._id).then(() => {
+            TicketService.deleteTicket(this.ticket.id).then(() => {
                 this.loading = false;
-                this.$router.go(-1);
+                this.$router.push(`/projects/${this.ticket.projId}`);
             }).catch((err) => {
                 this.loading = false;
-                if(err.response.data.error) {
-                    this.serverError = err.response.data.error;
-                } else {
-                    this.serverError = err;
-                }
+                this.serverError = err;
             });
         },
         closeTicket() {
@@ -203,7 +196,7 @@ export default {
         },
         selectHandler(arg) {
             if(arg) {
-                this.assignedUsers.push(arg.item);
+                this.assignedUsers.push(this.users.find(u => u.username == arg.item));
             }
 
             // Refilter results
@@ -212,14 +205,9 @@ export default {
 
         },
         inputChangeHandler(text) {
-            this.filteredUsers = this.users;
-            // Filter results based on input & already assigned users
-            const userArray = this.users[0].data.filter(item => {
-                return item.toLowerCase().indexOf(text.toLowerCase()) > -1 && !this.assignedUsers.includes(item);
+            this.filteredUsers = this.users.filter(item => {
+                return item.username.toLowerCase().indexOf(text.toLowerCase()) > -1 && !this.assignedUsers.some(i => i.id == item.id);
             });
-            this.filteredUsers = [{
-                data: userArray
-            }];
         }
     }
 };

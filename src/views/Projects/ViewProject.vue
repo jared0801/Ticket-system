@@ -10,7 +10,7 @@
 
             <div class="right-align">
                 <button v-if="isLead" class="button is-info editButton" v-on:click="editProject">Edit Project</button>
-                <router-link v-else class="button" :to="{ name: 'create-ticket' }">Create a ticket</router-link>
+                <router-link class="button" :to="{ name: 'create-ticket' }">Create a ticket</router-link>
             </div>
             <div v-if="editting" class="project-info">
                 <EditProject :project="project" v-on:close-project="editProject" />
@@ -19,6 +19,7 @@
                 <p>Project: {{ project.title }}</p>
                 <p>Description: {{ project.description }}</p>
                 <p>Lead: {{ project.lead }}</p>
+                <p>Users: <span v-for="(user, i) in project.users" :key="user.id">{{user.username}}<span v-if="i < project.users.length-1">, </span></span></p>
             </div>
             <TicketList />
         </div>
@@ -52,11 +53,11 @@ export default {
     },
     computed: {
         isLead() {
-            return this.project.userId === this.getUser().id;
+            return this.project.lead === this.getUser().username;
         }
     },
     methods: {
-        ...mapGetters(['getUser']),
+        ...mapGetters('user', ['getUser']),
         editProject() {
             this.editting = !this.editting;
         }

@@ -22,21 +22,35 @@
 
 <script>
 import UserService from '../api/UserService';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
 
 export default {
     name: "GlobalHeader",
     props: {
     },
     computed: {
-        ...mapState(['isLoggedIn', 'username']),
+        ...mapState('user', ['isLoggedIn', 'username']),
+        ...mapGetters('user', ['getUser']),
     },
     methods: {
-        ...mapMutations(['removeUser']),
+        ...mapMutations('user', ['removeUser']),
+        ...mapMutations('user', ['storeUser']),
+        ...mapActions('tickets', ['getAppData']),
         logout() {
             this.removeUser();
-            UserService.logoutUser();
-            this.$router.push('/');
+            UserService.logoutUser().then((res) => {
+                if(res.status == 200) {
+                    this.$router.push('/');
+                }
+            });
+        }
+    },
+    async created() {
+        const response = await UserService.getCurrentUser();
+        if(response.data && 'username' in response.data) {
+            const user = response.data;
+            this.storeUser(user);
+            await this.getAppData();
         }
     }
 }

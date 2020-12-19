@@ -40,14 +40,14 @@ class ProjectService {
         });
     }
 
-    // Create a project
+    // Update a project
     static updateProject(project) {
         return axios.post(`${url}/${project.id}`, {
             ...project
         });
     }
 
-    // Delete tickets
+    // Delete a project
     static deleteProject(id) {
         return axios.delete(`${url}/${id}`);
     }

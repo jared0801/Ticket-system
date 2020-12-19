@@ -89,7 +89,7 @@ export default {
                 id: this.comment._id,
                 userId: this.getUser.id,
                 text: this.text,
-                username: this.getUser().username
+                username: this.getUser.username
             }
             CommentService.updateComment(comment).then(() => {
                 this.loading = false;
@@ -114,7 +114,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['getUser']),
+        ...mapGetters('user', ['getUser']),
         isCommenter() {
             return this.getUser.id === this.comment.userId;
         },

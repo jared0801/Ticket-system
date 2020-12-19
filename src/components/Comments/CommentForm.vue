@@ -44,7 +44,7 @@ export default {
     async created() {
         this.loading = true;
         try {
-            this.comments = await CommentService.getComments(this.$route.params.id);
+            this.comments = await CommentService.getComments(this.$route.params.tid);
             this.loading = false;
         } catch(err) {
             this.error = err.response.data.error;
@@ -52,7 +52,7 @@ export default {
         }
     },
     methods: {
-        ...mapGetters(['getUser']),
+        ...mapGetters('user', ['getUser']),
         createComment() {
             this.loading = true;
             const comment = {

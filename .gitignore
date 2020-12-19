@@ -2,6 +2,7 @@
 node_modules
 /dist
 server/public
+old
 
 # local env files
 .env

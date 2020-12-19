@@ -7,18 +7,22 @@ class TicketService {
     static getTickets(projId) {
         return new Promise((resolve, reject) => {
             axios.get(`${url}/${projId}`).then((res) => {
-                const data = res.data;
-                data.resolved = data.resolved.map(ticket => ({
-                    ...ticket,
-                    createdAt: new Date(ticket.createdAt),
-                    resolvedAt: new Date(ticket.resolvedAt)
-                }));
-                data.unresolved = data.unresolved.map(ticket => ({
-                    ...ticket,
-                    createdAt: new Date(ticket.createdAt),
-                    resolvedAt: ''
-                }));
-                resolve(data);
+                const tickets = {};
+                console.log(res.data);
+                if(res.data) {
+                    
+                    tickets.resolved = res.data.resolved.map(ticket => ({
+                        ...ticket,
+                        createdAt: new Date(ticket.createdAt),
+                        resolvedAt: new Date(ticket.resolvedAt)
+                    }));
+                    tickets.unresolved = res.data.unresolved.map(ticket => ({
+                        ...ticket,
+                        createdAt: new Date(ticket.createdAt),
+                        resolvedAt: ''
+                    }));
+                }
+                resolve(tickets);
             }).catch((err) => {
                 reject(err);
             })
@@ -26,9 +30,9 @@ class TicketService {
     }
 
     // Get a single ticket
-    static getTicket(id) {
+    static getTicket(pid, tid) {
         return new Promise((resolve, reject) => {
-            axios.get(`${url}/ticket/${id}`).then((res) => {
+            axios.get(`${url}/${pid}/ticket/${tid}`).then((res) => {
                 const ticket = res.data;
                 resolve({
                     ...ticket,
@@ -56,7 +60,7 @@ class TicketService {
     }
 
     static resolveTicket(ticket) {
-        const id = ticket._id;
+        const id = ticket.id;
         return new Promise((resolve, reject) => {
             axios.get(`${url}/res/${id}`).then((res) => {
                 const ticketInfo = res.data;
@@ -72,7 +76,7 @@ class TicketService {
     }
 
     static unresolveTicket(ticket) {
-        const id = ticket._id;
+        const id = ticket.id;
         return new Promise((resolve, reject) => {
             axios.get(`${url}/unres/${id}`).then((res) => {
                 const ticketInfo = res.data;
@@ -88,6 +92,7 @@ class TicketService {
 
     // Delete tickets
     static deleteTicket(id) {
+        console.log('delete ticket')
         return axios.delete(`${url}/${id}`);
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="project-list">
         <div class="notification is-danger" v-if="error">{{ error }}</div>
 
         <div class="project-container">
@@ -13,9 +13,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="project in projects" v-bind:key="project._id">
+                    <tr v-for="project in projects" v-bind:key="project.id">
                         <td>
-                            <router-link :to="`/projects/${project._id}`">{{ project.title }}</router-link>
+                            <router-link :to="`/projects/${project.id}`">{{ project.title }}</router-link>
                         </td>
                         <td class="project-description">{{ project.description }}</td>
                         <td>{{ project.lead }}</td>
@@ -30,7 +30,8 @@
 </template>
 
 <script>
-import ProjectService from '../api/ProjectService';
+import ProjectService from '@/api/ProjectService';
+import { mapGetters } from 'vuex';
 
 export default {
     name: "ProjectList",
@@ -41,23 +42,43 @@ export default {
             loading: false
         }
     },
-    async created() {
-        this.loading = true;
+    computed: {
+        ...mapGetters('tickets', ['getProjects']),
+    },
+    methods: {
+        getData() {
+            ProjectService.getProjects().then((res) => {
+                console.log(res);
+                console.log(this.getProjects);
+                this.projects = this.getProjects.projects;
+            });
+        }
+    },
+    watch:{
+        $route: function(to, from){
+            console.log(to);
+            console.log(from);
+            this.getData();
+        }
+    } ,
+    created() {
+        this.getData();
+        /*this.loading = true;
         try {
             this.projects = await ProjectService.getProjects();
             this.loading = false;
         } catch(err) {
             this.error = err.message;
             this.loading = false;
-        }
+        }*/
     }
     
 }
 </script>
 
 <style scoped>
-.container {
-    text-align: center;
+.project-list {
+    margin-top: 1em;
     width: 100%;
 }
 

@@ -17,11 +17,44 @@
                 <textarea class="textarea" type="text" id="create-ticket" v-model="description" placeholder="Project description" />
             </div>
         </div>
+
+        
+
+        <div class="field">
+            <label class="label">Assign users to this project</label>
+            <div class="control">
+                <!-- <div class="select">
+                    <select v-model="assignedUsers[0]">
+                        <option disabled value="">Select dropdown</option>
+                        <option v-for="user in users" :key="user">{{ user }}</option>
+                    </select>
+                </div> -->
+
+                <vue-autosuggest
+                :suggestions="[{data: filteredUsers.map(r => r.username)}]"
+                :input-props="{id:'autosuggest__input', placeholder:'Assign to', class: 'input'}"
+                @selected="selectHandler"
+                @input="inputChangeHandler"
+                componentAttrClassAutosuggestResults="result-container dropdown-content"
+                >
+                    <template slot-scope="{suggestion}">
+                        <span class="suggestion-item button">{{suggestion.item}}</span>
+                    </template>
+                </vue-autosuggest>
+            </div>
+        </div>
+
+        <div class="field">
+            <div>
+                <label class="label">Assigned to: </label>
+                <div v-for="(user, index) in assignedUsers" :key="user.id">{{ user.username }} <a class="delete" aria-label="remove assigned user" v-on:click="rmAssignedUser(index)"></a></div>
+            </div>
+        </div>
         
         <div v-if="project" class="button-div field">
             <div class="control delete-control">
-                <button class="button is-danger" v-on:click="toggleModal">Delete Project</button>
-                <Modal v-if="activeModal"
+                <button class="button is-danger" v-on:click.prevent="toggleModal">Delete Project</button>
+                <Modal v-show="activeModal"
                     content="Are you sure you would like to delete this project? This will delete all tickets associated with this project."
                     buttonText="Delete"
                     aria="Confirm deletion"
@@ -47,6 +80,8 @@
 <script>
 import ProjectService from '@/api/ProjectService';
 import Modal from '@/components/Modal';
+import UserService from '@/api/UserService';
+import { VueAutosuggest } from 'vue-autosuggest';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -56,6 +91,8 @@ export default {
             title: '',
             description: '',
             users: [],
+            filteredUsers: [],
+            assignedUsers: [],
             serverError: '',
             errors: {},
             loading: false,
@@ -63,28 +100,57 @@ export default {
         }
     },
     components: {
-        Modal
+        Modal,
+        VueAutosuggest
     },
     props: {
         project: {
             type: Object
         }
     },
-    created() {
-        if(this.project) {
-            this.description = this.project.description;
-            this.title = this.project.title;
+    async created() {
+        this.loading = true;
+        try {
+            if(this.project) {
+                this.description = this.project.description;
+                this.title = this.project.title;
+                this.assignedUsers = this.project.users;
+            }
+            const userArray = await UserService.getUsers();
+            /*this.users = [{
+                data: userArray
+            }];
+            this.filteredUsers = [{
+                data: userArray.map(r => r.username)
+            }]*/
+            this.users = userArray;
+            this.filteredUsers = userArray;
+            if(this.assignedUsers.length) {
+                this.filteredUsers = this.users.filter(item => {
+                    return !this.assignedUsers.some(i => i.id==item.id);
+                });
+            }
+            this.loading = false;
+        } catch(err) {
+            this.loading = false;
+            this.serverError = err;
+            console.log(err);
+            /*if(err.response.data.error) {
+                this.serverError = err.response.data.error;
+            } else {
+                this.serverError = err;
+            }*/
         }
     },
     methods: {
-        ...mapGetters(['getUser']),
+        ...mapGetters('user', ['getUser']),
         createProject() {
             this.loading = true;
             const project = {
                 title: this.title,
                 description: this.description,
                 userId: this.getUser().id,
-                users: this.users,
+                users: this.assignedUsers,
                 username: this.getUser().username
             }
             if(!project.title) {
@@ -92,12 +158,19 @@ export default {
                 this.loading = false;
                 return;
             }
-            ProjectService.createProject(project).then(() => {
-                this.loading = false;
-                this.title = '';
-                this.description = '';
-                this.users = [];
-                this.$router.go(-1);
+            ProjectService.createProject(project).then((res) => {
+                console.log(res);
+                if(res.status == 201) {
+                    this.title = '';
+                    this.description = '';
+                    this.users = [];
+                    const route = `/projects/${res.data.id}`;
+                    console.log(route);
+                    ProjectService.getProjects().then(() => {
+                        this.loading = false;
+                        this.$router.push(route);
+                    });
+                }
             }).catch((err) => {
                 this.loading = false;
                 if(err.response.data.error) {
@@ -110,24 +183,23 @@ export default {
         updateProject() {
             this.loading = true;
             if(!this.project) return;
-            const project = {
+            const proj = {
                 title: this.title,
                 description: this.description,
-                userId: this.project.userId,
-                users: this.project.users,
-                id: this.project._id
+                users: this.assignedUsers,
+                id: this.project.id
             }
-            if(!project.title) {
+            if(!proj.title) {
                 this.errors['title'] = "A title is required to create a project.";
                 this.loading = false;
                 return;
             }
-            ProjectService.updateProject(project).then(() => {
+            ProjectService.updateProject(proj).then(() => {
                 this.loading = false;
                 this.title = '';
                 this.description = '';
                 this.users = [];
-                this.$router.go(0);
+                this.$router.push(`/projects/${proj.id}`);
             }).catch((err) => {
                 this.loading = false;
                 if(err.response.data.error) {
@@ -139,12 +211,41 @@ export default {
         },
         deleteProject() {
             if(!this.project) return;
-            ProjectService.deleteProject(this.project._id).then(() => {
-                this.$router.go(-1);
+            ProjectService.deleteProject(this.project.id).then(() => {
+                this.$router.push('/projects');
             })
         },
         toggleModal() {
             this.activeModal = !this.activeModal;
+        },
+
+
+        // assigning users
+        rmAssignedUser(index) {
+            this.assignedUsers.splice(index, 1);
+        },
+        selectHandler(arg) {
+            if(arg) {
+                this.assignedUsers.push(this.users.find(u => u.username == arg.item));
+            }
+
+            // Refilter results
+            this.inputChangeHandler(arg.item);
+            arg.item = '';
+
+        },
+        inputChangeHandler(text) {
+            // Filter results based on input & already assigned users
+            /*const userArray = this.users[0].data.filter(item => {
+                console.log(item);
+                return item.username.toLowerCase().indexOf(text.toLowerCase()) > -1 && !this.assignedUsers.includes(item.username);
+            });
+            this.filteredUsers = [{
+                data: userArray
+            }];*/
+            this.filteredUsers = this.users.filter(item => {
+                return item.username.toLowerCase().indexOf(text.toLowerCase()) > -1 && !this.assignedUsers.some(i => i.id == item.id);
+            });
         }
     }
 }

@@ -22,7 +22,7 @@ export default {
     components: {
         ProjectList,
         Header
-    },
+    }
 };
 </script>
 

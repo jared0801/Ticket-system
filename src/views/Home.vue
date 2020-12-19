@@ -7,7 +7,7 @@
             <router-link v-if="isLoggedIn" class="button" to="/projects">Get Started</router-link>
             <div v-else>
                 <p><router-link to="/login">Login</router-link> or <router-link to="/register">register</router-link> to get started!</p>
-                <p><a @click="devUser">Try it out</a> - Tour the app without the ability to create projects, tickets, or comments.</p>
+                <!-- <p><a @click="devUser">Try it out</a> - Tour the app without the ability to create projects, tickets, or comments.</p> -->
             </div>
             
         </div>
@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import UserService from '@/api/UserService';
 import { mapState, mapMutations } from 'vuex';
 
 export default {
@@ -24,13 +23,14 @@ export default {
     components: {
     },
     computed: {
-        ...mapState(['isLoggedIn']),
+        ...mapState('user', ['isLoggedIn']),
     },
     methods: {
-        ...mapMutations(['storeUser']),
-        devUser() {
+        ...mapMutations('user', ['storeUser']),
+        /*devUser() {
             UserService.loginDevUser().then(res => {
                 if(res.status === 200) {
+                    //this.$store.commit('user/storeUser', res.data);
                     this.storeUser(res.data);
                     this.$router.push('/projects');
                 }
@@ -42,7 +42,7 @@ export default {
                 }
             })
 
-        }
+        }*/
     }
 };
 </script>

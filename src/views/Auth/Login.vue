@@ -18,7 +18,7 @@
                 <div class="field">
                     <label class="label">Username</label>
                     <div class="control has-icons-left has-icons-right">
-                        <input class="input" :class="{ 'is-danger' : errors['username'] }" type="text" required placeholder="Username" v-model="username">
+                        <input class="input" :class="{ 'is-danger' : errors['username'] }" type="text" required autocomplete="username" placeholder="Username" v-model="username">
                         <span class="icon is-small is-left">
                             <i class="fas fa-user"></i>
                         </span>
@@ -29,7 +29,7 @@
                 <div class="field">
                     <label class="label">Password</label>
                     <div class="control has-icons-left has-icons-right">
-                        <input class="input" :class="{ 'is-danger' : errors['password'] }" type="password" required placeholder="Password" v-model="password">
+                        <input class="input" :class="{ 'is-danger' : errors['password'] }" type="password" required autocomplete="current-password" placeholder="Password" v-model="password">
                         <span class="icon is-small is-left">
                             <i class="fas fa-key"></i>
                         </span>
@@ -55,7 +55,7 @@
 <script>
 import UserService from '@/api/UserService';
 import Header from '@/components/Header';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
     name: 'Login',
@@ -63,7 +63,7 @@ export default {
         Header
     },
     computed: {
-        ...mapState(['isLoggedIn']),
+        ...mapState('user', ['isLoggedIn']),
     },
     data() {
         return {
@@ -76,8 +76,14 @@ export default {
             }
         }
     },
+    created() {
+        if(this.isLoggedIn) {
+            this.$router.push('/');
+        }
+    },
     methods: {
-        ...mapMutations(['storeUser']),
+        ...mapMutations('user', ['storeUser']),
+        ...mapActions('tickets', ['getAppData']),
         clearFields() {
             this.username = '';
             this.password = '';
@@ -92,6 +98,7 @@ export default {
                 }).then(res => {
                     if(res.status === 200) {
                         this.storeUser(res.data);
+                        this.getAppData();
                         this.clearFields();
                         this.$router.push('/');
                     }
