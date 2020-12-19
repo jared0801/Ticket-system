@@ -1,13 +1,13 @@
 {
   "name": "ticket-system",
   "version": "0.1.0",
-  "description": "A full stack vue/express ticket system",
+  "description": "A full stack vue/mysql/express ticket system",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "start": "node server/index.js",
-    "dev": "nodemon server/index.js",
+    "dev": "nodemon server/index.js"
   },
   "dependencies": {
     "axios": "^0.19.2",

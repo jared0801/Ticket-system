@@ -1,6 +1,6 @@
-# ticket-system
+# Ticket system / Bug Tracker
 
-A ticketing system that can be used to track bugs, projects, and requests built using Vue, MongoDB, and Express.
+A ticketing system that can be used to track bugs, projects, and requests built using Vue, MySQL, and Express.
 
 ## Project setup
 ```
@@ -14,7 +14,7 @@ npm run serve
 
 ### Starts and hot-reloads backend server for development
 ```
-npm run devserver
+npm run dev
 ```
 
 ### Compiles and minifies for production
@@ -31,6 +31,3 @@ npm run start
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
