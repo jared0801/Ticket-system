@@ -47,30 +47,13 @@ export default {
     },
     methods: {
         getData() {
-            ProjectService.getProjects().then((res) => {
-                console.log(res);
-                console.log(this.getProjects);
+            ProjectService.getProjects().then(() => {
                 this.projects = this.getProjects.projects;
             });
         }
     },
-    watch:{
-        $route: function(to, from){
-            console.log(to);
-            console.log(from);
-            this.getData();
-        }
-    } ,
     created() {
         this.getData();
-        /*this.loading = true;
-        try {
-            this.projects = await ProjectService.getProjects();
-            this.loading = false;
-        } catch(err) {
-            this.error = err.message;
-            this.loading = false;
-        }*/
     }
     
 }

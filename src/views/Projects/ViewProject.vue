@@ -1,12 +1,9 @@
 <template>
     <div class="tickets">
-        <!-- <router-link to="/">Go home</router-link>
-        <h1 class="title">Latest Tickets</h1>
-        <hr> -->
 
         <div class="content">
             
-            <Header title="Project Tickets" backlinkText="Back" />
+            <Header title="Project Tickets" backlinkText="Projects" backlink="/projects" />
 
             <div class="right-align">
                 <button v-if="isLead" class="button is-info editButton" v-on:click="editProject">Edit Project</button>

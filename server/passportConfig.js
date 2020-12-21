@@ -42,15 +42,19 @@ module.exports = function(passport) {
                 if(err) {
                     return done(err);
                 } else {
-                    const user = result[0];
+                    if(result.length) {
+                        const user = result[0];
 
-                    bcrypt.compare(password, user.password, (err, response) => {
-                        if(err) return done(err);
-                        if(response === true) {
-                            return done(null, user);
-                        }
+                        bcrypt.compare(password, user.password, (err, response) => {
+                            if(err) return done(err);
+                            if(response === true) {
+                                return done(null, user);
+                            }
+                            return done(null, false);
+                        });
+                    } else {
                         return done(null, false);
-                    });
+                    }
                 }
         
             });

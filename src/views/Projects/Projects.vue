@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header title="Projects" backlink="/" backlinkText="Go home" />
+            <Header title="Projects" />
             <div class="right-align">
                 <router-link class="button" to="/projects/create">Create a new project</router-link>
             </div>

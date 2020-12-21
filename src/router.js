@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
 import store from './store';
 import UserService from './api/UserService';
 
@@ -12,7 +11,7 @@ const router = new Router({
         {
             path: '/',
             name: 'home',
-            component: Home,
+            component: () => import(/* webpackChunkName: "auth" */ './views/Home.vue'),
             meta: { public: true } // Logging in is not required
         },
         {
@@ -21,13 +20,7 @@ const router = new Router({
             // route level code-splitting
             // this generates a separate chunk (ticket.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import(/* webpackChunkName: "auth" */ './views/Auth/Register.vue'),
-            meta: { public: true }
-        },
-        {
-            path: '/login',
-            name: 'login',
-            component: () => import(/* webpackChunkName: "auth" */ './views/Auth/Login.vue'),
+            component: () => import(/* webpackChunkName: "auth" */ './views/Register.vue'),
             meta: { public: true }
         },
         {
@@ -78,7 +71,7 @@ router.beforeEach((to, from, next) => {
                 next();
             } else next({ path: '/login' });
         }).catch(() => {
-            next({ path: '/login' });
+            next({ path: '/' });
         });
     }
     

@@ -12,10 +12,6 @@
             <router-link class="button" to="/profile">Profile</router-link>
             <button @click="logout" class="button" href="/logout">Logout</button>
         </span>
-        <span class="button-group" v-else>
-            <router-link class="button" to="/login">Login</router-link>
-            <router-link class="button" to="/register">Register</router-link>
-        </span>
 
     </header>    
 </template>
@@ -46,7 +42,6 @@ export default {
     },
     created() {
         UserService.getCurrentUser().then(async (res) => {
-            console.log(res);
             if(res.data && 'username' in res.data) {
                 const user = res.data;
                 this.storeUser(user);
