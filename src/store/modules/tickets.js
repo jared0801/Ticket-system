@@ -25,8 +25,6 @@ export default {
     actions: {
         getAppData(context) {
             ProjectService.getProjects().then(res => {
-                console.log('GETAPPDATA')
-                console.log(res);
                 context.commit('setProjects', res);
             }).catch(e => {
                 console.log(e);

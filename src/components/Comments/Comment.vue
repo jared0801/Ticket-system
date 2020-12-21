@@ -127,7 +127,6 @@ export default {
             return `${hours}:${minutes} ${ampm} - ${this.comment.createdAt.getMonth()+1}/${this.comment.createdAt.getDate()}/${this.comment.createdAt.getFullYear()}`;
         },
         updatedDateTime() {
-            console.log(this.comment.updatedAt);
             let hours = this.comment.updatedAt.getHours();
             let minutes = this.comment.updatedAt.getMinutes();
             let ampm = hours >= 12 ? 'pm' : 'am';

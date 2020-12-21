@@ -5,7 +5,7 @@ const { body, validationResult } = require('express-validator');
 
 const router = express.Router();
 
-// Get a single comment
+// Get comments for a ticket
 router.get('/:id', async (req, res) => {
     const sql = `
         SELECT
@@ -17,6 +17,8 @@ router.get('/:id', async (req, res) => {
             comments.user_id = users.id
         WHERE
             ticket_id = ?
+        ORDER BY
+            createdAt DESC
     `;
     db.query(sql, req.params.id, (err, result) => {
         if(err) throw err;
