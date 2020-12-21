@@ -1,10 +1,31 @@
 # Ticket system / Bug Tracker
 
-A ticketing system that can be used to track bugs, projects, and requests built using Vue, MySQL, and Express.
+A ticketing system that can be used to track bugs, projects, and requests. Built by Jared Jacobson using Vue, MySQL, and Express.
 
 ## Project setup
 ```
 npm install
+```
+Create a file in the project root directory called .env and enter the following information:
+```
+VUE_APP_API=
+NODE_ENV=
+SESS_SECRET=
+DB_HOST=
+DB_USER=
+DB_PASS=
+DB_NAME=
+```
+
+An example would be:
+```
+VUE_APP_API=http://localhost:5000/api
+NODE_ENV=development
+SESS_SECRET=secret
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=pass
+DB_NAME=ticket-system
 ```
 
 ### Compiles and hot-reloads client for development
