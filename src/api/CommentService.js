@@ -11,7 +11,7 @@ class CommentService {
                 resolve(data.map(comment => ({
                     ...comment,
                     createdAt: new Date(comment.createdAt),
-                    lastEdit: comment.lastEdit ? new Date(comment.lastEdit) : ''
+                    updatedAt: new Date(comment.updatedAt)
                 })));
             }).catch((err) => {
                 reject(err);

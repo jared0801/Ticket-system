@@ -8,9 +8,7 @@ class TicketService {
         return new Promise((resolve, reject) => {
             axios.get(`${url}/${projId}`).then((res) => {
                 const tickets = {};
-                console.log(res.data);
                 if(res.data) {
-                    
                     tickets.resolved = res.data.resolved.map(ticket => ({
                         ...ticket,
                         createdAt: new Date(ticket.createdAt),
@@ -64,8 +62,6 @@ class TicketService {
         return new Promise((resolve, reject) => {
             axios.get(`${url}/res/${id}`).then((res) => {
                 const ticketInfo = res.data;
-                console.log('infoooo');
-                console.log(ticketInfo);
                 resolve({
                     ...ticketInfo,
                 });
@@ -80,7 +76,6 @@ class TicketService {
         return new Promise((resolve, reject) => {
             axios.get(`${url}/unres/${id}`).then((res) => {
                 const ticketInfo = res.data;
-                console.log(ticketInfo);
                 resolve({
                     ...ticketInfo,
                 });
@@ -92,7 +87,6 @@ class TicketService {
 
     // Delete tickets
     static deleteTicket(id) {
-        console.log('delete ticket')
         return axios.delete(`${url}/${id}`);
     }
 }
