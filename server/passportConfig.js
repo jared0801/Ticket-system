@@ -3,21 +3,23 @@ const bcrypt = require('bcrypt');
 const db = require('./connection');
 
 module.exports = function(passport) {
+    // Supply unique way for passport to serialize each user
     passport.serializeUser(function(user, done) {
         //console.log(user.id);
-        const userDto = {
+        /*const userDto = {
             id: user.id,
             username: user.username
-        }
-        done(null, userDto);
+        }*/
+        done(null, user.id);
     });
 
+    // Supply a way for passport to deserialize each user based on serialization
     passport.deserializeUser(function(user, done) {
-        let info = {
+        /*let info = {
             id: user.id
-        }
-        let sql = `SELECT * FROM users WHERE ?`;
-        db.query(sql, info, (err, result) => {
+        }*/
+        let sql = `SELECT * FROM users WHERE id=?`;
+        db.query(sql, user, (err, result) => {
             if(err) {
                 done(err, false);
             } else {
@@ -28,6 +30,7 @@ module.exports = function(passport) {
         });
     });
 
+    // Supply strategy for confirming a users credentials
     passport.use(new LocalStrategy(
         function(username, password, done) {
 

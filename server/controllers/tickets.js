@@ -114,15 +114,14 @@ router.post('/', authMiddleware, [
     body('userId').not().isEmpty().withMessage("A userId is required to create a ticket.").trim().escape(),
     body('projId').not().isEmpty().withMessage("A projId is required to create a ticket.").trim().escape(),
 ], async (req, res) => {
+    
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
     if(req.body.username.includes('dev1')) {
         return res.status(403).json({ error: "You cannot create a ticket as the dev user." })
     }
-    console.log(req.body);
-
     let ticket = {
         title: req.body.title,
         text: req.body.text,
@@ -140,7 +139,6 @@ router.post('/', authMiddleware, [
     */
     let ticketId = 0;
     const users = req.body.users;
-    console.log(users);
 
     const sql = 'INSERT INTO tickets SET ?';
     db.query(sql, ticket, (err, result) => {
@@ -196,18 +194,17 @@ router.post('/:id', authMiddleware, [
     body('title').not().isEmpty().withMessage("A title is required to create a ticket.").trim().escape(),
     body('text').not().isEmpty().withMessage("Ticket details are required to create a ticket.").trim().escape()
 ], async (req, res) => {
+    
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
-    console.log(req.body);
     let ticket = {
         title: req.body.title,
         text: req.body.text,
         updatedAt: new Date()
     }
     const users = req.body.users.map(u => u.id);
-    console.log(users);
     // Update ticket data
     const sql = 'UPDATE tickets SET ? WHERE ?';
     db.query(sql, [ticket, {id: req.params.id}], (err, result) => {
@@ -235,13 +232,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     if(req.user.username.includes('dev1')) {
         return res.status(403).json({ error: "You cannot delete a ticket as the dev user." })
     }
-    console.log('TICKET DELETE')
-    console.log(req.params.id);
     // First delete ticket_users references
     let sql = 'DELETE FROM ticket_users WHERE ?';
         db.query(sql, {ticket_id: req.params.id}, (err, result) => {
             if(err) throw err;
-            console.log('')
             // Then delete the ticket itself
             sql = 'DELETE FROM tickets WHERE ?';
             db.query(sql, {id: req.params.id}, (err, result) => {

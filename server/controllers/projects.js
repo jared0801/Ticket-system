@@ -118,9 +118,10 @@ router.post('/', authMiddleware, [
     body('description').not().isEmpty().withMessage("A description is required to create a project.").trim().escape(),
     body('userId').not().isEmpty().withMessage("A lead userId is required to create a project.").trim().escape()
 ], async (req, res) => {
+    
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
     if(req.body.username.includes('dev1')) {
         return res.status(403).json({ error: "You cannot create a project as the dev user." })
@@ -163,11 +164,11 @@ router.post('/:id', authMiddleware, [
     body('title').not().isEmpty().withMessage("A title is required to create a project.").trim().escape(),
     body('description').not().isEmpty().withMessage("A description is required to create a project.").trim().escape()
 ], async (req, res) => {
+    
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
-    console.log(req.body);
     let project = {
         title: req.body.title,
         description: req.body.description,
@@ -184,7 +185,6 @@ router.post('/:id', authMiddleware, [
     if(!seenLead) users.push(project.lead);
     console.log(users);*/
     const users = req.body.users.map(u => u.id);
-    console.log(users);
     // Update project data
     const sql = 'UPDATE projects SET ? WHERE ?';
     db.query(sql, [project, {id: req.params.id}], (err, result) => {

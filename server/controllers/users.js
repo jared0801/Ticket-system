@@ -36,7 +36,7 @@ router.post('/register', [
 
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
@@ -105,7 +105,7 @@ router.post('/update', authMiddleware, [
 
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
     if(req.body.username.includes('dev1')) {
         return res.status(403).json({ error: "You cannot update the dev user." })
@@ -125,7 +125,6 @@ router.post('/update', authMiddleware, [
             if(err) {
                 res.send(err);
             } else {
-                console.log(result);
                 res.status(200).send("User successfully updated!");
             }
         });
