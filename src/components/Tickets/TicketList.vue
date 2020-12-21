@@ -35,7 +35,7 @@
                 <tbody>
                     <tr v-for="ticket in (resolved_tab ? resolved_tickets : unresolved_tickets)" v-bind:key="ticket.id">
                         <td>
-                            <router-link :to="`/${$route.params.id}/tickets/${ticket.id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
+                            <router-link :to="`/projects/${$route.params.id}/tickets/${ticket.id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
                         </td>
                         <td class="ticket-description">{{ ticket.text }}</td>
                         <td>{{ ticket.submitter }}</td>
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import TicketService from '../api/TicketService';
+import TicketService from '@/api/TicketService';
 
 export default {
     name: "TicketList",

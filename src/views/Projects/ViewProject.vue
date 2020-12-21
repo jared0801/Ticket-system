@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import TicketList from '@/components/TicketList';
-import EditProject from '@/components/EditProject';
+import TicketList from '@/components/Tickets/TicketList';
+import EditProject from '@/components/Projects/EditProject';
 import ProjectService from '@/api/ProjectService';
 import Header from '@/components/Header';
 import { mapGetters } from 'vuex';

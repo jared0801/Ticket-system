@@ -33,8 +33,7 @@ export default {
         ...mapGetters('user', ['getUser']),
     },
     methods: {
-        ...mapMutations('user', ['removeUser']),
-        ...mapMutations('user', ['storeUser']),
+        ...mapMutations('user', ['removeUser', 'storeUser']),
         ...mapActions('tickets', ['getAppData']),
         logout() {
             this.removeUser();
@@ -45,13 +44,17 @@ export default {
             });
         }
     },
-    async created() {
-        const response = await UserService.getCurrentUser();
-        if(response.data && 'username' in response.data) {
-            const user = response.data;
-            this.storeUser(user);
-            await this.getAppData();
-        }
+    created() {
+        UserService.getCurrentUser().then(async (res) => {
+            console.log(res);
+            if(res.data && 'username' in res.data) {
+                const user = res.data;
+                this.storeUser(user);
+                await this.getAppData();
+            }
+        }).catch(() => {
+            // User not logged in
+        });
     }
 }
 </script>

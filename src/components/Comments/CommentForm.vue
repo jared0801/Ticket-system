@@ -17,7 +17,7 @@
                 <i class="fas fa-spinner fa-pulse"></i> Loading...
             </span>
             <div v-else>
-                <Comment v-for="comment in comments" :comment=comment :key="comment._id" />
+                <Comment v-for="comment in comments" :comment=comment :key="comment.id" />
             </div>
         </div>
     </div>
@@ -58,8 +58,7 @@ export default {
             const comment = {
                 text: this.text,
                 userId: this.getUser().id,
-                ticket: this.$route.params.id,
-                username: this.getUser().username
+                ticketId: this.$route.params.tid
             }
             CommentService.createComment(comment).then(() => {
                 this.loading = false;

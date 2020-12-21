@@ -13,7 +13,7 @@
 
 <script>
 import Header from '@/components/Header';
-import EditTicket from '@/components/EditTicket';
+import EditTicket from '@/components/Tickets/EditTicket';
 
 export default {
     name: 'CreateTicket',

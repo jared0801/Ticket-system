@@ -1,7 +1,7 @@
 <template>
     <div class="card comment">
         <header class="card-header">
-            <p>{{ comment.user }}</p>
+            <p>{{ comment.username }}</p>
             
             <div v-if="isCommenter" class="card-header-icon">
                 <a @click="toggleEdit" role="button" class="edit" :class="{ 'selected' : editing }"><i class="fas fa-edit"></i></a>
@@ -35,9 +35,9 @@
             <div v-else class="comment-content">
                 {{ comment.text }}
                 <div class="help">
-                    <time v-if="comment.lastEdit" :datetime="comment.createdAt">
+                    <time v-if="comment.updatedAt" :datetime="comment.createdAt">
                         <br>
-                        Last Edited: {{ editedDateTime }}
+                        Last Edited: {{ updatedDateTime }}
                     </time>
                     <br>
                     <time :datetime="comment.createdAt">
@@ -86,10 +86,9 @@ export default {
         updateComment() {
             this.loading = true;
             const comment = {
-                id: this.comment._id,
+                id: this.comment.id,
                 userId: this.getUser.id,
-                text: this.text,
-                username: this.getUser.username
+                text: this.text
             }
             CommentService.updateComment(comment).then(() => {
                 this.loading = false;
@@ -101,7 +100,7 @@ export default {
         },
         deleteComment() {
             this.loading = true;
-            CommentService.deleteComment(this.comment._id).then(() => {
+            CommentService.deleteComment(this.comment.id).then(() => {
                 this.loading = false;
                 this.$router.go(0);
             }).catch(err => {
@@ -116,7 +115,7 @@ export default {
     computed: {
         ...mapGetters('user', ['getUser']),
         isCommenter() {
-            return this.getUser.id === this.comment.userId;
+            return this.getUser.username === this.comment.username;
         },
         createdDateTime() {
             let hours = this.comment.createdAt.getHours();
@@ -127,14 +126,15 @@ export default {
             minutes = minutes < 10 ? '0'+minutes : minutes;
             return `${hours}:${minutes} ${ampm} - ${this.comment.createdAt.getMonth()+1}/${this.comment.createdAt.getDate()}/${this.comment.createdAt.getFullYear()}`;
         },
-        editedDateTime() {
-            let hours = this.comment.lastEdit.getHours();
-            let minutes = this.comment.lastEdit.getMinutes();
+        updatedDateTime() {
+            console.log(this.comment.updatedAt);
+            let hours = this.comment.updatedAt.getHours();
+            let minutes = this.comment.updatedAt.getMinutes();
             let ampm = hours >= 12 ? 'pm' : 'am';
             hours = hours % 12;
             hours = hours ? hours : 12; // The hour '0' should be '12'
             minutes = minutes < 10 ? '0'+minutes : minutes;
-            return `${hours}:${minutes} ${ampm} - ${this.comment.lastEdit.getMonth()+1}/${this.comment.lastEdit.getDate()}/${this.comment.lastEdit.getFullYear()}`;
+            return `${hours}:${minutes} ${ampm} - ${this.comment.updatedAt.getMonth()+1}/${this.comment.updatedAt.getDate()}/${this.comment.updatedAt.getFullYear()}`;
         }
     }
     

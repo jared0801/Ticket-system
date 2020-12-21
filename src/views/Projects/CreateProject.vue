@@ -12,7 +12,7 @@
 
 <script>
 import Header from '@/components/Header';
-import EditProject from '@/components/EditProject';
+import EditProject from '@/components/Projects/EditProject';
 
 export default {
     name: 'CreateProject',

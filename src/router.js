@@ -53,12 +53,12 @@ const router = new Router({
         {
             path: '/projects/:id/create',
             name: 'create-ticket',
-            component: () => import(/* webpackChunkName: "project" */ './views/Projects/Tickets/CreateTicket.vue')
+            component: () => import(/* webpackChunkName: "project" */ './views/Tickets/CreateTicket.vue')
         },
         {
-            path: '/:pid/tickets/:tid',
+            path: '/projects/:pid/tickets/:tid',
             name: 'view-ticket',
-            component: () => import(/* webpackChunkName: "project" */ './views/Projects/Tickets/ViewTicket.vue')
+            component: () => import(/* webpackChunkName: "project" */ './views/Tickets/ViewTicket.vue')
         }
     ],
 });

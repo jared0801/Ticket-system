@@ -51,7 +51,7 @@
 
 <script>
 import TicketService from '@/api/TicketService';
-import EditTicket from '@/components/EditTicket';
+import EditTicket from '@/components/Tickets/EditTicket';
 import CommentForm from '@/components/Comments/CommentForm';
 import Header from '@/components/Header';
 import { mapGetters } from 'vuex';
