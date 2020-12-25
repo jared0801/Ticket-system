@@ -6,6 +6,7 @@ const passport = require('passport');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 require('dotenv').config();
+//const initDb = require('./migration/dbInit');
 
 const app = express();
 
@@ -18,11 +19,14 @@ const db = require('./connection');
 // Use existing connection for session store
 const sessionStore = new MySQLStore({}, db);
 
-db.connect((err) => {
+db.connect(async (err) => {
     if(err) {
         throw err;
     }
     console.log("MySQL is connected.");
+
+    // Don't uncomment unless you know what you're doing!
+    //await initDb();
 });
 
 // Apply standard global middleware for parsing request body, cookies, and handling CORS
