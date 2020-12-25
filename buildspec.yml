@@ -1,0 +1,8 @@
+phases:
+  install:
+    commands:
+      # Install prod dependencies
+      - npm install --only=production
+
+      # Update AWS CLI to latest version
+      - pip install --upgrade awscli
