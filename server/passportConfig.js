@@ -25,19 +25,16 @@ module.exports = function(passport) {
     // Supply strategy for confirming a users credentials
     passport.use(new LocalStrategy(
         function(username, password, done) {
-            console.log('strategy');
 
             let info = {
                 username,
             }
-            console.log(username);
             // username is unique in db
             let sql = `SELECT * FROM users WHERE ?`;
             db.query(sql, info, (err, result) => {
                 if(err) {
                     return done(err);
                 } else {
-                    console.log(result);
                     if(result.length) {
                         const user = result[0];
 

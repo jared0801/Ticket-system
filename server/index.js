@@ -19,15 +19,8 @@ const db = require('./connection');
 // Use existing connection for session store
 const sessionStore = new MySQLStore({}, db);
 
-db.connect(async (err) => {
-    if(err) {
-        throw err;
-    }
-    console.log("MySQL is connected.");
-
-    // Don't uncomment unless you know what you're doing!
-    //await initDb();
-});
+// Don't uncomment unless you know what you're doing!
+//await initDb();
 
 // Apply standard global middleware for parsing request body, cookies, and handling CORS
 app.use(bodyParser.json());
