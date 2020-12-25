@@ -23,7 +23,6 @@
     "express-session": "^1.17.0",
     "express-validator": "^6.4.0",
     "mysql": "^2.18.1",
-    "node-sass": "^4.13.1",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0"
   },
@@ -40,7 +39,8 @@
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.1.2",
     "nodemon": "^2.0.2",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "node-sass": "^4.13.1"
   },
   "eslintConfig": {
     "root": true,
