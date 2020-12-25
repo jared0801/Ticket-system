@@ -47,8 +47,8 @@ class UserService {
     static loginDevUser() {
         const loginUrl = `${url}/login`;
         return axios.post(loginUrl, {
-            username: 'dev1',
-            password: 'dev123'
+            username: 'demo',
+            password: 'demo123'
         });
     }
 

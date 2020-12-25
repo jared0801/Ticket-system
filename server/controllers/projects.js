@@ -123,8 +123,8 @@ router.post('/', authMiddleware, [
     if(!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    if(req.body.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot create a project as the dev user." })
+    if(req.body.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot create a project as the demo user." })
     }
 
     let project = {
@@ -209,8 +209,8 @@ router.post('/:id', authMiddleware, [
 
 // Delete a project
 router.delete('/:id', authMiddleware, async (req, res) => {
-    if(req.user.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot delete a project as the dev user." })
+    if(req.user.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot delete a project as the demo user." })
     }
     // First delete project_users references
     let sql = 'DELETE FROM project_users WHERE ?';

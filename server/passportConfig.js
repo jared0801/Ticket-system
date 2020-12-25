@@ -5,19 +5,11 @@ const db = require('./connection');
 module.exports = function(passport) {
     // Supply unique way for passport to serialize each user
     passport.serializeUser(function(user, done) {
-        //console.log(user.id);
-        /*const userDto = {
-            id: user.id,
-            username: user.username
-        }*/
         done(null, user.id);
     });
 
     // Supply a way for passport to deserialize each user based on serialization
     passport.deserializeUser(function(user, done) {
-        /*let info = {
-            id: user.id
-        }*/
         let sql = `SELECT * FROM users WHERE id=?`;
         db.query(sql, user, (err, result) => {
             if(err) {
@@ -33,15 +25,19 @@ module.exports = function(passport) {
     // Supply strategy for confirming a users credentials
     passport.use(new LocalStrategy(
         function(username, password, done) {
+            console.log('strategy');
 
             let info = {
                 username,
             }
+            console.log(username);
+            // username is unique in db
             let sql = `SELECT * FROM users WHERE ?`;
             db.query(sql, info, (err, result) => {
                 if(err) {
                     return done(err);
                 } else {
+                    console.log(result);
                     if(result.length) {
                         const user = result[0];
 

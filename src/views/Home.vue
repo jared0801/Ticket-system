@@ -47,7 +47,7 @@
                     First time here? <router-link to="/register">Sign Up</router-link>
                 </div>
                 <div>
-                    Just taking a look? <router-link to="/">Demo login</router-link>
+                    Just taking a look? <a href="#" @click="demoLogin">Demo login</a>
                 </div>
             </form>
             
@@ -91,6 +91,16 @@ export default {
         clearFields() {
             this.username = '';
             this.password = '';
+        },
+        demoLogin() {
+            UserService.loginDevUser().then(res => {
+                if(res.status === 200) {
+                    this.storeUser(res.data);
+                    this.getAppData();
+                    this.clearFields();
+                    this.$router.push('/projects');
+                }
+            })
         },
         checkForm(event) {
             this.error = '';

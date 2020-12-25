@@ -119,8 +119,8 @@ router.post('/', authMiddleware, [
     if(!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    if(req.body.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot create a ticket as the dev user." })
+    if(req.body.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot create a ticket as the demo user." })
     }
     let ticket = {
         title: req.body.title,
@@ -159,8 +159,8 @@ router.post('/', authMiddleware, [
 // Resolve ticket
 router.get('/res/:id', authMiddleware, async (req, res) => {
     // TODO: validate user has access to this ticket/project
-    if(req.user.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot resolve a ticket as the dev user." })
+    if(req.user.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot resolve a ticket as the demo user." })
     }
     const project = {
         resolvedAt: new Date()
@@ -175,8 +175,8 @@ router.get('/res/:id', authMiddleware, async (req, res) => {
 // Unresolve ticket
 router.get('/unres/:id', authMiddleware, async (req, res) => {
     // TODO: validate user has access to this ticket/project
-    if(req.user.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot unresolve a ticket as the dev user." })
+    if(req.user.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot unresolve a ticket as the demo user." })
     }
     const project = {
         resolvedAt: null
@@ -229,8 +229,8 @@ router.post('/:id', authMiddleware, [
 
 // Delete a ticket
 router.delete('/:id', authMiddleware, async (req, res) => {
-    if(req.user.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot delete a ticket as the dev user." })
+    if(req.user.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot delete a ticket as the demo user." })
     }
     // First delete ticket_users references
     let sql = 'DELETE FROM ticket_users WHERE ?';

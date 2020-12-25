@@ -107,8 +107,8 @@ router.post('/update', authMiddleware, [
     if(!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    if(req.body.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot update the dev user." })
+    if(req.body.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot update the demo user." })
     }
     try {
 

@@ -32,8 +32,8 @@ router.post('/', [
     body('ticketId').isNumeric().not().isEmpty().withMessage("A ticket id is required to leave a comment on a ticket.").trim().escape(),
     body('userId').isNumeric().not().isEmpty().withMessage("A lead userId is required to create a project.").trim().escape()
 ], async (req, res) => {
-    if(req.user.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot create a comment as the dev user." })
+    if(req.user.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot create a comment as the demo user." })
     }
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
@@ -62,8 +62,8 @@ router.post('/:id', [
     body('id').isNumeric().not().isEmpty().withMessage("A comment id is required to update a comment.").trim().escape(),
     body('userId').isNumeric().not().isEmpty().withMessage("A user id is required to update a comment.").trim().escape()
 ], async (req, res) => {
-    if(req.user.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot create a comment as the dev user." })
+    if(req.user.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot create a comment as the demo user." })
     }
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
@@ -86,8 +86,8 @@ router.post('/:id', [
 
 // Delete a comment
 router.delete('/:id', authMiddleware, async (req, res) => {
-    if(req.user.username.includes('dev1')) {
-        return res.status(403).json({ error: "You cannot delete a project as the dev user." })
+    if(req.user.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot delete a project as the demo user." })
     }
     // First delete project_users references
     let sql = 'DELETE FROM comments WHERE ? AND ?';
