@@ -9,7 +9,7 @@ export default {
         comments: []
     },
     getters: {
-        getProjects(state) {
+        getData(state) {
             return { 
                 tickets: state.tickets,
                 projects: state.projects,

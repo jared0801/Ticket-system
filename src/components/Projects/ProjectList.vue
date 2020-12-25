@@ -13,7 +13,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="project in projects" v-bind:key="project.id">
+                    <tr v-for="project in getData.projects" v-bind:key="project.id">
                         <td>
                             <router-link :to="`/projects/${project.id}`">{{ project.title }}</router-link>
                         </td>
@@ -30,8 +30,7 @@
 </template>
 
 <script>
-import ProjectService from '@/api/ProjectService';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     name: "ProjectList",
@@ -43,17 +42,13 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('tickets', ['getProjects']),
+        ...mapGetters('tickets', ['getData']),
     },
     methods: {
-        getData() {
-            ProjectService.getProjects().then(() => {
-                this.projects = this.getProjects.projects;
-            });
-        }
+        ...mapActions('tickets', ['getAppData'])
     },
-    created() {
-        this.getData();
+    async created() {
+        await this.getAppData();
     }
     
 }

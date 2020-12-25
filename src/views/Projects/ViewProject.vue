@@ -5,9 +5,13 @@
             
             <Header title="Project Tickets" backlinkText="Projects" backlink="/projects" />
 
-            <div class="right-align">
-                <button v-if="isLead" class="button is-info editButton" v-on:click="editProject">Edit Project</button>
-                <router-link class="button" :to="{ name: 'create-ticket' }">Create a ticket</router-link>
+            <div class="field button-div right-align">
+                <div v-if="isLead" class="control">
+                    <button class="button is-info editButton" v-on:click="editProject">Edit Project</button>
+                </div>
+                <div class="control">
+                    <router-link class="button" :to="{ name: 'create-ticket' }">Create a ticket</router-link>
+                </div>
             </div>
             <div v-if="editting" class="project-info">
                 <EditProject :project="project" v-on:close-project="editProject" />

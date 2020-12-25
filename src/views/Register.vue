@@ -78,7 +78,7 @@
 <script>
 import UserService from '@/api/UserService';
 import Header from '@/components/Header';
-import { mapState } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
     name: 'Register',
@@ -105,10 +105,12 @@ export default {
     },
     created() {
         if(this.isLoggedIn) {
-            this.$router.push('/');
+            this.$router.push('/projects');
         }
     },
     methods: {
+        ...mapMutations('user', ['storeUser']),
+        ...mapActions('tickets', ['getAppData']),
         clearErrors() {
             this.errors.username = '';
             this.errors.email = '';
@@ -145,7 +147,6 @@ export default {
                     email: this.email
                 }).then(res => {
                     if(res.status === 201) {
-                        this.clearFields();
                         UserService.loginUser({
                             username: this.username,
                             password: this.password
@@ -157,7 +158,9 @@ export default {
                                 this.$router.push('/projects');
                             }
                         }).catch(err => {
-                            if(err.response.status === 401) {
+                            console.log('not logged in');
+                            console.log(err);
+                            if(err.response && err.response.status === 401) {
                                 this.error = "Username or password is invalid.";
                             } else {
                                 this.error = err.error;

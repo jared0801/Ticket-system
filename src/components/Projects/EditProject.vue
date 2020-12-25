@@ -173,7 +173,7 @@ export default {
                 }
             }).catch((err) => {
                 this.loading = false;
-                if(err.response.data.error) {
+                if(err.response?.data?.error) {
                     this.serverError = err.response.data.error;
                 } else {
                     this.serverError = err;

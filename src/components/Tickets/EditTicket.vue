@@ -12,13 +12,6 @@
         <div class="field">
             <label class="label">Assign this ticket</label>
             <div class="control">
-                <!-- <div class="select">
-                    <select v-model="assignedUsers[0]">
-                        <option disabled value="">Select dropdown</option>
-                        <option v-for="user in users" :key="user">{{ user }}</option>
-                    </select>
-                </div> -->
-
                 <vue-autosuggest
                 :suggestions="[{data: filteredUsers.map(r => r.username)}]"
                 :input-props="{id:'autosuggest__input', placeholder:'Assign to', class: 'input'}"
@@ -106,7 +99,6 @@ export default {
     async created() {
         this.loading = true;
         try {
-            console.log(this.ticket);
             if(this.ticket) {
                 this.title = this.ticket.title;
                 this.text = this.ticket.text;
@@ -115,7 +107,6 @@ export default {
             const userArray = await UserService.getUsers();
             this.users = userArray;
             this.filteredUsers = userArray;
-            console.log(this.assignedUsers);
             if(this.assignedUsers && this.assignedUsers.length) {
                 this.filteredUsers = this.users.filter(item => {
                     return !this.assignedUsers.some(i => i.id==item.id);
@@ -148,13 +139,16 @@ export default {
                 this.loading = false;
                 this.text = '';
                 this.title = '';
-                this.getAppData().then(res => {
-                    console.log(res);
+                this.getAppData().then(() => {
                     this.$router.push(`/projects/${this.$route.params.id}`);
                 })
             }).catch((err) => {
                 this.loading = false;
-                this.serverError = err;
+                if(err.response?.data?.error) {
+                    this.serverError = err.response.data.error;
+                } else {
+                    this.serverError = err;
+                }
             });
         },
         updateTicket() {
@@ -167,8 +161,7 @@ export default {
                 projId: this.ticket.projId,
                 id: this.ticket.id,
             }
-            TicketService.updateTicket(ticket).then((res) => {
-                console.log(res);
+            TicketService.updateTicket(ticket).then(() => {
                 this.loading = false;
                 this.text = '';
                 this.title = '';

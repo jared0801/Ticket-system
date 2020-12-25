@@ -26,11 +26,11 @@
                     </div>
                 </div>
                 
-                <div class="field">
+                <!-- <div class="field">
                     <div class="control">
                         <button class="button">Change Password</button>
                     </div>
-                </div>
+                </div> -->
                 
                 <div class="field">
                     <div class="control">
