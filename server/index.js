@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser(process.env.SESS_SECRET));
 app.use(cors({
     credentials: true,
-    origin: "http://localhost:8080", // location of frontend app
+    origin: process.env.FE_ORIGIN, // location of frontend app
 }));
 
 // Create an expiration date for login cookie

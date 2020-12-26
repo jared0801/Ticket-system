@@ -15,6 +15,7 @@ DB_HOST=
 DB_USER=
 DB_PASS=
 DB_NAME=
+FE_ORIGIN=
 ```
 
 An example would be:
@@ -26,6 +27,7 @@ DB_HOST=localhost
 DB_USER=root
 DB_PASS=pass
 DB_NAME=ticket-system
+FE_ORIGIN=localhost:8080
 ```
 
 ### Compiles and hot-reloads client for development
