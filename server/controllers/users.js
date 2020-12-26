@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const db = require('../connection');
 const { authMiddleware } = require('../middleware/auth');
