@@ -69,7 +69,7 @@ router.beforeEach((to, from, next) => {
                 // User session is recognized
                 store.commit('user/storeUser', user);
                 next();
-            } else next({ path: '/login' });
+            } else next({ path: '/' });
         }).catch(() => {
             next({ path: '/' });
         });

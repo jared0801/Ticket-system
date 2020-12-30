@@ -80,9 +80,16 @@ export default {
             }
         }
     },
-    created() {
+    mounted() {
         if(this.isLoggedIn) {
             this.$router.push('/projects');
+        }
+    },
+    watch: {
+        isLoggedIn: function(val) {
+            if(val === true) {
+                this.$router.push('/projects');
+            }
         }
     },
     methods: {

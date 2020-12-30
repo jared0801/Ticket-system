@@ -1,7 +1,7 @@
 const db = require('../connection');
 
 async function initDb() {
-
+/*
     // User table
     let sql = `CREATE TABLE users(
         id int AUTO_INCREMENT,
@@ -38,6 +38,8 @@ async function initDb() {
         text VARCHAR(1000),
         project_id int NOT NULL,
         user_id int NOT NULL,
+        status_id int NOT NULL DEFAULT 0,
+        type_id int NOT NULL DEFAULT 1,
         createdAt DATETIME NOT NULL DEFAULT current_timestamp(),
         updatedAt DATETIME,
         resolvedAt DATETIME,
@@ -90,8 +92,11 @@ async function initDb() {
             FOREIGN KEY (user_id)
             REFERENCES users(id)
     )`;
-    await db.query(sql)
-    console.log("Project_users table created!");
+    db.query(sql, (err, res) => {
+        if(err) throw err;
+        console.log(res);
+        console.log("Project_users table created!");
+    });
     
 
     sql = `CREATE TABLE ticket_users(
@@ -106,11 +111,68 @@ async function initDb() {
             FOREIGN KEY (user_id)
             REFERENCES users(id)
     )`;
-    await db.query(sql);
-    console.log("ticket_users table created!");
+    db.query(sql, (err, res) => {
+        if(err) throw err;
+        console.log(res);
+        console.log("ticket_users table created!");
+    });
     
 
+    sql = `CREATE TABLE ticket_status(
+        id int AUTO_INCREMENT,
+        status VARCHAR(255),
+        PRIMARY KEY(id)
+    )`;
+    db.query(sql, (err, res) => {
+        if(err) throw err;
+        console.log(res);
+        console.log("ticket_status table created!");
+    });
 
+    
+    
+    const statuses = [
+        ["Open"],
+        ["In Progress"],
+        ["Blocked"],
+        ["Closed"]
+    ]
+    sql = `INSERT INTO ticket_status (status) VALUES ?`;
+    db.query(sql, [statuses], (err, res) => {
+        if(err) throw err;
+        console.log(res);
+        console.log("ticket statuses inserted!");
+    });
+
+
+
+
+
+    sql = `CREATE TABLE ticket_type(
+        id int AUTO_INCREMENT,
+        type VARCHAR(255),
+        PRIMARY KEY(id)
+    )`;
+    db.query(sql, (err, res) => {
+        if(err) throw err;
+        console.log(res);
+        console.log("ticket_type table created!");
+    });
+   
+
+    const types = [
+        ["Bug / Error"],
+        ["Feature Request"],
+        ["Project Proposal"],
+        ["Training"]
+    ]
+    sql = `INSERT INTO ticket_type (type) VALUES ?`;
+    db.query(sql, [types], (err, res) => {
+        if(err) throw err;
+        console.log(res);
+        console.log("Ticket types inserted!");
+    });
+    */
 };
 
-module.exports = remigrateDb;
+module.exports = initDb;

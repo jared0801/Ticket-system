@@ -26,6 +26,8 @@
                 <thead>
                     <tr>
                         <th>Title</th>
+                        <th>Type</th>
+                        <th>Status</th>
                         <th>Description</th>
                         <th>Submitter</th>
                         <th v-if="resolved_tab">Completed</th>
@@ -37,6 +39,8 @@
                         <td>
                             <router-link :to="`/projects/${$route.params.id}/tickets/${ticket.id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
                         </td>
+                        <td>{{ ticket.type }}</td>
+                        <td>{{ ticket.status }}</td>
                         <td class="ticket-description">{{ ticket.text }}</td>
                         <td>{{ ticket.submitter }}</td>
                         <td class="completed" v-if="resolved_tab">{{ `${ticket.resolvedAt.getMonth()+1}/${ticket.resolvedAt.getDate()}/${ticket.resolvedAt.getFullYear()}` }}</td>
@@ -129,9 +133,11 @@ export default {
 	Label the data
 	*/
 	td:nth-of-type(1):before { content: "Title"; }
-	td:nth-of-type(2):before { content: "Description"; }
-	td:nth-of-type(3):before { content: "Submitter"; }
-	td.created:nth-of-type(4):before { content: "Created"; }
-	td.completed:nth-of-type(4):before { content: "Completed"; }
+	td:nth-of-type(2):before { content: "Type"; }
+	td:nth-of-type(3):before { content: "Status"; }
+	td:nth-of-type(4):before { content: "Description"; }
+	td:nth-of-type(5):before { content: "Submitter"; }
+	td.created:nth-of-type(6):before { content: "Created"; }
+	td.completed:nth-of-type(6):before { content: "Completed"; }
 }
 </style>

@@ -8,6 +8,19 @@
                 <input class="input" type="text" v-model="title" placeholder="Ticket title">
             </div>
         </div>
+        <div class="field">
+            <div class="control">
+                <label class="label">Ticket Type</label>
+                <div class="select">
+                    <select v-model="type_id">
+                        <option value="1">Bug / Error</option>
+                        <option value="2">Feature Request</option>
+                        <option value="3">Project Proposal</option>
+                        <option value="4">Training</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
         <div class="field">
             <label class="label">Assign this ticket</label>
@@ -52,7 +65,7 @@
                     classType="is-danger" />
             </div>
             <div class="control">
-                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="updateTicket">Update</button>
+                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click.prevent="updateTicket">Update</button>
             </div>
             <div class="control">
                 <button class="button is-warning" v-on:click="closeTicket">Cancel</button>
@@ -84,7 +97,8 @@ export default {
             users: [],
             filteredUsers: [],
             loading: false,
-            activeModal: false
+            activeModal: false,
+            type_id: 1
         }
     },
     props: {
@@ -103,13 +117,15 @@ export default {
                 this.title = this.ticket.title;
                 this.text = this.ticket.text;
                 this.assignedUsers = this.ticket.users;
+                this.type_id = this.ticket.type_id;
             }
             const userArray = await UserService.getUsers();
             this.users = userArray;
             this.filteredUsers = userArray;
             if(this.assignedUsers && this.assignedUsers.length) {
-                this.filteredUsers = this.users.filter(item => {
-                    return !this.assignedUsers.some(i => i.id==item.id);
+                const assignedUsers = this.assignedUsers;
+                this.filteredUsers = this.users.filter(function(item) {
+                    return !assignedUsers.some(i => i.id==item.id);
                 });
             }
             this.loading = false;
@@ -131,9 +147,11 @@ export default {
                 text: this.text,
                 userId: this.getUser().id,
                 users: this.assignedUsers,
-                projId: this.$route.params.id,
+                project_id: this.$route.params.id,
                 resolvedAt: '',
-                username: this.getUser().username
+                username: this.getUser().username,
+                status_id: 0,
+                type_id: this.type_id
             }
             TicketService.createTicket(ticket).then(() => {
                 this.loading = false;
@@ -158,14 +176,16 @@ export default {
                 text: this.text,
                 user: this.ticket.user,
                 users: this.assignedUsers,
-                projId: this.ticket.projId,
+                project_id: this.ticket.project_id,
+                status_id: this.ticket.status_id,
+                type_id: this.type_id,
                 id: this.ticket.id,
             }
             TicketService.updateTicket(ticket).then(() => {
                 this.loading = false;
                 this.text = '';
                 this.title = '';
-                this.$router.go(0);
+                //this.$router.go(0);
             }).catch((err) => {
                 this.loading = false;
                 this.serverError = err;
@@ -175,7 +195,7 @@ export default {
             this.loading = true;
             TicketService.deleteTicket(this.ticket.id).then(() => {
                 this.loading = false;
-                this.$router.push(`/projects/${this.ticket.projId}`);
+                this.$router.push(`/projects/${this.ticket.project_id}`);
             }).catch((err) => {
                 this.loading = false;
                 this.serverError = err;
@@ -198,8 +218,9 @@ export default {
 
         },
         inputChangeHandler(text) {
-            this.filteredUsers = this.users.filter(item => {
-                return item.username.toLowerCase().indexOf(text.toLowerCase()) > -1 && !this.assignedUsers.some(i => i.id == item.id);
+            const assignedUsers = this.assignedUsers;
+            this.filteredUsers = this.users.filter(function(item) {
+                return item.username.toLowerCase().indexOf(text.toLowerCase()) > -1 && !assignedUsers.some(i => i.id == item.id);
             });
         }
     }

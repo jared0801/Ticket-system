@@ -6,7 +6,7 @@ const passport = require('passport');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 require('dotenv').config();
-//const initDb = require('./migration/dbInit');
+// const initDb = require('./migration/dbInit');
 
 const app = express();
 
@@ -18,9 +18,6 @@ const db = require('./connection');
 
 // Use existing connection for session store
 const sessionStore = new MySQLStore({}, db);
-
-// Don't uncomment unless you know what you're doing!
-//await initDb();
 
 // Apply standard global middleware for parsing request body, cookies, and handling CORS
 app.use(bodyParser.json());
@@ -74,7 +71,10 @@ app.use('/api/comments', comments);
 
 
 // Start server
-app.listen(port, (err) => {
+app.listen(port, async (err) => {
     if(err) return console.log(err);
     console.log(`Server has started on port ${port}...`);
+
+    // Don't uncomment unless you know what you're doing!
+    // await initDb();
 });

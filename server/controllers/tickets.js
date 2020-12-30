@@ -29,16 +29,22 @@ router.get('/:id', authMiddleware, async (req, res) => {
         (
         SELECT
             tickets.*,
+            ticket_status.status AS status,
+            ticket_type.type AS type,
             users.username AS submitter
         FROM
             project_users
         JOIN users ON users.id = user_id
         JOIN tickets ON tickets.project_id = project_users.project_id
+        JOIN ticket_status ON tickets.status_id = ticket_status.id
+        LEFT JOIN ticket_type ON tickets.type_id = ticket_type.id
         WHERE
             users.id = ?
     ) usertickets
     WHERE
         ?
+    ORDER BY
+        createdAt DESC
     `
     db.query(sql, [req.user.id, info], (err, result) => {
         if(err) {
@@ -63,10 +69,19 @@ router.get('/:pid/ticket/:tid', authMiddleware, async (req, res) => {
         project_id: req.params.pid
     }
     
-    let sql = `SELECT tickets.*, u.username AS submitter FROM tickets
-    JOIN users AS u
-    ON
-        user_id = u.id WHERE tickets.id=? AND project_id=?`;
+    let sql = `SELECT
+        tickets.*,
+        ticket_status.status AS status,
+        ticket_type.type AS type,
+        u.username AS submitter
+    FROM tickets
+    JOIN users AS u ON
+        user_id = u.id
+    JOIN ticket_status ON
+        tickets.status_id = ticket_status.id
+    LEFT JOIN ticket_type ON
+        tickets.type_id = ticket_type.id
+    WHERE tickets.id=? AND project_id=?`;
     db.query(sql, [info.id, info.project_id], (err, result) => {
         if(err) {
             throw err;
@@ -112,7 +127,7 @@ router.post('/', authMiddleware, [
     body('title').not().isEmpty().withMessage("A title is required to create a ticket.").trim().escape(),
     body('text').not().isEmpty().withMessage("Text is required to create a ticket.").trim().escape(),
     body('userId').not().isEmpty().withMessage("A userId is required to create a ticket.").trim().escape(),
-    body('projId').not().isEmpty().withMessage("A projId is required to create a ticket.").trim().escape(),
+    body('project_id').not().isEmpty().withMessage("A project_id is required to create a ticket.").trim().escape(),
 ], async (req, res) => {
     
     const errors = validationResult(req);
@@ -126,7 +141,8 @@ router.post('/', authMiddleware, [
         title: req.body.title,
         text: req.body.text,
         user_id: req.body.userId,
-        project_id: req.body.projId,
+        project_id: req.body.project_id,
+        type_id: req.body.type_id,
         createdAt: new Date()
     }
     // Add creator as a user by default
@@ -162,11 +178,11 @@ router.get('/res/:id', authMiddleware, async (req, res) => {
     if(req.user.username.includes('demo')) {
         return res.status(403).json({ error: "You cannot resolve a ticket as the demo user." })
     }
-    const project = {
+    const ticket = {
         resolvedAt: new Date()
     }
     const sql = 'UPDATE tickets SET ? WHERE ?';
-    db.query(sql, [project, {id: req.params.id}], (err, result) => {
+    db.query(sql, [ticket, {id: req.params.id}], (err, result) => {
         if(err) throw err;
         res.status(200).send(result);
     });
@@ -202,6 +218,8 @@ router.post('/:id', authMiddleware, [
     let ticket = {
         title: req.body.title,
         text: req.body.text,
+        status_id: req.body.status_id,
+        type_id: req.body.type_id,
         updatedAt: new Date()
     }
     const users = req.body.users.map(u => u.id);

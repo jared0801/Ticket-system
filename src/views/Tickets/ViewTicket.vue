@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header :title="`Ticket: ${ticket.title}`" backlinkText="Back" />
+            <Header :title="`Ticket: ${ticket.title}`" backlinkText="Back" :backlink="`/projects/${ticket.project_id}`" />
             
             <div class="box">
                 <div class="notification is-danger" v-if="error">{{ error }}</div>
@@ -23,6 +23,24 @@
                         </div>
                         <div class="field desc-field">
                             <p>{{ ticket.text }}</p>
+                        </div>
+                        <div class="field">
+                            <p>Type: {{ ticket.type }}</p>
+                        </div>
+                        <div class="field">
+                            Status:
+                            <span class="control"> 
+                                <span v-if="!isAssignedUser">
+                                    {{ ticket.status }}
+                                </span>
+                                <div class="select" v-else>
+                                    <select v-model="setStatus">
+                                        <option value="0">Open</option>
+                                        <option value="1">In Progress</option>
+                                        <option value="2">Blocked</option>
+                                    </select>
+                                </div>
+                            </span>
                         </div>
                         <div class="field">
                             <p>Submitter: {{ ticket.submitter }}</p>
@@ -68,28 +86,59 @@ export default {
             loading: false,
             ticket: {},
             editting: false,
-            error: ''
+            error: '',
+            setStatus: ''
         }
     },
     computed: {
         isSubmitter() {
             return this.ticket.user_id === this.getUser().id;
+        },
+        isAssignedUser() {
+            return this.ticket.users.some(t => t.id === this.getUser().id);
         }
     },
     async created() {
         this.loading = true;
         try {
             this.ticket = await TicketService.getTicket(this.$route.params.pid, this.$route.params.tid);
+            this.setStatus = this.ticket.status_id;
             this.loading = false;
         } catch(err) {
             this.error = err.response.data.error;
             this.loading = false;
         }
     },
+    watch: {
+        setStatus: function(newVal, oldVal) {
+            if(!this.loading && newVal != oldVal) {
+                this.updateTicketStatus(newVal);
+            }
+        }
+    },
     methods: {
         ...mapGetters('user', ['getUser']),
         editTicket() {
             this.editting = !this.editting;
+        },
+        updateTicketStatus(status) {
+            this.loading = true;
+            const ticket = {
+                title: this.ticket.title,
+                text: this.ticket.text,
+                user: this.ticket.user,
+                users: this.ticket.users,
+                project_id: this.ticket.project_id,
+                status_id: status,
+                type_id: this.ticket.type_id,
+                id: this.ticket.id,
+            }
+            TicketService.updateTicket(ticket).then(() => {
+                this.loading = false;
+            }).catch((err) => {
+                this.loading = false;
+                this.serverError = err;
+            });
         },
         resolveTicket() {
             if(!this.ticket.resolvedAt) {
