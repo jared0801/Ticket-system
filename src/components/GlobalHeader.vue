@@ -1,7 +1,7 @@
 <template>
     <header class="header">
 
-        <router-link class="button home-button" :to="isLoggedIn ? '/projects' : '/'">
+        <router-link class="button home-button" :to="isLoggedIn ? '/dashboard' : '/'">
             <div class="icon-wrapper">
                 <i class="fas fa-trademark fa-2x"></i>
             </div>
