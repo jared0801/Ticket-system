@@ -36,7 +36,6 @@ export default {
     name: "ProjectList",
     data() {
         return {
-            projects: [],
             error: '',
             loading: false
         }

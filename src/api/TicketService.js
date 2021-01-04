@@ -27,6 +27,25 @@ class TicketService {
         });
     }
 
+    // Get all tickets associated with a user
+    static getAllTickets() {
+        return new Promise((resolve, reject) => {
+            axios.get(`${url}/all`).then((res) => {
+                let tickets = [];
+                if(res.data) {
+                    tickets = res.data.map(ticket => ({
+                        ...ticket,
+                        createdAt: new Date(ticket.createdAt),
+                        resolvedAt: ticket.resolvedAt ? new Date(ticket.resolvedAt) : ''
+                    }));
+                }
+                resolve(tickets);
+            }).catch((err) => {
+                reject(err);
+            })
+        });
+    }
+
     // Get a single ticket
     static getTicket(pid, tid) {
         return new Promise((resolve, reject) => {

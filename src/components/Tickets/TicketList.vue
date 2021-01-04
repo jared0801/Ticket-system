@@ -27,6 +27,7 @@
                     <tr>
                         <th>Title</th>
                         <th>Type</th>
+                        <th>Priority</th>
                         <th>Status</th>
                         <th>Description</th>
                         <th>Submitter</th>
@@ -40,6 +41,7 @@
                             <router-link :to="`/projects/${$route.params.id}/tickets/${ticket.id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
                         </td>
                         <td>{{ ticket.type }}</td>
+                        <td>{{ ticket.priority }}</td>
                         <td>{{ ticket.status }}</td>
                         <td class="ticket-description">{{ ticket.text }}</td>
                         <td>{{ ticket.submitter }}</td>
@@ -123,7 +125,7 @@ export default {
     box-shadow: none;
 }
 
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 925px) {
 
     .ticket-description {
         max-width: none;
@@ -134,10 +136,11 @@ export default {
 	*/
 	td:nth-of-type(1):before { content: "Title"; }
 	td:nth-of-type(2):before { content: "Type"; }
-	td:nth-of-type(3):before { content: "Status"; }
-	td:nth-of-type(4):before { content: "Description"; }
-	td:nth-of-type(5):before { content: "Submitter"; }
-	td.created:nth-of-type(6):before { content: "Created"; }
-	td.completed:nth-of-type(6):before { content: "Completed"; }
+	td:nth-of-type(3):before { content: "Priority"; }
+	td:nth-of-type(4):before { content: "Status"; }
+	td:nth-of-type(5):before { content: "Description"; }
+	td:nth-of-type(6):before { content: "Submitter"; }
+	td.created:nth-of-type(7):before { content: "Created"; }
+	td.completed:nth-of-type(7):before { content: "Completed"; }
 }
 </style>

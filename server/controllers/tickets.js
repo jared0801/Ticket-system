@@ -17,20 +17,14 @@ const router = express.Router();
     });
 });*/
 
-// Returns all tickets associated with a project
-router.get('/:id', authMiddleware, async (req, res) => {
-    let info = {
-        project_id: req.params.id
-    }
+// Returns all tickets associated with a user
+router.get('/all', authMiddleware, async (req, res) => {
     let sql = `
-    SELECT
-        *
-    FROM
-        (
         SELECT
             tickets.*,
             ticket_status.status AS status,
             ticket_type.type AS type,
+            ticket_priority.priority AS priority,
             users.username AS submitter
         FROM
             project_users
@@ -38,15 +32,47 @@ router.get('/:id', authMiddleware, async (req, res) => {
         JOIN tickets ON tickets.project_id = project_users.project_id
         JOIN ticket_status ON tickets.status_id = ticket_status.id
         LEFT JOIN ticket_type ON tickets.type_id = ticket_type.id
+        LEFT JOIN ticket_priority ON tickets.priority_id = ticket_priority.id
         WHERE
             users.id = ?
-    ) usertickets
-    WHERE
-        ?
-    ORDER BY
-        createdAt DESC
+        ORDER BY
+            createdAt DESC
+    `;
+    db.query(sql, [req.user.id], (err, result) => {
+        if(err) {
+            throw err;
+        } else {
+            res.send(result);
+        }
+
+    });
+});
+
+
+// Returns all tickets associated with a project
+router.get('/:id', authMiddleware, async (req, res) => {
+    let sql = `
+        SELECT
+            tickets.*,
+            ticket_status.status AS status,
+            ticket_type.type AS type,
+            ticket_priority.priority AS priority,
+            users.username AS submitter
+        FROM
+            project_users
+        JOIN users ON users.id = user_id
+        JOIN tickets ON tickets.project_id = project_users.project_id
+        JOIN ticket_status ON tickets.status_id = ticket_status.id
+        LEFT JOIN ticket_type ON tickets.type_id = ticket_type.id
+        LEFT JOIN ticket_priority ON tickets.priority_id = ticket_priority.id
+        WHERE
+            users.id = ?
+        AND
+            tickets.project_id = ?
+        ORDER BY
+            createdAt DESC
     `
-    db.query(sql, [req.user.id, info], (err, result) => {
+    db.query(sql, [req.user.id, req.params.id], (err, result) => {
         if(err) {
             throw err;
         } else {
@@ -61,6 +87,8 @@ router.get('/:id', authMiddleware, async (req, res) => {
     });
 });
 
+
+
 // Get a specific ticket
 router.get('/:pid/ticket/:tid', authMiddleware, async (req, res) => {
     
@@ -72,6 +100,7 @@ router.get('/:pid/ticket/:tid', authMiddleware, async (req, res) => {
     let sql = `SELECT
         tickets.*,
         ticket_status.status AS status,
+        ticket_priority.priority AS priority,
         ticket_type.type AS type,
         u.username AS submitter
     FROM tickets
@@ -81,6 +110,8 @@ router.get('/:pid/ticket/:tid', authMiddleware, async (req, res) => {
         tickets.status_id = ticket_status.id
     LEFT JOIN ticket_type ON
         tickets.type_id = ticket_type.id
+    LEFT JOIN ticket_priority ON
+        tickets.priority_id = ticket_priority.id
     WHERE tickets.id=? AND project_id=?`;
     db.query(sql, [info.id, info.project_id], (err, result) => {
         if(err) {
@@ -143,6 +174,7 @@ router.post('/', authMiddleware, [
         user_id: req.body.userId,
         project_id: req.body.project_id,
         type_id: req.body.type_id,
+        priority_id: req.body.priority_id,
         createdAt: new Date()
     }
     // Add creator as a user by default
@@ -219,9 +251,11 @@ router.post('/:id', authMiddleware, [
         title: req.body.title,
         text: req.body.text,
         status_id: req.body.status_id,
+        priority_id: req.body.priority_id,
         type_id: req.body.type_id,
         updatedAt: new Date()
     }
+    console.log(ticket);
     const users = req.body.users.map(u => u.id);
     // Update ticket data
     const sql = 'UPDATE tickets SET ? WHERE ?';

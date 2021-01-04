@@ -40,6 +40,7 @@ async function initDb() {
         user_id int NOT NULL,
         status_id int NOT NULL DEFAULT 0,
         type_id int NOT NULL DEFAULT 1,
+        priority_id int NOT NULL DEFAULT 1,
         createdAt DATETIME NOT NULL DEFAULT current_timestamp(),
         updatedAt DATETIME,
         resolvedAt DATETIME,
@@ -127,22 +128,22 @@ async function initDb() {
         if(err) throw err;
         console.log(res);
         console.log("ticket_status table created!");
+
+            
+        const statuses = [
+            ["Open"],
+            ["In Progress"],
+            ["Blocked"],
+            ["Closed"]
+        ]
+        sql = `INSERT INTO ticket_status (status) VALUES ?`;
+        db.query(sql, [statuses], (err, res) => {
+            if(err) throw err;
+            console.log(res);
+            console.log("ticket statuses inserted!");
+        });
     });
 
-    
-    
-    const statuses = [
-        ["Open"],
-        ["In Progress"],
-        ["Blocked"],
-        ["Closed"]
-    ]
-    sql = `INSERT INTO ticket_status (status) VALUES ?`;
-    db.query(sql, [statuses], (err, res) => {
-        if(err) throw err;
-        console.log(res);
-        console.log("ticket statuses inserted!");
-    });
 
 
 
@@ -157,20 +158,45 @@ async function initDb() {
         if(err) throw err;
         console.log(res);
         console.log("ticket_type table created!");
+
+        const types = [
+            ["Bug / Error"],
+            ["Feature Request"],
+            ["Project Proposal"],
+            ["Training"]
+        ]
+        sql = `INSERT INTO ticket_type (type) VALUES ?`;
+        db.query(sql, [types], (err, res) => {
+            if(err) throw err;
+            console.log(res);
+            console.log("Ticket types inserted!");
+        });
     });
    
+    
 
-    const types = [
-        ["Bug / Error"],
-        ["Feature Request"],
-        ["Project Proposal"],
-        ["Training"]
-    ]
-    sql = `INSERT INTO ticket_type (type) VALUES ?`;
-    db.query(sql, [types], (err, res) => {
+   sql = `CREATE TABLE ticket_priority(
+        id int AUTO_INCREMENT,
+        priority VARCHAR(255),
+        PRIMARY KEY(id)
+    )`;
+    db.query(sql, (err, res) => {
         if(err) throw err;
         console.log(res);
-        console.log("Ticket types inserted!");
+        console.log("ticket_priority table created!");
+
+        const priorities = [
+            ["Low"],
+            ["Medium"],
+            ["High"],
+            ["Urgent"]
+        ]
+        sql = `INSERT INTO ticket_priority (priority) VALUES ?`;
+        db.query(sql, [priorities], (err, res) => {
+            if(err) throw err;
+            console.log(res);
+            console.log("Ticket priorities inserted!");
+        });
     });
     */
 };

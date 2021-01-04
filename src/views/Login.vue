@@ -1,5 +1,5 @@
 <template>
-    <div class="home">
+    <div class="login">
 
         <div class="content">
             
@@ -62,7 +62,7 @@ import Header from '@/components/Header';
 import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
-    name: 'Home',
+    name: 'Login',
     components: {
         Header
     },
@@ -82,13 +82,13 @@ export default {
     },
     mounted() {
         if(this.isLoggedIn) {
-            this.$router.push('/projects');
+            this.$router.push('/dashboard');
         }
     },
     watch: {
         isLoggedIn: function(val) {
             if(val === true) {
-                this.$router.push('/projects');
+                this.$router.push('/dashboard');
             }
         }
     },

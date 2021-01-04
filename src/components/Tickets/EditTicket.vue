@@ -21,6 +21,20 @@
                 </div>
             </div>
         </div>
+        
+        <div class="field">
+            <div class="control">
+                <label class="label">Ticket Priority</label>
+                <div class="select">
+                    <select v-model="priority_id">
+                        <option value="1">Low</option>
+                        <option value="2">Medium</option>
+                        <option value="3">High</option>
+                        <option value="4">Urgent</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
         <div class="field">
             <label class="label">Assign this ticket</label>
@@ -98,7 +112,8 @@ export default {
             filteredUsers: [],
             loading: false,
             activeModal: false,
-            type_id: 1
+            type_id: 1,
+            priority_id: 1,
         }
     },
     props: {
@@ -118,6 +133,7 @@ export default {
                 this.text = this.ticket.text;
                 this.assignedUsers = this.ticket.users;
                 this.type_id = this.ticket.type_id;
+                this.priority_id = this.ticket.priority_id;
             }
             const userArray = await UserService.getUsers();
             this.users = userArray;
@@ -151,7 +167,8 @@ export default {
                 resolvedAt: '',
                 username: this.getUser().username,
                 status_id: 0,
-                type_id: this.type_id
+                type_id: this.type_id,
+                priority_id: this.priority_id
             }
             TicketService.createTicket(ticket).then(() => {
                 this.loading = false;
@@ -179,6 +196,7 @@ export default {
                 project_id: this.ticket.project_id,
                 status_id: this.ticket.status_id,
                 type_id: this.type_id,
+                priority_id: this.priority_id,
                 id: this.ticket.id,
             }
             TicketService.updateTicket(ticket).then(() => {

@@ -7,11 +7,12 @@ Vue.use(Router);
 
 const router = new Router({
     mode: 'history',
+    base: '/projects/ticketsystem',
     routes: [
         {
             path: '/',
-            name: 'home',
-            component: () => import(/* webpackChunkName: "auth" */ './views/Home.vue'),
+            name: 'login',
+            component: () => import(/* webpackChunkName: "auth" */ './views/Login.vue'),
             meta: { public: true } // Logging in is not required
         },
         {

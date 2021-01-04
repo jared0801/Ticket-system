@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header :title="`Ticket: ${ticket.title}`" backlinkText="Back" :backlink="`/projects/${ticket.project_id}`" />
+            <Header :title="`Ticket: ${ticket.title}`" backlinkText="Project" :backlink="`/projects/${ticket.project_id}`" />
             
             <div class="box">
                 <div class="notification is-danger" v-if="error">{{ error }}</div>
@@ -29,7 +29,7 @@
                         </div>
                         <div class="field">
                             Status:
-                            <span class="control"> 
+                            <div class="control inline"> 
                                 <span v-if="!isAssignedUser">
                                     {{ ticket.status }}
                                 </span>
@@ -40,7 +40,23 @@
                                         <option value="2">Blocked</option>
                                     </select>
                                 </div>
-                            </span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            Priority:
+                            <div class="control inline"> 
+                                <span v-if="!isAssignedUser">
+                                    {{ ticket.priority }}
+                                </span>
+                                <div class="select" v-else>
+                                    <select v-model="setPriority">
+                                        <option value="1">Low</option>
+                                        <option value="2">Medium</option>
+                                        <option value="3">High</option>
+                                        <option value="4">Urgent</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="field">
                             <p>Submitter: {{ ticket.submitter }}</p>
@@ -87,7 +103,8 @@ export default {
             ticket: {},
             editting: false,
             error: '',
-            setStatus: ''
+            setStatus: undefined,
+            setPriority: undefined
         }
     },
     computed: {
@@ -102,7 +119,11 @@ export default {
         this.loading = true;
         try {
             this.ticket = await TicketService.getTicket(this.$route.params.pid, this.$route.params.tid);
+            if(this.ticket.id == undefined) {
+                this.$router.push(`/projects/${this.$route.params.pid}`)
+            }
             this.setStatus = this.ticket.status_id;
+            this.setPriority = this.ticket.priority_id;
             this.loading = false;
         } catch(err) {
             this.error = err.response.data.error;
@@ -111,8 +132,13 @@ export default {
     },
     watch: {
         setStatus: function(newVal, oldVal) {
-            if(!this.loading && newVal != oldVal) {
+            if(!this.loading && oldVal !== undefined) {
                 this.updateTicketStatus(newVal);
+            }
+        },
+        setPriority: function(newVal, oldVal) {
+            if(!this.loading && oldVal !== undefined) {
+                this.updateTicketPriority(newVal);
             }
         }
     },
@@ -126,10 +152,31 @@ export default {
             const ticket = {
                 title: this.ticket.title,
                 text: this.ticket.text,
-                user: this.ticket.user,
+                user: this.ticket.submitter,
                 users: this.ticket.users,
                 project_id: this.ticket.project_id,
+                priority_id: this.ticket.priority_id,
                 status_id: status,
+                type_id: this.ticket.type_id,
+                id: this.ticket.id,
+            }
+            TicketService.updateTicket(ticket).then(() => {
+                this.loading = false;
+            }).catch((err) => {
+                this.loading = false;
+                this.serverError = err;
+            });
+        },
+        updateTicketPriority(priority) {
+            this.loading = true;
+            const ticket = {
+                title: this.ticket.title,
+                text: this.ticket.text,
+                user: this.ticket.submitter,
+                users: this.ticket.users,
+                project_id: this.ticket.project_id,
+                status_id: this.ticket.status_id,
+                priority_id: priority,
                 type_id: this.ticket.type_id,
                 id: this.ticket.id,
             }
@@ -183,6 +230,11 @@ export default {
 
 .desc-field {
     margin-bottom: 3em;
+}
+
+.inline {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .ticket > .content > .box {
