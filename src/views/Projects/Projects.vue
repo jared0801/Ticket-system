@@ -4,10 +4,18 @@
         <div class="content">
             
             <Header title="Projects" backlink="/dashboard" backlinkText="Dashboard" />
-            <div class="right-align">
-                <router-link class="button" to="/projects/create">Create a new project</router-link>
-            </div>
-            <ProjectList />
+
+            <v-container>
+                <v-row>
+                    <v-col>
+                        <v-btn to="/projects/create">Create a new project</v-btn>
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <ProjectList />
+                </v-row>
+            </v-container>
         </div>
         
     </div>

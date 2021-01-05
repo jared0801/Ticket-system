@@ -4,8 +4,18 @@
 
         
 
-        <div class="tabs is-boxed">
-            <ul>
+        <div class="tabs">
+            <v-tabs v-model="resolved_tab">
+                <v-tab>
+                    <i class="mr-2 fas fa-ticket-alt" aria-hidden="true"></i>
+                    <span>Open Tickets</span>
+                </v-tab>
+                <v-tab>
+                    <i class="mr-2 far fa-check-square" aria-hidden="true"></i>
+                    <span>Completed Tickets</span>
+                </v-tab>
+            </v-tabs>
+            <!-- <ul>
                 <li class="tab" :class="{'is-active' : resolved_tab === false}">
                     <a @click="resolved_tab = false">
                         <span class="icon is-small"><i class="fas fa-ticket-alt" aria-hidden="true"></i></span>
@@ -18,45 +28,27 @@
                         <span>Completed Tickets</span>
                     </a>
                 </li>
-            </ul>
+            </ul> -->
         </div>
 
         <div class="ticket-container">
-            <table class="table is-hoverable is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Type</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th>Description</th>
-                        <th>Submitter</th>
-                        <th v-if="resolved_tab">Completed</th>
-                        <th v-else>Created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="ticket in (resolved_tab ? resolved_tickets : unresolved_tickets)" v-bind:key="ticket.id">
-                        <td>
-                            <router-link :to="`/projects/${$route.params.id}/tickets/${ticket.id}`">{{ ticket.title ? ticket.title : 'Name' }}</router-link>
-                        </td>
-                        <td>{{ ticket.type }}</td>
-                        <td>{{ ticket.priority }}</td>
-                        <td>{{ ticket.status }}</td>
-                        <td class="ticket-description">{{ ticket.text }}</td>
-                        <td>{{ ticket.submitter }}</td>
-                        <td class="completed" v-if="resolved_tab">{{ `${ticket.resolvedAt.getMonth()+1}/${ticket.resolvedAt.getDate()}/${ticket.resolvedAt.getFullYear()}` }}</td>
-                        <td class="created" v-else>{{ `${ticket.createdAt.getMonth()+1}/${ticket.createdAt.getDate()}/${ticket.createdAt.getFullYear()}` }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div v-if="!loading && (resolved_tab ? resolved_tickets : unresolved_tickets).length === 0" class="notification">
-                <p v-if="resolved_tab">This project doesn't have any completed tickets yet.</p>
-                <p v-else>This project doesn't have any tickets yet.</p>
-            </div>
 
             <div v-if="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>
+            <v-data-table
+                v-else
+                :headers="headers"
+                :items="items"
+                :items-per-page="10"
+                class="elevation-1 data-table"
+                @click:row="selectTicket"
+            >
+                <template v-slot:[`item.createdAt`]="{ item }">
+                    <span>{{ `${item.createdAt.getMonth()+1}/${item.createdAt.getDate()}/${item.createdAt.getFullYear()}` }}</span>
+                </template>
+                <template v-slot:[`item.description`]="{ item }">
+                    <div class="text-truncate" style="max-width: 300px">{{ item.description }}</div>
+                </template>
+            </v-data-table>
         </div>
     </div>
 </template>
@@ -66,13 +58,57 @@ import TicketService from '@/api/TicketService';
 
 export default {
     name: "TicketList",
+    computed: {
+        items() {
+            if(this.resolved_tab) {
+                return this.resolved_tickets;
+            } else {
+                return this.unresolved_tickets;
+            }
+        }
+    },
+    methods: {
+        selectTicket(ticket) {
+            this.$router.push(`/projects/${this.$route.params.id}/tickets/${ticket.id}`)
+        }
+    },
     data() {
         return {
-            resolved_tab: false,
+            resolved_tab: 0,
             resolved_tickets: [],
             unresolved_tickets: [],
             error: '',
-            loading: false
+            loading: false,
+            headers: [
+                {
+                    text: 'Title',
+                    value: 'title'
+                },
+                {
+                    text: 'Type',
+                    value: 'type'
+                },
+                {
+                    text: 'Priority',
+                    value: 'priority'
+                },
+                {
+                    text: 'Status',
+                    value: 'status'
+                },
+                {
+                    text: 'Description',
+                    value: 'description'
+                },
+                {
+                    text: 'Submitter',
+                    value: 'submitter'
+                },
+                {
+                    text: this.resolved_tab ? 'Completed' : 'Created',
+                    value: this.resolved_tab ? 'resolvedAt' : 'createdAt'
+                }
+            ]
         }
     },
     async mounted() {
@@ -108,6 +144,10 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     max-width: 30vw;
+}
+
+.data-table >>> tbody tr:hover {
+  cursor: pointer;
 }
 
 .tabs > ul {

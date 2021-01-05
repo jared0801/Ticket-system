@@ -3,7 +3,18 @@
         <div class="notification is-danger" v-if="error">{{ error }}</div>
 
         <div class="project-container">
-            <table class="table is-hoverable is-fullwidth">
+            <v-data-table
+                :headers="headers"
+                :items="getData.projects"
+                :items-per-page="10"
+                class="elevation-1 data-table"
+                @click:row="selectProj"
+            >
+                <template v-slot:[`item.createdAt`]="{ item }">
+                    <span>{{ `${item.createdAt.getMonth()+1}/${item.createdAt.getDate()}/${item.createdAt.getFullYear()}` }}</span>
+                </template>
+            </v-data-table>
+            <!-- <table class="table is-hoverable is-fullwidth">
                 <thead>
                     <tr>
                         <th>Title</th>
@@ -22,7 +33,7 @@
                         <td>{{ `${project.createdAt.getMonth()+1}/${project.createdAt.getDate()}/${project.createdAt.getFullYear()}` }}</td>
                     </tr>
                 </tbody>
-            </table>
+            </table> -->
 
             <div v-if="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>
         </div>
@@ -37,14 +48,38 @@ export default {
     data() {
         return {
             error: '',
-            loading: false
+            loading: false,
+            headers: [
+                {
+                    text: 'Title',
+                    value: 'title'
+                },
+                {
+                    text: 'Description',
+                    value: 'description'
+                },
+                {
+                    text: 'Lead',
+                    value: 'lead'
+                },
+                {
+                    text: 'Created',
+                    value: 'createdAt'
+                }
+            ]
         }
     },
     computed: {
         ...mapGetters('tickets', ['getData']),
+        /*items() {
+            return this.getData.projects.map(p => p);
+        }*/
     },
     methods: {
-        ...mapActions('tickets', ['getAppData'])
+        ...mapActions('tickets', ['getAppData']),
+        selectProj(proj) {
+            this.$router.push(`/projects/${proj.id}`)
+        }
     },
     async created() {
         await this.getAppData();
@@ -68,6 +103,10 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     max-width: 30vw;
+}
+
+.data-table >>> tbody tr:hover {
+  cursor: pointer;
 }
 
 @media only screen and (max-width: 760px) {

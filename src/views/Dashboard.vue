@@ -5,43 +5,52 @@
             
             <Header title="Dashboard" />
 
-            <div class="field is-grouped">
-                <div class="control right-align">
-                    <router-link class="button" to="/projects">Go to Projects</router-link>
-                </div>
+            <v-container>
+                <v-row justify="space-between">
+                    <v-col cols="12" md="4">
+                        <v-select v-model="selectedProj" :items="projItems" label="Select a Project"></v-select>
+                    </v-col>
 
-                <div class="control select">
-                    <select v-model="selectedProj">
-                        <option value="-1">All projects</option>
-                        <option :value="proj.id" v-for="proj in projects" :key="proj.id">{{proj.title}}</option>
-                    </select>
-                </div>
-            </div>
+                    <v-col class="text-right">
+                        <v-btn to="/projects">Go to Projects</v-btn>
+                    </v-col>
+                </v-row>
+                <v-row>
 
-            <div style="width: 100%;">
-                <div class="graphGrid">
-                    
-                    <div class="chart-container">
-                        Tickets By Type
-                        <PieChart class="ticket-chart" v-if="!loading" :chart-data="typedata" :options="options" />
-                    </div>
+                    <v-col>
+                        
+                        <v-card elevation="1" tile class="pa-3">
+                            <v-card-title>Tickets By Type</v-card-title>
+                            <PieChart class="ticket-chart" v-if="!loading" :chart-data="typedata" :options="options" />
+                        </v-card>
+                    </v-col>
+                    <v-col>
+                        
+                        <v-card elevation="1" tile class="pa-3">
+                            <v-card-title>Tickets By Status</v-card-title>
+                            <PieChart class="ticket-chart" v-if="!loading" :chart-data="statusdata" :options="options" />
+                        </v-card>
+                    </v-col>
+                    <v-col>
 
-                    <div class="chart-container">
-                        Tickets By Status
-                        <PieChart class="ticket-chart" v-if="!loading" :chart-data="statusdata" :options="options" />
-                    </div>
+                        <v-card elevation="1" tile class="pa-3">
+                            <v-card-title>Tickets By Priority</v-card-title>
+                            <PieChart class="ticket-chart" v-if="!loading" :chart-data="prioritydata" :options="options" />
+                        </v-card>
+                    </v-col>
+                    <v-col>
 
-                    <div class="chart-container">
-                        Tickets By Priority
-                        <PieChart class="ticket-chart" v-if="!loading" :chart-data="prioritydata" :options="options" />
-                    </div>
-
-                    <div class="chart-container">
-                        Tickets Resolved Over Time
-                        <LineChart class="ticket-chart" v-if="!loading" :chart-data="tickettimedata" :options="lineoptions" />
-                    </div>
-                </div>
-            </div>
+                        <v-card elevation="1" tile class="pa-3">
+                            <v-card-title>Tickets Resolved Over Time</v-card-title>
+                            <LineChart class="ticket-chart" v-if="!loading" :chart-data="tickettimedata" :options="lineoptions" />
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-container>
+            <v-card elevation="1" tile class="pa-3 text-center">
+                <v-card-title class="justify-center">More Charts Coming Soon</v-card-title>
+                <v-card-text class="text-center">Thank you for your patience</v-card-text>
+            </v-card>
         </div>
         
     </div>
@@ -134,8 +143,8 @@ export default {
                 legend: {
                     display: false
                 },
-                responsive: false,
-                maintainAspectRatio: true,
+                responsive: true,
+                maintainAspectRatio: false,
                 /*animation: {
                     onProgress: function(animation) {
                         console.log(this.value);
@@ -148,8 +157,8 @@ export default {
                 legend: {
                     display: false
                 },
-                responsive: false,
-                maintainAspectRatio: true,
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: {
 					x: {
 						display: true,
@@ -177,7 +186,22 @@ export default {
     },
     computed: {
         ...mapGetters('tickets', ['getData']),
-        ...mapState('user', ['isLoggedIn'])
+        ...mapState('user', ['isLoggedIn']),
+        projItems() {
+            let projs = [
+                {
+                    value: -1,
+                    text: 'All Projects'
+                }
+            ];
+            projs.push(...this.projects.map(p => {
+                return {
+                    value: p.id,
+                    text: p.title
+                }
+            }));
+            return projs;
+        }
     },
     methods: {
         ...mapActions('tickets', ['getAppData']),
@@ -245,7 +269,7 @@ export default {
     },
     watch: {
         async selectedProj(val) {
-            if(val === '-1') {
+            if(val === -1) {
                 await this.getAllProjects();
             } else {
                 await this.getSelectedProject();
@@ -273,30 +297,9 @@ export default {
 </script>
 
 <style scoped>
-.graphGrid {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: 1fr 1fr 1fr;
-    justify-items: center;
-}
-
-.chart-container {
-    text-align: center;
-}
 
 .ticket-chart {
-    margin: 5px;
-}
-
-@media screen and (max-width: 1500px){
-    .graphGrid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media screen and (max-width: 900px){
-    .graphGrid {
-        grid-template-columns: 1fr;
-    }
+    width: 300px;
+    height: 300px;
 }
 </style>

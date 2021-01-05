@@ -156,7 +156,7 @@ router.get('/:pid/ticket/:tid', authMiddleware, async (req, res) => {
 // Add a ticket
 router.post('/', authMiddleware, [
     body('title').not().isEmpty().withMessage("A title is required to create a ticket.").trim().escape(),
-    body('text').not().isEmpty().withMessage("Text is required to create a ticket.").trim().escape(),
+    body('description').not().isEmpty().withMessage("description is required to create a ticket.").trim().escape(),
     body('userId').not().isEmpty().withMessage("A userId is required to create a ticket.").trim().escape(),
     body('project_id').not().isEmpty().withMessage("A project_id is required to create a ticket.").trim().escape(),
 ], async (req, res) => {
@@ -170,7 +170,7 @@ router.post('/', authMiddleware, [
     }
     let ticket = {
         title: req.body.title,
-        text: req.body.text,
+        description: req.body.description,
         user_id: req.body.userId,
         project_id: req.body.project_id,
         type_id: req.body.type_id,
@@ -240,7 +240,7 @@ router.get('/unres/:id', authMiddleware, async (req, res) => {
 // Edit a ticket
 router.post('/:id', authMiddleware, [
     body('title').not().isEmpty().withMessage("A title is required to create a ticket.").trim().escape(),
-    body('text').not().isEmpty().withMessage("Ticket details are required to create a ticket.").trim().escape()
+    body('description').not().isEmpty().withMessage("Ticket details are required to create a ticket.").trim().escape()
 ], async (req, res) => {
     
     const errors = validationResult(req);
@@ -249,7 +249,7 @@ router.post('/:id', authMiddleware, [
     }
     let ticket = {
         title: req.body.title,
-        text: req.body.text,
+        description: req.body.description,
         status_id: req.body.status_id,
         priority_id: req.body.priority_id,
         type_id: req.body.type_id,

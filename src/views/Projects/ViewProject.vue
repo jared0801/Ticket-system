@@ -5,24 +5,39 @@
             
             <Header title="Project Tickets" backlinkText="Projects" backlink="/projects" />
 
-            <div class="field button-div right-align">
-                <div v-if="isLead" class="control">
-                    <button class="button is-info editButton" v-on:click="editProject">Edit Project</button>
-                </div>
-                <div class="control">
-                    <router-link class="button" :to="{ name: 'create-ticket' }">Create a ticket</router-link>
-                </div>
-            </div>
-            <div v-if="editting" class="project-info">
-                <EditProject :project="project" v-on:close-project="editProject" />
-            </div>
-            <div v-else class="project-info">
-                <p>Project: {{ project.title }}</p>
-                <p>Description: {{ project.description }}</p>
-                <p>Lead: {{ project.lead }}</p>
-                <p>Users: <span v-for="(user, i) in project.users" :key="user.id">{{user.username}}<span v-if="i < project.users.length-1">, </span></span></p>
-            </div>
-            <TicketList />
+            <v-container>
+                <v-row>
+                    <v-col v-if="isLead">
+                        <v-btn @click="editProject" class="editButton">Edit Project</v-btn>
+                    </v-col>
+                    <v-col class="text-right">
+                        <v-btn :to="{ name: 'create-ticket' }">Create a new ticket</v-btn>
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <div v-if="editting" class="project-info">
+                        <EditProject :project="project" v-on:close-project="editProject" />
+                    </div>
+
+                    <v-card v-else class="project-info">
+                        <v-card-text class="text--primary">
+                            <div class="title text-center">
+                                <h3>{{ project.title }}</h3>
+                            </div>
+                            <p>{{ project.description }}</p>
+                            <p>Lead: <v-chip color="primary" class="ma-1">{{ project.lead }}</v-chip></p>
+                            <!-- <p>Users: <span v-for="(user, i) in project.users" :key="user.id">{{user.username}}<span v-if="i < project.users.length-1">, </span></span></p> -->
+                            <p>Users: <v-chip v-for="user in project.users" :key="user.id" color="secondary" class="ma-1">{{user.username}}</v-chip></p>
+                        </v-card-text>
+                    </v-card>
+                </v-row>
+
+                <v-row>
+                    <TicketList />
+                </v-row>
+            
+            </v-container>
         </div>
         
     </div>

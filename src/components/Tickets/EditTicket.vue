@@ -39,7 +39,7 @@
         <div class="field">
             <label class="label">Assign this ticket</label>
             <div class="control">
-                <vue-autosuggest
+                <!-- <vue-autosuggest
                 :suggestions="[{data: filteredUsers.map(r => r.username)}]"
                 :input-props="{id:'autosuggest__input', placeholder:'Assign to', class: 'input'}"
                 @selected="selectHandler"
@@ -49,7 +49,7 @@
                     <template slot-scope="{suggestion}">
                         <span class="suggestion-item button">{{suggestion.item}}</span>
                     </template>
-                </vue-autosuggest>
+                </vue-autosuggest> -->
             </div>
         </div>
 
@@ -97,7 +97,6 @@
 import TicketService from '@/api/TicketService';
 import UserService from '@/api/UserService';
 import Modal from '@/components/Modal';
-import { VueAutosuggest } from 'vue-autosuggest';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -122,7 +121,6 @@ export default {
         }
     },
     components: {
-        VueAutosuggest,
         Modal
     },
     async created() {

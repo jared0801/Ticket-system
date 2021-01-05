@@ -1,19 +1,22 @@
 <template>
     <section class="page-header">
 
-        <router-link v-if="backlink" class="button back-button" :to="backlink">
-            <i class="fas fa-arrow-left"></i>
-            <span style="padding-left: 10px">{{ backlinkText }}</span>
-        </router-link>
+        <v-container>
+            <v-row>
+                <v-btn exact :to="backlink" v-if="backlink" class="mt-4">
+                    <i class="fas fa-arrow-left"></i>
+                    <span style="padding-left: 10px">{{ backlinkText }}</span>
+                </v-btn>
+                <v-btn v-else-if="backlinkText" class="mt-4" @click="$router.go(-1)">
+                    <i class="fas fa-arrow-left"></i>
+                    <span style="padding-left: 10px">{{ backlinkText }}</span>
+                </v-btn>
 
-        <a v-else-if="backlinkText" role="button" class="button back-button" @click="$router.go(-1)">
-            <i class="fas fa-arrow-left"></i>
-            <span style="padding-left: 10px">{{ backlinkText }}</span>
-        </a>
-
-
-
-        <h1 class="title">{{ title }}</h1>
+                <v-col style="text-align: center;">
+                    <h1 class="text-lg-h3">{{ title }}</h1>
+                </v-col>
+            </v-row>
+        </v-container>
 
     </section>    
 </template>
@@ -40,15 +43,6 @@ export default {
 <style scoped>
 .page-header {
     padding: 1.5em 0;
-    text-align: center;
-}
-
-.header-menu {
-    display: flex;
-    justify-content: space-between;
-}
-
-.back-button {
 }
 
 .button-group {

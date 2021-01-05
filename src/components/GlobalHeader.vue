@@ -1,4 +1,24 @@
 <template>
+    <v-app-bar
+        app
+        color="primary"
+        dark
+        >
+      <div>
+        <v-btn text class="button home-button ml-2 mr-2 primary" :to="isLoggedIn ? '/dashboard' : '/'">
+            <h1 class="title white--text">Ticket System</h1>
+        </v-btn>
+      </div>
+
+      <v-spacer></v-spacer>
+
+        <p class="mb-0 mr-5">Welcome back, {{ username }}</p>
+        <div class="d-flex align-center" v-if="isLoggedIn">
+            <v-btn to="/profile" text>Profile</v-btn>
+            <v-btn @click="logout" text href="/logout">Logout</v-btn>
+        </div>
+    </v-app-bar>
+    <!--
     <header class="header">
 
         <router-link class="button home-button" :to="isLoggedIn ? '/dashboard' : '/'">
@@ -13,7 +33,8 @@
             <button @click="logout" class="button" href="/logout">Logout</button>
         </span>
 
-    </header>    
+    </header>
+    -->
 </template>
 
 <script>
@@ -55,10 +76,6 @@ export default {
 </script>
 
 <style scoped>
-.home-button {
-    margin-left: 10%;
-    background: #003459;
-}
 .icon-wrapper {
     overflow: hidden;
     width: 18px;
@@ -72,19 +89,5 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 1rem 0;
-}
-
-.button-group {
-    margin-right: 10%;
-    display: flex;
-    align-items: center;
-}
-
-.button-group .button {
-    margin: 0 5px;
-}
-
-.welcome-user {
-    padding-right: 1em;
 }
 </style>

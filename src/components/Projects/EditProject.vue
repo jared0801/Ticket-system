@@ -1,93 +1,117 @@
 <template>
-    <form>
-        <div class="notification is-danger" v-if="serverError">{{ serverError }}</div>
+    <v-form v-model="valid">
+        <v-container>
+            <div class="notification is-danger" v-if="serverError">{{ serverError }}</div>
 
 
-        <div class="field">
-            <label class="label">Project Title</label>
-            <div class="control">
-                <input class="input" :class="{ 'is-danger' : errors['title'] }" type="text" v-model="title" placeholder="Project title">
-            </div>
-            <p v-if="errors['title']" class="help is-danger">{{ errors['title'] }}</p>
-        </div>
+            <v-row class="field">
+                <v-col>
+                    <v-text-field
+                        v-model="title"
+                        label="Project Title"
+                        required
+                    ></v-text-field>
+                </v-col>
+                <!--
+                <p v-if="errors['title']" class="help is-danger">{{ errors['title'] }}</p> -->
+            </v-row>
 
-        <div class="field">
-            <label class="label">Project Description</label>
-            <div class="control">
-                <textarea class="textarea" type="text" id="create-ticket" v-model="description" placeholder="Project description" />
-            </div>
-        </div>
+            <v-row class="field">
+                <v-col>
+                    <v-text-field
+                        v-model="description"
+                        label="Project Description"
+                        required
+                    ></v-text-field>
+                </v-col>
+            </v-row>
 
-        
+            
 
-        <div class="field">
-            <label class="label">Assign users to this project</label>
-            <div class="control">
-                <!-- <div class="select">
-                    <select v-model="assignedUsers[0]">
-                        <option disabled value="">Select dropdown</option>
-                        <option v-for="user in users" :key="user">{{ user }}</option>
-                    </select>
+            <v-row class="field">
+                <v-col>
+                    <v-autocomplete
+                        v-model="assignedUsers"
+                        :items="filteredUsers"
+                        filled
+                        chips
+                        color="blue-grey lighten-2"
+                        label="Assigned Users"
+                        item-text="username"
+                        item-value="username"
+                        multiple
+                    >
+                        <template v-slot:selection="data">
+                            <v-chip
+                                v-bind="data.attrs"
+                                :input-value="data.selected"
+                                close
+                                @click="data.select"
+                                @click:close="remove(data.item)"
+                            >
+                                {{ data.item.username }}
+                            </v-chip>
+                        </template>
+
+                        <template v-slot:item="data">
+                            <v-list-item-content v-text="data.item.username"></v-list-item-content>
+                        </template>
+                    </v-autocomplete>
+                </v-col>
+            </v-row>
+            
+            <v-row v-if="project">
+                <!-- <div class="control delete-control">
+                    <button class="button is-danger" v-on:click.prevent="toggleModal">Delete Project</button>
+                    <Modal v-show="activeModal"
+                        content="Are you sure you would like to delete this project? This will delete all tickets associated with this project."
+                        buttonText="Delete"
+                        aria="Confirm deletion"
+                        v-on:toggle-modal="toggleModal"
+                        v-on:confirm="deleteProject"
+                        classType="is-danger" />
+                </div>
+                <div class="control">
+                    <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="updateProject">Update</button>
+                </div>
+                <div v-if="project" class="control">
+                    <button class="button is-warning" v-on:click="$emit('close-project')">Close</button>
                 </div> -->
-
-                <vue-autosuggest
-                :suggestions="[{data: filteredUsers.map(r => r.username)}]"
-                :input-props="{id:'autosuggest__input', placeholder:'Assign to', class: 'input'}"
-                @selected="selectHandler"
-                @input="inputChangeHandler"
-                componentAttrClassAutosuggestResults="result-container dropdown-content"
-                >
-                    <template slot-scope="{suggestion}">
-                        <span class="suggestion-item button">{{suggestion.item}}</span>
-                    </template>
-                </vue-autosuggest>
-            </div>
-        </div>
-
-        <div class="field">
-            <div>
-                <label class="label">Assigned to: </label>
-                <div v-for="(user, index) in assignedUsers" :key="user.id">{{ user.username }} <a class="delete" aria-label="remove assigned user" v-on:click="rmAssignedUser(index)"></a></div>
-            </div>
-        </div>
-        
-        <div v-if="project" class="button-div field">
-            <div class="control delete-control">
-                <button class="button is-danger" v-on:click.prevent="toggleModal">Delete Project</button>
+                <v-col>
+                    <v-btn class="warning mr-2" @click.prevent="toggleModal">Delete Project</v-btn>
+                </v-col>
                 <Modal v-show="activeModal"
-                    content="Are you sure you would like to delete this project? This will delete all tickets associated with this project."
-                    buttonText="Delete"
-                    aria="Confirm deletion"
-                    v-on:toggle-modal="toggleModal"
-                    v-on:confirm="deleteProject"
-                    classType="is-danger" />
-            </div>
-            <div class="control">
-                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click="updateProject">Update</button>
-            </div>
-            <div v-if="project" class="control">
-                <button class="button is-warning" v-on:click="$emit('close-project')">Close</button>
-            </div>
-        </div>
-        <div v-else class="field button-div">
-            <div class="control">
-                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click.prevent="createProject">Create</button>
-            </div>
-        </div>
-    </form>
+                        content="Are you sure you would like to delete this project? This will delete all tickets associated with this project."
+                        buttonText="Delete"
+                        aria="Confirm deletion"
+                        v-on:toggle-modal="toggleModal"
+                        v-on:confirm="deleteProject"
+                        classType="is-danger" />
+                
+                <v-col class="text-right">
+                    <v-btn class="primary mr-2" @click="updateProject">Update</v-btn>
+                    <v-btn class="secondary" @click="$emit('close-project')">Close</v-btn>
+                </v-col>
+            </v-row>
+
+            <v-row v-else class="ma-1">
+                <v-btn class="primary" :class="{ 'is-loading' : loading }" @click.prevent="createProject">Create</v-btn>
+            </v-row>
+        </v-container>
+    </v-form>
 </template>
 
 <script>
 import ProjectService from '@/api/ProjectService';
 import Modal from '@/components/Modal';
 import UserService from '@/api/UserService';
-import { VueAutosuggest } from 'vue-autosuggest';
 import { mapGetters } from 'vuex';
 
 export default {
     name: 'EditProject',
     data() {
         return {
+            valid: false,
             title: '',
             description: '',
             users: [],
@@ -100,15 +124,14 @@ export default {
         }
     },
     components: {
-        Modal,
-        VueAutosuggest
+        Modal
     },
     props: {
         project: {
             type: Object
         }
     },
-    async created() {
+    async mounted() {
         this.loading = true;
         try {
             if(this.project) {
@@ -144,6 +167,11 @@ export default {
     },
     methods: {
         ...mapGetters('user', ['getUser']),
+        remove(item) {
+            console.log(item);
+            const index = this.assignedUsers.indexOf(item.username)
+            if (index >= 0) this.assignedUsers.splice(index, 1)
+        },
         createProject() {
             this.loading = true;
             const project = {
@@ -221,7 +249,7 @@ export default {
 
 
         // assigning users
-        rmAssignedUser(index) {
+        /*rmAssignedUser(index) {
             this.assignedUsers.splice(index, 1);
         },
         selectHandler(arg) {
@@ -233,8 +261,8 @@ export default {
             this.inputChangeHandler(arg.item);
             arg.item = '';
 
-        },
-        inputChangeHandler(text) {
+        },*/
+        //inputChangeHandler(text) {
             // Filter results based on input & already assigned users
             /*const userArray = this.users[0].data.filter(item => {
                 console.log(item);
@@ -243,10 +271,10 @@ export default {
             this.filteredUsers = [{
                 data: userArray
             }];*/
-            this.filteredUsers = this.users.filter(item => {
+            /*this.filteredUsers = this.users.filter(item => {
                 return item.username.toLowerCase().indexOf(text.toLowerCase()) > -1 && !this.assignedUsers.some(i => i.id == item.id);
-            });
-        }
+            });*/
+        //}
     }
 }
 </script>

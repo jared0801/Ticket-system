@@ -2,7 +2,7 @@
     <div>
         <div class="content">
             
-            <Header title="Create a project" backlink="/" backlinkText="Go Home" />
+            <Header title="Create a project" backlink="/projects" backlinkText="Projects" />
 
             <EditProject />
             

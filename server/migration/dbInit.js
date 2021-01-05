@@ -35,7 +35,7 @@ async function initDb() {
     sql = `CREATE TABLE tickets(
         id int AUTO_INCREMENT,
         title VARCHAR(255),
-        text VARCHAR(1000),
+        description TEXT,
         project_id int NOT NULL,
         user_id int NOT NULL,
         status_id int NOT NULL DEFAULT 0,

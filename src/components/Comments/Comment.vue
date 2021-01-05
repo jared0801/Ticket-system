@@ -141,7 +141,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/styles/colors.scss";
 
 .comment {
     margin-bottom: 10px;
@@ -182,10 +181,10 @@ export default {
     margin-right: 1em;
     color: lightgray;
 }
-.edit:hover {
+/*.edit:hover {
     color: $grey-light;
 }
 .selected {
     color: $blue;
-}
+}*/
 </style>
