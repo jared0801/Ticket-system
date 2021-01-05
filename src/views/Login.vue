@@ -5,7 +5,53 @@
             
             <Header title="Welcome to The Ticket System" />
 
-            <form
+            <v-form v-model="valid">
+                <v-container>
+                    <v-row>
+                        <v-col>
+                            <v-text-field
+                                v-model="username"
+                                autocomplete="username"
+                                label="Username"
+                                required
+                            >                    
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-text-field
+                                v-model="password"
+                                label="Password"
+                                required
+                                autocomplete="current-password"
+                                :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                                @click:append="showPass = !showPass"
+                                :type="showPass ? 'text' : 'password'"
+                            >                    
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-btn @click.prevent="checkForm" class="primary">Submit</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-divider class="mt-7 mb-5" />
+                    <v-row>
+                        <v-col>
+                            First time here? <v-btn text to="/register">Sign Up</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            Just taking a look? <v-btn text @click="demoLogin">Demo login</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-form>
+
+            <!-- <form
                 id="loginForm"
                 @submit="checkForm"
             >
@@ -49,7 +95,7 @@
                 <div>
                     Just taking a look? <a href="#" @click="demoLogin">Demo login</a>
                 </div>
-            </form>
+            </form> -->
             
         </div>
 
@@ -73,6 +119,8 @@ export default {
         return {
             username: '',
             password: '',
+            valid: false,
+            showPass: false,
             error: '',
             errors: {
                 username: '',
