@@ -17,7 +17,7 @@ async function initDb() {
 
     sql = `CREATE TABLE projects(
         id int AUTO_INCREMENT,
-        title VARCHAR(255),
+        title VARCHAR(255) UNIQUE NOT NULL,
         description TEXT,
         lead int NOT NULL,
         createdAt DATETIME NOT NULL DEFAULT current_timestamp(),
@@ -88,7 +88,8 @@ async function initDb() {
         PRIMARY KEY(project_id, user_id),
         CONSTRAINT projects
             FOREIGN KEY (project_id)
-            REFERENCES projects(id),
+            REFERENCES projects(id)
+            ON DELETE CASCADE,
         CONSTRAINT users
             FOREIGN KEY (user_id)
             REFERENCES users(id)

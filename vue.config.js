@@ -1,9 +1,12 @@
 const path = require('path');
 
 module.exports = {
-    outputDir: path.resolve(__dirname, './server/public'),
-    publicPath: '',
-    devServer: {
-        proxy: 'http://localhost:5000'
-    }
-};
+    "outputDir": path.resolve(__dirname, './server/public'),
+    "publicPath": "",
+    "devServer": {
+        "proxy": "http://localhost:5000"
+    },
+    "transpileDependencies": [
+        "vuetify"
+    ]
+}

@@ -143,10 +143,16 @@ router.post('/', authMiddleware, [
     let projId = 0;
 
     const sql = 'INSERT INTO projects SET ?';
-    let query = db.query(sql, project, (err, result) => {
+    db.query(sql, project, (err, result) => {
+        if(err) {
+            if(err.code === "ER_DUP_ENTRY") {
+                console.log('duplicate');
+                return res.status(400).json({ error: "This project title is already in use." });
+            } else {
+                throw err;
+            }
+        }
         projId = result.insertId;
-        if(err) throw err;
-        //console.log(result.insertId);
         let promises = [];
         for(user of users) {
             const sql2 = `INSERT INTO project_users SET project_id=${projId}, user_id=?`;
