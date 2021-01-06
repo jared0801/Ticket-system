@@ -23,9 +23,9 @@
                     <v-card v-else class="project-info">
                         <v-card-text class="text--primary">
                             <div class="title text-center">
-                                <h3>{{ project.title }}</h3>
+                                <h3 v-html="project.title"></h3>
                             </div>
-                            <p>{{ project.description }}</p>
+                            <p v-html="project.description"></p>
                             <p>Lead: <v-chip color="primary" class="ma-1">{{ project.lead }}</v-chip></p>
                             <p>Users: <v-chip v-for="user in project.users" :key="user.id" color="secondary" class="ma-1">{{user.username}}</v-chip></p>
                         </v-card-text>

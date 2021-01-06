@@ -11,13 +11,9 @@ class TicketService {
                 if(res.data) {
                     tickets.resolved = res.data.resolved.map(ticket => ({
                         ...ticket,
-                        createdAt: new Date(ticket.createdAt),
-                        resolvedAt: new Date(ticket.resolvedAt)
                     }));
                     tickets.unresolved = res.data.unresolved.map(ticket => ({
                         ...ticket,
-                        createdAt: new Date(ticket.createdAt),
-                        resolvedAt: ''
                     }));
                 }
                 resolve(tickets);
@@ -35,8 +31,7 @@ class TicketService {
                 if(res.data) {
                     tickets = res.data.map(ticket => ({
                         ...ticket,
-                        createdAt: new Date(ticket.createdAt),
-                        resolvedAt: ticket.resolvedAt ? new Date(ticket.resolvedAt) : ''
+                        resolvedAt: ticket.resolvedAt ? ticket.resolvedAt : ''
                     }));
                 }
                 resolve(tickets);
@@ -53,8 +48,7 @@ class TicketService {
                 const ticket = res.data;
                 resolve({
                     ...ticket,
-                    createdAt: new Date(ticket.createdAt),
-                    resolvedAt: ticket.resolvedAt ? new Date(ticket.resolvedAt) : ''
+                    resolvedAt: ticket.resolvedAt ? ticket.resolvedAt : ''
                 });
             }).catch((err) => {
                 reject(err);

@@ -5,7 +5,7 @@
             
             <Header title="Create a ticket" backlinkText="View Tickets" />
 
-            <EditTicket />
+            <EditTicket :project=project />
 
         </div>
     </div>
@@ -14,11 +14,13 @@
 <script>
 import Header from '@/components/Header';
 import EditTicket from '@/components/Tickets/EditTicket';
+import { mapGetters } from 'vuex';
 
 export default {
     name: 'CreateTicket',
     data() {
         return {
+            project: {}
         }
     },
     components: {
@@ -26,8 +28,10 @@ export default {
         EditTicket
     },
     created() {
+        this.project = this.getData.projects.filter(p => p.id == this.$router.params.id);
     },
     methods: {
+        ...mapGetters('user', ['getData']),
     }
 };
 </script>

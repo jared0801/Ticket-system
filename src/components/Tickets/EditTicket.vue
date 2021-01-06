@@ -136,8 +136,6 @@
 
 <script>
 import TicketService from '@/api/TicketService';
-import UserService from '@/api/UserService';
-//import Modal from '@/components/Modal';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -156,7 +154,7 @@ export default {
             priority_id: 1,
             titleRules: [
                 t => !!t || "A title is required.",
-                t => (t.length > 2 && t.length < 33) || "Title must be between 3 and 32 characters long."
+                t => (t.length > 2 && t.length < 255) || "Title must be between 3 and 254 characters long."
             ],
             descRules: [
                 d => !!d || "A description is required."
@@ -208,6 +206,9 @@ export default {
     props: {
         ticket: {
             type: Object
+        },
+        project: {
+            type: Object
         }
     },
     components: {
@@ -223,8 +224,8 @@ export default {
                 this.type_id = this.ticket.type_id;
                 this.priority_id = this.ticket.priority_id;
             }
-            const userArray = await UserService.getUsers();
-            this.users = userArray;
+            //const userArray = await UserService.getUsers();
+            this.users = this.project.users;
             this.loading = false;
         } catch(err) {
             this.loading = false;
@@ -236,6 +237,10 @@ export default {
         ...mapGetters('user', ['getUser']),
         toggleModal() {
             this.activeModal = !this.activeModal;
+        },
+        remove(item) {
+            const index = this.assignedUsers.map(u => u.username).indexOf(item.username)
+            if (index >= 0) this.assignedUsers.splice(index, 1)
         },
         createTicket() {
             if(!this.$refs.form.validate()) return;

@@ -26,7 +26,7 @@ import ProjectList from '@/components/Projects/ProjectList';
 import Header from '@/components/Header';
 
 export default {
-    name: 'Tickets',
+    name: 'Projects',
     components: {
         ProjectList,
         Header

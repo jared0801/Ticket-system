@@ -12,10 +12,10 @@
 
       <v-spacer></v-spacer>
 
-        <p class="mb-0 mr-5">Welcome back, {{ username }}</p>
         <div class="d-flex align-center" v-if="isLoggedIn">
+            <p class="mb-0 mr-5">Welcome back, {{ username }}</p>
             <v-btn to="/profile" text>Profile</v-btn>
-            <v-btn @click="logout" text href="/logout">Logout</v-btn>
+            <v-btn @click="logout" text>Logout</v-btn>
         </div>
     </v-app-bar>
     <!--

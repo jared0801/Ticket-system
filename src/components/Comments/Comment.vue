@@ -70,11 +70,11 @@
             <div class="help">
                 <time v-if="comment.updatedAt" :datetime="comment.createdAt">
                     <br>
-                    Last Edited: {{ updatedDateTime }}
+                    Last Edited: {{ dateTime(comment.updatedAt) }}
                 </time>
                 <br>
                 <time :datetime="comment.createdAt">
-                    Created: {{ createdDateTime }}
+                    Created: {{ dateTime(comment.createdAt) }}
                 </time>
             </div>
         </v-card-text>
@@ -135,30 +135,22 @@ export default {
                 this.error = err.response.data.error;
                 this.loading = false;
             })
+        },
+        dateTime(t) {
+            const date = new Date(t);
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let ampm = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // The hour '0' should be '12'
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            return `${hours}:${minutes} ${ampm} - ${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
         }
     },
     computed: {
         ...mapGetters('user', ['getUser']),
         isCommenter() {
             return this.getUser.username === this.comment.username;
-        },
-        createdDateTime() {
-            let hours = this.comment.createdAt.getHours();
-            let minutes = this.comment.createdAt.getMinutes();
-            let ampm = hours >= 12 ? 'pm' : 'am';
-            hours = hours % 12;
-            hours = hours ? hours : 12; // The hour '0' should be '12'
-            minutes = minutes < 10 ? '0'+minutes : minutes;
-            return `${hours}:${minutes} ${ampm} - ${this.comment.createdAt.getMonth()+1}/${this.comment.createdAt.getDate()}/${this.comment.createdAt.getFullYear()}`;
-        },
-        updatedDateTime() {
-            let hours = this.comment.updatedAt.getHours();
-            let minutes = this.comment.updatedAt.getMinutes();
-            let ampm = hours >= 12 ? 'pm' : 'am';
-            hours = hours % 12;
-            hours = hours ? hours : 12; // The hour '0' should be '12'
-            minutes = minutes < 10 ? '0'+minutes : minutes;
-            return `${hours}:${minutes} ${ampm} - ${this.comment.updatedAt.getMonth()+1}/${this.comment.updatedAt.getDate()}/${this.comment.updatedAt.getFullYear()}`;
         }
     }
     

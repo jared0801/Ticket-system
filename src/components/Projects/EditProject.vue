@@ -43,6 +43,7 @@
                         return-object
                         chips
                         hide-selected
+                        hide-no-data
                         color="blue-grey lighten-2"
                         label="Assigned Users"
                         item-text="username"
@@ -136,7 +137,7 @@ export default {
             activeModal: false,
             titleRules: [
                 t => !!t || "A title is required.",
-                t => (t.length > 2 && t.length < 33) || "Title must be between 3 and 32 characters long."
+                t => (t.length > 2 && t.length < 255) || "Title must be between 3 and 254 characters long."
             ],
             descRules: [
                 d => !!d || "A description is required."

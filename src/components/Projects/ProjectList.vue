@@ -10,8 +10,11 @@
                 class="elevation-1 data-table"
                 @click:row="selectProj"
             >
+                <template v-slot:[`item.title`]="{ item }">
+                    <div v-html="item.title"></div>
+                </template>
                 <template v-slot:[`item.createdAt`]="{ item }">
-                    <span>{{ `${item.createdAt.getMonth()+1}/${item.createdAt.getDate()}/${item.createdAt.getFullYear()}` }}</span>
+                    <span>{{ item.createdAt | dateToHuman }}</span>
                 </template>
             </v-data-table>
             <!-- <table class="table is-hoverable is-fullwidth">
@@ -67,6 +70,12 @@ export default {
                     value: 'createdAt'
                 }
             ]
+        }
+    },
+    filters: {
+        dateToHuman(t) {
+            t = new Date(t);
+            return `${t.getMonth()+1}/${t.getDate()}/${t.getFullYear()}`;
         }
     },
     computed: {

@@ -10,8 +10,7 @@ class CommentService {
                 const data = res.data;
                 resolve(data.map(comment => ({
                     ...comment,
-                    createdAt: new Date(comment.createdAt),
-                    updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : ''
+                    updatedAt: comment.updatedAt ? comment.updatedAt : ''
                 })));
             }).catch((err) => {
                 reject(err);

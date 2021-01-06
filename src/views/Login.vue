@@ -112,7 +112,7 @@ export default {
                 if(res.status === 200) {
                     this.storeUser(res.data);
                     this.getAppData();
-                    this.$router.push('/projects');
+                    //this.$router.push('/dashboard');
                 }
             })
         },
@@ -127,7 +127,7 @@ export default {
                     if(res.status === 200) {
                         this.storeUser(res.data);
                         this.getAppData();
-                        this.$router.push('/projects');
+                        //this.$router.push('/dashboard');
                     }
                 }).catch(err => {
                     if(err.response.status === 401) {

@@ -1,20 +1,28 @@
 <template>
-    <div class="ticket">
+    <v-container class="ticket">
             
         <Header :title="`${project.title} Tickets`" backlinkText="Project" :backlink="`/projects/${ticket.project_id}`" />
+
+
+        <v-row v-if="error" class="red lighten-2 mb-4 ma-1">
+            <v-col>
+                <span class="white--text">{{error}}</span>
+            </v-col>
+        </v-row>
 
         <span v-if="loading">
             <i class="fas fa-spinner fa-pulse"></i> Loading...
         </span>
-        <v-container v-else-if="editing">
-            <EditTicket :ticket="ticket" v-on:close-ticket="editTicket" />
-        </v-container>
-        <v-container v-else>
+
+        <div v-else-if="editing">
+            <EditTicket :ticket="ticket" :project="project" v-on:close-ticket="editTicket" />
+        </div>
+        <div v-else>
             <v-row>
                 <v-col v-if="isSubmitter">
                     <v-btn @click="editTicket" class="editButton">Edit Ticket</v-btn>
                 </v-col>
-                <v-col class="text-right">
+                <v-col v-if="isAssignedUser" class="text-right">
                     <v-btn v-if="ticket.resolvedAt" class="red lighten-2" v-on:click="unresolveTicket">Mark As Incomplete</v-btn>
                     <v-btn v-else class="primary resolveButton" v-on:click="resolveTicket">Mark As Complete</v-btn>
                 </v-col>
@@ -24,10 +32,10 @@
                 <v-col>
                 <v-card class="ticket-info">
                     <v-card-text class="text--primary">
-                        <div class="title text-center">
-                            <h3>{{ ticket.title }}</h3>
+                        <div class="title text-center mb-7">
+                            <h3 v-html="ticket.title"></h3>
                         </div>
-                        <p>{{ ticket.description }}</p>
+                        <p class="mb-7" v-html="ticket.description"></p>
                         <p>Type: <v-chip color="primary" class="ma-1">{{ ticket.type }}</v-chip></p>
                         <div v-if="isAssignedUser">
                             <v-select
@@ -59,12 +67,12 @@
                 </v-col>
             </v-row>
         
-        </v-container>
-        <v-container>
+        </div>
+        <div>
             <CommentForm />
-        </v-container>
+        </div>
         
-    </div>
+    </v-container>
 </template>
 
 <script>
@@ -184,7 +192,7 @@ export default {
                 this.loading = false;
             }).catch((err) => {
                 this.loading = false;
-                this.serverError = err;
+                this.error = err;
             });
         },
         updateTicketPriority(priority) {
@@ -204,7 +212,7 @@ export default {
                 this.loading = false;
             }).catch((err) => {
                 this.loading = false;
-                this.serverError = err;
+                this.error = err;
             });
         },
         resolveTicket() {
@@ -216,6 +224,7 @@ export default {
                 TicketService.resolveTicket(ticket).then(() => {
                     this.$router.go(-1);
                 }).catch(err => {
+                    console.log(err.response)
                     this.error = err.response.data.error;
                 });
             }
@@ -229,6 +238,7 @@ export default {
                 TicketService.unresolveTicket(ticket).then(() => {
                     this.$router.go(-1);
                 }).catch(err => {
+                    console.log(err.response)
                     this.error = err.response.data.error;
                 });
             }

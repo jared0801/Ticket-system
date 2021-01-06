@@ -42,11 +42,17 @@
                 class="elevation-1 data-table"
                 @click:row="selectTicket"
             >
+                <template v-slot:[`item.title`]="{ item }">
+                    <div v-html="item.title"></div>
+                </template>
+                <template v-slot:[`item.priority_id`]="{ item }">
+                    <div>{{item.priority}}</div>
+                </template>
                 <template v-slot:[`item.createdAt`]="{ item }">
-                    <span>{{ `${item.createdAt.getMonth()+1}/${item.createdAt.getDate()}/${item.createdAt.getFullYear()}` }}</span>
+                    <span>{{ item.createdAt | dateToHuman }}</span>
                 </template>
                 <template v-slot:[`item.description`]="{ item }">
-                    <div class="text-truncate" style="max-width: 300px">{{ item.description }}</div>
+                    <div v-html="item.description" class="text-truncate" style="max-width: 300px"></div>
                 </template>
             </v-data-table>
         </div>
@@ -72,6 +78,12 @@ export default {
             this.$router.push(`/projects/${this.$route.params.id}/tickets/${ticket.id}`)
         }
     },
+    filters: {
+        dateToHuman(t) {
+            t = new Date(t);
+            return `${t.getMonth()+1}/${t.getDate()}/${t.getFullYear()}`;
+        }
+    },
     data() {
         return {
             resolved_tab: 0,
@@ -90,7 +102,7 @@ export default {
                 },
                 {
                     text: 'Priority',
-                    value: 'priority'
+                    value: 'priority_id'
                 },
                 {
                     text: 'Status',
@@ -144,6 +156,10 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     max-width: 30vw;
+}
+
+.data-table >>> tbody td {
+  height: 60px !important;
 }
 
 .data-table >>> tbody tr:hover {

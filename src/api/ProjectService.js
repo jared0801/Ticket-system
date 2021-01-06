@@ -10,7 +10,6 @@ class ProjectService {
                 const data = res.data;
                 resolve(data.map(project => ({
                     ...project,
-                    createdAt: new Date(project.createdAt)
                 })));
             }).catch((err) => {
                 reject(err);
@@ -25,7 +24,6 @@ class ProjectService {
                 const project = res.data;
                 resolve({
                     ...project,
-                    createdAt: new Date(project.createdAt)
                 });
             }).catch((err) => {
                 reject(err);
