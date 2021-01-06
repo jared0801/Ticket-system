@@ -1,46 +1,59 @@
 <template>
-    <div>
-
-        <div class="content">
+    <v-container>
 
             <Header title="Profile" backlinkText="Go back" />
 
-            <div class="notification is-danger" v-if="error">{{ error }}</div>
-        
-            <div v-if="success" class="notification is-success">
-                {{ success }}
-            </div>
+            <v-row>
+                <v-col v-if="error" class="red lighten-2 mb-4 ma-1">
+                    <span class="white--text">{{error}}</span>
+                </v-col>
+                <v-col v-else-if="success" class="blue lighten-2 mb-4 ma-1">
+                    <span class="white--text">{{success}}</span>
+                </v-col>
+            </v-row>
 
-            <form>
-                <div class="field">
-                    <label class="label">Username</label>
-                    <div class="control">
-                        <input class="input" type="text" v-model="username" placeholder="Username">
-                    </div>
-                </div>
+            <v-form>
+                <v-row>
+                    <v-col>
+                        <v-text-field
+                            v-model="username"
+                            label="Username"
+                            :rules="usernameRules"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
 
-                <div class="field">
-                    <label class="label">Email</label>
-                    <div class="control">
-                        <input class="input" type="text" id="create-ticket" v-model="email" placeholder="Email" />
-                    </div>
-                </div>
+                <v-row>
+                    <v-col>
+                        <v-text-field
+                            v-model="email"
+                            label="Email"
+                            :rules="emailRules"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
                 
-                <!-- <div class="field">
-                    <div class="control">
-                        <button class="button">Change Password</button>
-                    </div>
-                </div> -->
-                
-                <div class="field">
-                    <div class="control">
-                        <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click.prevent="updateProfile">Update Profile</button>
-                    </div>
-                </div>
-            </form>
-            
-        </div>
-    </div>
+                <!-- <v-row>
+                    <v-col>
+                        <v-btn
+                            @click="changePassword"
+                        >Change Password</v-btn>
+                    </v-col>
+                </v-row> -->
+
+                <v-row>
+                    <v-col>
+                        <v-btn
+                            class="primary"
+                            :class="{ 'is-loading' : loading }"
+                            @click.prevent="updateProfile"
+                        >Update Profile</v-btn>
+                    </v-col>
+                </v-row>
+            </v-form>
+    </v-container>
 </template>
 
 <script>
@@ -56,7 +69,19 @@ export default {
             email: '',
             error: '',
             success: '',
-            loading: false
+            loading: false,
+            usernameRules: [
+                u => !!u || "Username is required.",
+                u => (u.length > 3 && u.length < 33) || "Username must be between 4 and 32 characters long."
+            ],
+            emailRules: [
+                v => !!v || 'E-mail is required',
+                v => /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'E-mail must be valid',
+            ],
+            passwordRules: [
+                p => !!p || "Password is required.",
+                p => (p.length > 5 && p.length < 33) || "Password must be between 6 and 32 characters long."
+            ]
         }
     },
     components: {
@@ -84,7 +109,6 @@ export default {
                 username: this.username,
                 email: this.email
             }
-            console.log('UPDATE')
             UserService.updateUser(newProfile).then((res) => {
                 console.log(res);
                 if(res.status === 200) {

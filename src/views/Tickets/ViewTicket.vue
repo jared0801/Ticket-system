@@ -1,90 +1,75 @@
 <template>
     <div class="ticket">
+            
+        <Header :title="`${project.title} Tickets`" backlinkText="Project" :backlink="`/projects/${ticket.project_id}`" />
 
-        <div class="content">
-            
-            <Header :title="`Ticket: ${ticket.title}`" backlinkText="Project" :backlink="`/projects/${ticket.project_id}`" />
-            
-            <div class="box">
-                <div class="notification is-danger" v-if="error">{{ error }}</div>
-                <span v-if="loading">
-                    <i class="fas fa-spinner fa-pulse"></i> Loading...
-                </span>
-                <div v-else>
-                    <section v-if="!editting" class="box section">
-                        <div class="field button-div">
-                            <div v-if="isSubmitter" class="control">
-                                <button class="button is-info editButton" v-on:click="editTicket">Edit Ticket</button>
-                            </div>
-                            <div class="control">
-                                <button v-if="ticket.resolvedAt" class="button is-danger resolveButton" v-on:click="unresolveTicket">Mark As Incomplete</button>
-                                <button v-else class="button is-success resolveButton" v-on:click="resolveTicket">Mark As Complete</button>
-                            </div>
+        <span v-if="loading">
+            <i class="fas fa-spinner fa-pulse"></i> Loading...
+        </span>
+        <v-container v-else-if="editing">
+            <EditTicket :ticket="ticket" v-on:close-ticket="editTicket" />
+        </v-container>
+        <v-container v-else>
+            <v-row>
+                <v-col v-if="isSubmitter">
+                    <v-btn @click="editTicket" class="editButton">Edit Ticket</v-btn>
+                </v-col>
+                <v-col class="text-right">
+                    <v-btn v-if="ticket.resolvedAt" class="red lighten-2" v-on:click="unresolveTicket">Mark As Incomplete</v-btn>
+                    <v-btn v-else class="primary resolveButton" v-on:click="resolveTicket">Mark As Complete</v-btn>
+                </v-col>
+            </v-row>
+
+            <v-row>
+                <v-col>
+                <v-card class="ticket-info">
+                    <v-card-text class="text--primary">
+                        <div class="title text-center">
+                            <h3>{{ ticket.title }}</h3>
                         </div>
-                        <div class="field desc-field">
-                            <p>{{ ticket.text }}</p>
+                        <p>{{ ticket.description }}</p>
+                        <p>Type: <v-chip color="primary" class="ma-1">{{ ticket.type }}</v-chip></p>
+                        <div v-if="isAssignedUser">
+                            <v-select
+                                v-model="setStatus"
+                                :items="statuses"
+                                label="Status"
+                            ></v-select>
                         </div>
-                        <div class="field">
-                            <p>Type: {{ ticket.type }}</p>
+                        <p v-else>
+                            Status: <v-chip color="secondary" class="ma-1">{{ ticket.status }}</v-chip>
+                        </p>
+                        <div v-if="isAssignedUser">
+                            <v-select
+                                v-model="setPriority"
+                                :items="priorities"
+                                label="Priority"
+                            ></v-select>
                         </div>
-                        <div class="field">
-                            Status:
-                            <div class="control inline"> 
-                                <span v-if="!isAssignedUser">
-                                    {{ ticket.status }}
-                                </span>
-                                <div class="select" v-else>
-                                    <select v-model="setStatus">
-                                        <option value="0">Open</option>
-                                        <option value="1">In Progress</option>
-                                        <option value="2">Blocked</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field">
-                            Priority:
-                            <div class="control inline"> 
-                                <span v-if="!isAssignedUser">
-                                    {{ ticket.priority }}
-                                </span>
-                                <div class="select" v-else>
-                                    <select v-model="setPriority">
-                                        <option value="1">Low</option>
-                                        <option value="2">Medium</option>
-                                        <option value="3">High</option>
-                                        <option value="4">Urgent</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <p>Submitter: {{ ticket.submitter }}</p>
-                        </div>
-                        <div class="field">
-                            <p>Assigned Users: 
-                                <span v-for="(user, i) in ticket.users" :key="user.id">
-                                    {{user.username}}<span v-if="i < ticket.users.length-1">, </span>
-                                </span>
-                                <span v-if="ticket.users.length == 0">
-                                    None
-                                </span>
-                            </p>
-                        </div>
-                    </section>
-                    <section class="box section" v-else>
-                        <EditTicket :ticket="ticket" v-on:close-ticket="editTicket" />
-                    </section>
-                    <CommentForm />
-                </div>
-            </div>
-        </div>
+                        <p v-else>
+                            Priority: <v-chip color="tertiary" class="ma-1">{{ ticket.priority }}</v-chip>
+                        </p>
+                        <p>Submitter: <v-chip color="primary" class="ma-1">{{ ticket.submitter }}</v-chip></p>
+                        <p>Assigned Users: <v-chip v-for="user in ticket.users" :key="user.id" color="secondary" class="ma-1">{{user.username}}</v-chip></p>
+                    </v-card-text>
+
+
+                    
+                </v-card>
+                </v-col>
+            </v-row>
+        
+        </v-container>
+        <v-container>
+            <CommentForm />
+        </v-container>
         
     </div>
 </template>
 
 <script>
 import TicketService from '@/api/TicketService';
+import ProjectService from '@/api/ProjectService';
 import EditTicket from '@/components/Tickets/EditTicket';
 import CommentForm from '@/components/Comments/CommentForm';
 import Header from '@/components/Header';
@@ -101,8 +86,41 @@ export default {
         return {
             loading: false,
             ticket: {},
-            editting: false,
+            project: {},
+            editing: false,
             error: '',
+            statuses: [
+                {
+                    text: "Open",
+                    value: 0
+                },
+                {
+                    text: "In Progress",
+                    value: 1
+                },
+                {
+                    text: "Blocked",
+                    value: 2
+                },
+            ],
+            priorities: [
+                {
+                    text: "Low",
+                    value: 1
+                },
+                {
+                    text: "Medium",
+                    value: 2
+                },
+                {
+                    text: "High",
+                    value: 3
+                },
+                {
+                    text: "Urgent",
+                    value: 4
+                },
+            ],
             setStatus: undefined,
             setPriority: undefined
         }
@@ -118,6 +136,8 @@ export default {
     async created() {
         this.loading = true;
         try {
+            const project = await ProjectService.getProject(this.$route.params.pid);
+            this.project = project;
             this.ticket = await TicketService.getTicket(this.$route.params.pid, this.$route.params.tid);
             if(this.ticket.id == undefined) {
                 this.$router.push(`/projects/${this.$route.params.pid}`)
@@ -145,13 +165,13 @@ export default {
     methods: {
         ...mapGetters('user', ['getUser']),
         editTicket() {
-            this.editting = !this.editting;
+            this.editing = !this.editing;
         },
         updateTicketStatus(status) {
             this.loading = true;
             const ticket = {
                 title: this.ticket.title,
-                text: this.ticket.text,
+                description: this.ticket.description,
                 user: this.ticket.submitter,
                 users: this.ticket.users,
                 project_id: this.ticket.project_id,
@@ -171,7 +191,7 @@ export default {
             this.loading = true;
             const ticket = {
                 title: this.ticket.title,
-                text: this.ticket.text,
+                description: this.ticket.description,
                 user: this.ticket.submitter,
                 users: this.ticket.users,
                 project_id: this.ticket.project_id,

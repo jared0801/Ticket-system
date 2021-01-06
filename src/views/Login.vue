@@ -5,12 +5,13 @@
             
             <Header title="Welcome to The Ticket System" />
 
-            <v-form v-model="valid">
+            <v-form ref="form">
                 <v-container>
                     <v-row>
                         <v-col>
                             <v-text-field
                                 v-model="username"
+                                :rules="usernameRules"
                                 autocomplete="username"
                                 label="Username"
                                 required
@@ -22,6 +23,7 @@
                         <v-col>
                             <v-text-field
                                 v-model="password"
+                                :rules="passwordRules"
                                 label="Password"
                                 required
                                 autocomplete="current-password"
@@ -30,6 +32,11 @@
                                 :type="showPass ? 'text' : 'password'"
                             >                    
                             </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="error" class="red lighten-2 mb-4 ma-1">
+                        <v-col>
+                            <span class="white--text">{{error}}</span>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -50,52 +57,6 @@
                     </v-row>
                 </v-container>
             </v-form>
-
-            <!-- <form
-                id="loginForm"
-                @submit="checkForm"
-            >
-
-                <div v-if="error" class="notification is-danger">
-                    {{ error }}
-                </div>
-
-
-                <div class="field">
-                    <label class="label">Username</label>
-                    <div class="control has-icons-left has-icons-right">
-                        <input class="input" :class="{ 'is-danger' : errors['username'] }" type="text" required autocomplete="username" placeholder="Username" v-model="username">
-                        <span class="icon is-small is-left">
-                            <i class="fas fa-user"></i>
-                        </span>
-                    </div>
-                    <p v-if="errors['username']" class="help is-danger">{{ errors['username'] }}</p>
-                </div>
-                
-                <div class="field">
-                    <label class="label">Password</label>
-                    <div class="control has-icons-left has-icons-right">
-                        <input class="input" :class="{ 'is-danger' : errors['password'] }" type="password" required autocomplete="current-password" placeholder="Password" v-model="password">
-                        <span class="icon is-small is-left">
-                            <i class="fas fa-key"></i>
-                        </span>
-                    </div>
-                    <p v-if="errors['password']" class="help is-danger">{{ errors['password'] }}</p>
-                </div>
-
-                <div class="field is-grouped">
-                    <div class="control">
-                        <input type="submit" value="Sign In" class="button is-link" />
-                    </div>
-                </div>
-                
-                <div>
-                    First time here? <router-link to="/register">Sign Up</router-link>
-                </div>
-                <div>
-                    Just taking a look? <a href="#" @click="demoLogin">Demo login</a>
-                </div>
-            </form> -->
             
         </div>
 
@@ -117,15 +78,18 @@ export default {
     },
     data() {
         return {
+            error: '',
             username: '',
             password: '',
-            valid: false,
             showPass: false,
-            error: '',
-            errors: {
-                username: '',
-                password: ''
-            }
+            usernameRules: [
+                u => !!u || "Username is required.",
+                u => (u.length > 3 && u.length < 33) || "Username must be between 4 and 32 characters long."
+            ],
+            passwordRules: [
+                p => !!p || "Password is required.",
+                p => (p.length > 5 && p.length < 33) || "Password must be between 6 and 32 characters long."
+            ]
         }
     },
     mounted() {
@@ -143,22 +107,17 @@ export default {
     methods: {
         ...mapMutations('user', ['storeUser']),
         ...mapActions('tickets', ['getAppData']),
-        clearFields() {
-            this.username = '';
-            this.password = '';
-        },
         demoLogin() {
             UserService.loginDevUser().then(res => {
                 if(res.status === 200) {
                     this.storeUser(res.data);
                     this.getAppData();
-                    this.clearFields();
                     this.$router.push('/projects');
                 }
             })
         },
         checkForm(event) {
-            this.error = '';
+            if(!this.$refs.form.validate()) return;
 
             if(this.username && this.password) {
                 UserService.loginUser({
@@ -168,7 +127,6 @@ export default {
                     if(res.status === 200) {
                         this.storeUser(res.data);
                         this.getAppData();
-                        this.clearFields();
                         this.$router.push('/projects');
                     }
                 }).catch(err => {

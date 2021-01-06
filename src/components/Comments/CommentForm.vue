@@ -1,26 +1,34 @@
 <template>
-    <div class="container">
-        <div class="notification is-danger" v-if="error">{{ error }}</div>
+    <v-container>
+        <v-row v-if="error" class="red lighten-2 mb-4 ma-1">
+            <v-col>
+                <span class="white--text">{{error}}</span>
+            </v-col>
+        </v-row>
         
-        <div>
-            <h2>Comments</h2>
-            <div class="field">
-                <div class="control">
-                    <textarea class="textarea" type="text" id="create-ticket" v-model="text" placeholder="Leave a comment on this ticket" />
+        <v-row>
+            <v-col>
+                <h2>Comments</h2>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <div>
+                    <v-textarea hide-details="auto" outlined v-model="text" label="Leave a comment on this ticket" />
+
+                    <v-btn class="primary mt-2" :class="{ 'is-loading' : loading }" @click.prevent="createComment">Submit</v-btn>
                 </div>
-                <div class="control submit-control">
-                    <button class="button is-primary submit-button" :class="{ 'is-loading' : loading }" v-on:click.prevent="createComment">Submit</button>
+                
+                <span v-if="loading">
+                    <i class="fas fa-spinner fa-pulse"></i> Loading...
+                </span>
+
+                <div class="mt-5" v-else>
+                    <Comment v-for="comment in comments" :comment=comment :key="comment.id" />
                 </div>
-            </div>
-            
-            <span v-if="loading">
-                <i class="fas fa-spinner fa-pulse"></i> Loading...
-            </span>
-            <div v-else>
-                <Comment v-for="comment in comments" :comment=comment :key="comment.id" />
-            </div>
-        </div>
-    </div>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
@@ -75,12 +83,4 @@ export default {
 </script>
 
 <style scoped>
-.container {
-    margin-top: 2em;
-}
-
-.submit-control {
-    text-align: right;
-    margin: 1em 0;
-}
 </style>

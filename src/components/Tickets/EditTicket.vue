@@ -1,102 +1,143 @@
 <template>
-    <form>
-        <div class="notification is-danger" v-if="serverError">{{ serverError }}</div>
+    <v-form ref="form">
+        <v-container>
 
-        <div class="field">
-            <label class="label">Ticket Title</label>
-            <div class="control">
-                <input class="input" type="text" v-model="title" placeholder="Ticket title">
-            </div>
-        </div>
-        <div class="field">
-            <div class="control">
-                <label class="label">Ticket Type</label>
-                <div class="select">
-                    <select v-model="type_id">
-                        <option value="1">Bug / Error</option>
-                        <option value="2">Feature Request</option>
-                        <option value="3">Project Proposal</option>
-                        <option value="4">Training</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        
-        <div class="field">
-            <div class="control">
-                <label class="label">Ticket Priority</label>
-                <div class="select">
-                    <select v-model="priority_id">
-                        <option value="1">Low</option>
-                        <option value="2">Medium</option>
-                        <option value="3">High</option>
-                        <option value="4">Urgent</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+            <v-row v-if="error" class="red lighten-2 mb-4 ma-1">
+                <v-col>
+                    <span class="white--text">{{error}}</span>
+                </v-col>
+            </v-row>
 
-        <div class="field">
-            <label class="label">Assign this ticket</label>
-            <div class="control">
-                <!-- <vue-autosuggest
-                :suggestions="[{data: filteredUsers.map(r => r.username)}]"
-                :input-props="{id:'autosuggest__input', placeholder:'Assign to', class: 'input'}"
-                @selected="selectHandler"
-                @input="inputChangeHandler"
-                componentAttrClassAutosuggestResults="result-container dropdown-content"
+
+            <v-row>
+                <v-col>
+                    <v-text-field
+                        v-model="title"
+                        label="Ticket Title"
+                        :rules="titleRules"
+                        required
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+
+            <v-row>
+                <v-col>
+                    <v-select :rules="typeRules" v-model="type_id" :items="types" label="Type"></v-select>
+                </v-col>
+            </v-row>
+
+            <v-row>
+                <v-col>
+                    <v-select :rules="priorityRules" v-model="priority_id" :items="priorities" label="Priority"></v-select>
+                </v-col>
+            </v-row>
+            
+
+            <v-row>
+                <v-col>
+                    <v-autocomplete
+                        v-model="assignedUsers"
+                        :items="users"
+                        @change="userSearch = ''"
+                        :search-input.sync="userSearch"
+                        outlined
+                        return-object
+                        chips
+                        hide-selected
+                        hide-no-data
+                        color="blue-grey lighten-2"
+                        label="Assign this ticket"
+                        item-text="username"
+                        item-value="username"
+                        multiple
+                    >
+                        <template v-slot:selection="data">
+                            <v-chip
+                                v-bind="data.attrs"
+                                :input-value="data.selected"
+                                close
+                                @click="data.select"
+                                @click:close="remove(data.item)"
+                            >
+                                {{ data.item.username }}
+                            </v-chip>
+                        </template>
+                    </v-autocomplete>
+                </v-col>
+            </v-row>
+
+            
+            <v-row>
+                <v-col>
+                    <v-textarea
+                        v-model="description"
+                        label="Ticket Description"
+                        required
+                        outlined
+                        :rules="descRules"
+                    ></v-textarea>
+                </v-col>
+            </v-row>
+            
+            <v-row v-if="ticket">
+                <v-dialog
+                    v-model="activeModal"
+                    width="500"
                 >
-                    <template slot-scope="{suggestion}">
-                        <span class="suggestion-item button">{{suggestion.item}}</span>
+                    <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        color="red lighten-2"
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                        Delete Ticket
+                    </v-btn>
                     </template>
-                </vue-autosuggest> -->
-            </div>
-        </div>
+            
+                    <v-card>
+                    <v-card-title class="headline grey lighten-2">
+                        Delete This Ticket?
+                    </v-card-title>
+            
+                    <v-card-text class="mt-2">
+                        Are you sure you would like to delete this ticket? This action cannot be undone.
+                    </v-card-text>
+            
+                    <v-divider></v-divider>
+            
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="red lighten-2"
+                            dark
+                            @click="deleteTicket"
+                        >
+                        Delete
+                        </v-btn>
+                    </v-card-actions>
+                    </v-card>
+                </v-dialog>
+                
+                <v-col class="text-right">
+                    <v-btn class="primary mr-2" @click.prevent="updateTicket">Update</v-btn>
+                    <v-btn class="secondary" @click="closeTicket">Close</v-btn>
+                </v-col>
+            </v-row>
 
-        <div class="field">
-            <div>
-                <label class="label">Assigned to: </label>
-                <div v-for="(user, index) in assignedUsers" :key="user.id">{{ user.username }} <a class="delete" aria-label="remove assigned user" v-on:click="rmAssignedUser(index)"></a></div>
-            </div>
-        </div>
+            <v-row v-else class="ma-1">
+                <v-btn class="primary" :class="{ 'is-loading' : loading }" @click.prevent="createTicket">Create</v-btn>
+            </v-row>
 
-        <div class="field">
-            <label class="label">Ticket Details</label>
-            <div class="control">
-                <textarea class="textarea" type="text" id="create-ticket" v-model="text" placeholder="Ticket details" />
-            </div>
-        </div>
-        
-        <div v-if="ticket" class="field button-div">
-            <div class="control delete-control">
-                <button class="button is-danger" v-on:click.prevent="toggleModal">Delete Ticket</button>
-                <Modal v-if="activeModal"
-                    content="Are you sure you would like to delete this ticket? This action cannot be undone."
-                    buttonText="Delete"
-                    aria="Confirm deletion"
-                    v-on:toggle-modal="toggleModal"
-                    v-on:confirm="deleteTicket"
-                    classType="is-danger" />
-            </div>
-            <div class="control">
-                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click.prevent="updateTicket">Update</button>
-            </div>
-            <div class="control">
-                <button class="button is-warning" v-on:click="closeTicket">Cancel</button>
-            </div>
-        </div>
-        <div v-else class="form button-div">
-            <div class="control">
-                <button class="button is-primary" :class="{ 'is-loading' : loading }" v-on:click.prevent="createTicket">Create</button>
-            </div>
-        </div>
-    </form>    
+
+        </v-container>
+    </v-form>
 </template>
 
 <script>
 import TicketService from '@/api/TicketService';
 import UserService from '@/api/UserService';
-import Modal from '@/components/Modal';
+//import Modal from '@/components/Modal';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -104,15 +145,64 @@ export default {
     data() {
         return {
             title: '',
-            text: '',
-            serverError: '',
+            description: '',
+            error: '',
+            userSearch: '',
             assignedUsers: [],
             users: [],
-            filteredUsers: [],
             loading: false,
             activeModal: false,
             type_id: 1,
             priority_id: 1,
+            titleRules: [
+                t => !!t || "A title is required.",
+                t => (t.length > 2 && t.length < 33) || "Title must be between 3 and 32 characters long."
+            ],
+            descRules: [
+                d => !!d || "A description is required."
+            ],
+            typeRules: [
+                d => !!d || "A type is required."
+            ],
+            priorityRules: [
+                d => !!d || "A priority is required."
+            ],
+            types: [
+                {
+                    text: "Bug / Error",
+                    value: 1
+                },
+                {
+                    text: "Feature Request",
+                    value: 2
+                },
+                {
+                    text: "Project Proposal",
+                    value: 3
+                },
+                {
+                    text: "Training",
+                    value: 4
+                },
+            ],
+            priorities: [
+                {
+                    text: "Low",
+                    value: 1
+                },
+                {
+                    text: "Medium",
+                    value: 2
+                },
+                {
+                    text: "High",
+                    value: 3
+                },
+                {
+                    text: "Urgent",
+                    value: 4
+                },
+            ],
         }
     },
     props: {
@@ -121,31 +211,24 @@ export default {
         }
     },
     components: {
-        Modal
+        //Modal
     },
-    async created() {
+    async mounted() {
         this.loading = true;
         try {
             if(this.ticket) {
                 this.title = this.ticket.title;
-                this.text = this.ticket.text;
+                this.description = this.ticket.description;
                 this.assignedUsers = this.ticket.users;
                 this.type_id = this.ticket.type_id;
                 this.priority_id = this.ticket.priority_id;
             }
             const userArray = await UserService.getUsers();
             this.users = userArray;
-            this.filteredUsers = userArray;
-            if(this.assignedUsers && this.assignedUsers.length) {
-                const assignedUsers = this.assignedUsers;
-                this.filteredUsers = this.users.filter(function(item) {
-                    return !assignedUsers.some(i => i.id==item.id);
-                });
-            }
             this.loading = false;
         } catch(err) {
             this.loading = false;
-            this.serverError = err;
+            this.error = err;
         }
     },
     methods: {
@@ -155,10 +238,11 @@ export default {
             this.activeModal = !this.activeModal;
         },
         createTicket() {
+            if(!this.$refs.form.validate()) return;
             this.loading = true;
             const ticket = {
                 title: this.title,
-                text: this.text,
+                description: this.description,
                 userId: this.getUser().id,
                 users: this.assignedUsers,
                 project_id: this.$route.params.id,
@@ -170,7 +254,7 @@ export default {
             }
             TicketService.createTicket(ticket).then(() => {
                 this.loading = false;
-                this.text = '';
+                this.description = '';
                 this.title = '';
                 this.getAppData().then(() => {
                     this.$router.push(`/projects/${this.$route.params.id}`);
@@ -178,17 +262,19 @@ export default {
             }).catch((err) => {
                 this.loading = false;
                 if(err.response?.data?.error) {
-                    this.serverError = err.response.data.error;
+                    this.error = err.response.data.error;
                 } else {
-                    this.serverError = err;
+                    this.error = err;
                 }
             });
         },
         updateTicket() {
+            if(!this.$refs.form.validate()) return;
+            if(!this.ticket) return;
             this.loading = true;
             const ticket = {
                 title: this.title,
-                text: this.text,
+                description: this.description,
                 user: this.ticket.user,
                 users: this.assignedUsers,
                 project_id: this.ticket.project_id,
@@ -199,12 +285,10 @@ export default {
             }
             TicketService.updateTicket(ticket).then(() => {
                 this.loading = false;
-                this.text = '';
-                this.title = '';
-                //this.$router.go(0);
+                this.$router.go(0);
             }).catch((err) => {
                 this.loading = false;
-                this.serverError = err;
+                this.error = err;
             });
         },
         deleteTicket() {
@@ -214,7 +298,7 @@ export default {
                 this.$router.push(`/projects/${this.ticket.project_id}`);
             }).catch((err) => {
                 this.loading = false;
-                this.serverError = err;
+                this.error = err;
             });
         },
         closeTicket() {

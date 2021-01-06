@@ -16,7 +16,7 @@
                 </v-row>
 
                 <v-row>
-                    <div v-if="editting" class="project-info">
+                    <div v-if="editing" class="project-info">
                         <EditProject :project="project" v-on:close-project="editProject" />
                     </div>
 
@@ -27,7 +27,6 @@
                             </div>
                             <p>{{ project.description }}</p>
                             <p>Lead: <v-chip color="primary" class="ma-1">{{ project.lead }}</v-chip></p>
-                            <!-- <p>Users: <span v-for="(user, i) in project.users" :key="user.id">{{user.username}}<span v-if="i < project.users.length-1">, </span></span></p> -->
                             <p>Users: <v-chip v-for="user in project.users" :key="user.id" color="secondary" class="ma-1">{{user.username}}</v-chip></p>
                         </v-card-text>
                     </v-card>
@@ -60,7 +59,7 @@ export default {
     data() {
         return {
             project: {},
-            editting: false
+            editing: false
         }
     },
     async created() {
@@ -75,7 +74,7 @@ export default {
     methods: {
         ...mapGetters('user', ['getUser']),
         editProject() {
-            this.editting = !this.editting;
+            this.editing = !this.editing;
         }
     }
 };
@@ -85,10 +84,5 @@ export default {
 .project-info {
     margin: 1em 0;
     width: 100%;
-}
-
-.right-align {
-    width: 100%;
-    text-align: right;
 }
 </style>

@@ -1,59 +1,90 @@
 <template>
-    <div class="card comment">
-        <header class="card-header">
-            <p>{{ comment.username }}</p>
-            
-            <div v-if="isCommenter" class="card-header-icon">
-                <a @click="toggleEdit" role="button" class="edit" :class="{ 'selected' : editing }"><i class="fas fa-edit"></i></a>
-                <a @click="deleteConfirmation" role="button" class="delete" aria-label="delete comment"></a>
-                <Modal v-if="confirmDelete"
-                    content="Are you sure you would like to delete this comment?"
-                    buttonText="Delete"
-                    aria="Confirm deletion"
-                    v-on:toggle-modal="deleteConfirmation"
-                    v-on:confirm="deleteComment"
-                    classType="is-danger" />
-            </div>
-            <!-- <a href="#" class="card-header-icon" aria-label="more options">
-                <span class="icon">
-                    <i class="fas fa-angle-down" aria-hidden="true"></i>
-                </span>
-            </a> -->
-        </header>
-        <div class="card-content">
-            <div class="notification is-danger" v-if="error">{{ error }}</div>
-            <div v-if="editing">
-                <div class="field">
-                    <div class="control">
-                        <textarea class="textarea" type="text" id="edit-ticket" v-model="text" />
-                    </div>
-                    <div class="control button-div submit-control">
-                        <button class="button is-primary submit-button" :class="{ 'is-loading' : loading }" v-on:click="updateComment">Update</button>
-                    </div>
+    <v-card class="mb-2">
+        <v-card-title>
+            <v-row>
+                <v-col>
+                    <h3 class="title">{{comment.username}}</h3>
+                </v-col>
+                <v-col class="text-right">
+                    <div v-if="isCommenter" class="card-header-icon">
+                    <v-btn small text dark color="grey lighten-1" @click="toggleEdit" :class="{ 'selected' : editing }"><i class="fas fa-edit"></i></v-btn>
+
+                    <v-dialog
+                        v-model="confirmDelete"
+                        width="500"
+                    >
+                        <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            color="red lighten-2"
+                            dark
+                            v-bind="attrs"
+                            v-on="on"
+                            small
+                            text
+                        >
+                            <i class="fas fa-times-circle"></i>
+                        </v-btn>
+                        </template>
+                
+                        <v-card>
+                        <v-card-title class="headline grey lighten-2">
+                            Delete This Comment?
+                        </v-card-title>
+                
+                        <v-card-text class="mt-2">
+                            Are you sure you would like to delete this comment? This action cannot be undone.
+                        </v-card-text>
+                
+                        <v-divider></v-divider>
+                
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                color="red lighten-2"
+                                dark
+                                @click="deleteComment"
+                            >
+                            Delete
+                            </v-btn>
+                        </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </div>
-            </div>
-            <div v-else class="comment-content">
-                {{ comment.text }}
-                <div class="help">
-                    <time v-if="comment.updatedAt" :datetime="comment.createdAt">
-                        <br>
-                        Last Edited: {{ updatedDateTime }}
-                    </time>
+                </v-col>
+            </v-row>
+        </v-card-title>
+        <v-card-text v-if="editing">
+            <v-row>
+                <v-col>
+                    <v-textarea full-width hide-details="auto" outlined v-model="text" />
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col>
+                    <v-btn class="primary" :class="{ 'is-loading' : loading }" v-on:click="updateComment">Update</v-btn>
+                </v-col>
+            </v-row>
+        </v-card-text>
+        <v-card-text v-else>
+            {{ comment.text }}
+            <div class="help">
+                <time v-if="comment.updatedAt" :datetime="comment.createdAt">
                     <br>
-                    <time :datetime="comment.createdAt">
-                        Created: {{ createdDateTime }}
-                    </time>
-                </div>
+                    Last Edited: {{ updatedDateTime }}
+                </time>
+                <br>
+                <time :datetime="comment.createdAt">
+                    Created: {{ createdDateTime }}
+                </time>
             </div>
-        </div>
-    </div>
+        </v-card-text>
+    </v-card>
     
     
 </template>
 
 <script>
 import CommentService from '@/api/CommentService';
-import Modal from '@/components/Modal.vue';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -66,9 +97,6 @@ export default {
             loading: false,
             confirmDelete: false,
         }
-    },
-    components: {
-        Modal
     },
     props: {
         comment: {
@@ -107,9 +135,6 @@ export default {
                 this.error = err.response.data.error;
                 this.loading = false;
             })
-        },
-        deleteConfirmation() {
-            this.confirmDelete = !this.confirmDelete;
         }
     },
     computed: {
@@ -178,7 +203,6 @@ export default {
 }
 
 .edit {
-    margin-right: 1em;
     color: lightgray;
 }
 /*.edit:hover {
