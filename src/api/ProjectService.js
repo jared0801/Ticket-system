@@ -7,10 +7,8 @@ class ProjectService {
     static getProjects() {
         return new Promise((resolve, reject) => {
             axios.get(url).then((res) => {
-                const data = res.data;
-                resolve(data.map(project => ({
-                    ...project,
-                })));
+                const projects = res.data;
+                resolve(projects);
             }).catch((err) => {
                 reject(err);
             })
@@ -22,9 +20,7 @@ class ProjectService {
         return new Promise((resolve, reject) => {
             axios.get(`${url}/${id}`).then((res) => {
                 const project = res.data;
-                resolve({
-                    ...project,
-                });
+                resolve(project);
             }).catch((err) => {
                 reject(err);
             })
@@ -33,16 +29,12 @@ class ProjectService {
 
     // Create a project
     static createProject(project) {
-        return axios.post(url, {
-            ...project
-        });
+        return axios.post(url, project);
     }
 
     // Update a project
     static updateProject(project) {
-        return axios.post(`${url}/${project.id}`, {
-            ...project
-        });
+        return axios.post(`${url}/${project.id}`, project);
     }
 
     // Delete a project

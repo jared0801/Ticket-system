@@ -14,7 +14,7 @@
 <script>
 import Header from '@/components/Header';
 import EditTicket from '@/components/Tickets/EditTicket';
-import { mapGetters } from 'vuex';
+import ProjectService from '@/api/ProjectService';
 
 export default {
     name: 'CreateTicket',
@@ -27,12 +27,10 @@ export default {
         Header,
         EditTicket
     },
-    created() {
-        this.project = this.getData.projects.filter(p => p.id == this.$router.params.id);
+    async created() {
+        this.project = await ProjectService.getProject(this.$route.params.id);
+        console.log(this.project);
     },
-    methods: {
-        ...mapGetters('user', ['getData']),
-    }
 };
 </script>
 

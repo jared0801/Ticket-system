@@ -35,6 +35,7 @@
             <v-row>
                 <v-col>
                     <v-autocomplete
+                        ref="autocomplete"
                         v-model="assignedUsers"
                         :items="users"
                         @change="userSearch = ''"
@@ -157,6 +158,8 @@ export default {
                 this.title = this.project.title;
                 this.assignedUsers = this.project.users;
             }
+            let autocompleteInput = this.$refs.autocomplete.$refs.input;
+            autocompleteInput.addEventListener('focus', this.onFocus, true);
             const userArray = await UserService.getUsers();
             this.users = userArray;
             this.loading = false;
@@ -176,6 +179,9 @@ export default {
         remove(item) {
             const index = this.assignedUsers.map(u => u.username).indexOf(item.username)
             if (index >= 0) this.assignedUsers.splice(index, 1)
+        },
+        onFocus() {
+            this.$refs.autocomplete.isMenuActive = true;
         },
         createProject() {
             if(!this.$refs.form.validate()) return;

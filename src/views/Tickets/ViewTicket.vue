@@ -144,8 +144,7 @@ export default {
     async created() {
         this.loading = true;
         try {
-            const project = await ProjectService.getProject(this.$route.params.pid);
-            this.project = project;
+            this.project = await ProjectService.getProject(this.$route.params.pid);
             this.ticket = await TicketService.getTicket(this.$route.params.pid, this.$route.params.tid);
             if(this.ticket.id == undefined) {
                 this.$router.push(`/projects/${this.$route.params.pid}`)

@@ -36,6 +36,7 @@
             <v-row>
                 <v-col>
                     <v-autocomplete
+                        ref="autocomplete"
                         v-model="assignedUsers"
                         :items="users"
                         @change="userSearch = ''"
@@ -211,6 +212,11 @@ export default {
             type: Object
         }
     },
+    watch: {
+        project(p) {
+            this.users = p.users;
+        }
+    },
     components: {
         //Modal
     },
@@ -224,8 +230,11 @@ export default {
                 this.type_id = this.ticket.type_id;
                 this.priority_id = this.ticket.priority_id;
             }
+            let autocompleteInput = this.$refs.autocomplete.$refs.input;
+            autocompleteInput.addEventListener('focus', this.onFocus, true);
             //const userArray = await UserService.getUsers();
             this.users = this.project.users;
+            console.log(this.users);
             this.loading = false;
         } catch(err) {
             this.loading = false;
@@ -237,6 +246,9 @@ export default {
         ...mapGetters('user', ['getUser']),
         toggleModal() {
             this.activeModal = !this.activeModal;
+        },
+        onFocus() {
+            this.$refs.autocomplete.isMenuActive = true;
         },
         remove(item) {
             const index = this.assignedUsers.map(u => u.username).indexOf(item.username)

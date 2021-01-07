@@ -226,7 +226,7 @@ export default {
 
             for(let i = 0; i < 12; i++) {
                 this.tickettimecounts[i] = this.tickets.filter(item => {
-                    return item.resolvedAt && item.resolvedAt.getMonth() == this.last12[i].getMonth();
+                    return item.resolvedAt && new Date(item.resolvedAt).getMonth() == this.last12[i].getMonth();
                 }).length;
             }
             this.tickettimedata.datasets[0].data = this.tickettimecounts;
