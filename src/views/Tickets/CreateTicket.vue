@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header title="Create a ticket" backlinkText="View Tickets" />
+            <Header title="Create A Ticket" backlinkText="View Tickets" />
 
             <EditTicket :project=project />
 

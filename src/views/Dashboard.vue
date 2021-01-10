@@ -212,10 +212,10 @@ export default {
             this.typecounts[3] = this.tickets.filter(ticket => ticket.type_id==4).length;
             this.typedata.datasets[0].data = this.typecounts;
 
-            this.statuscounts[0] = this.tickets.filter(ticket => ticket.status_id==0).length;
-            this.statuscounts[1] = this.tickets.filter(ticket => ticket.status_id==1).length;
-            this.statuscounts[2] = this.tickets.filter(ticket => ticket.status_id==2).length;
-            this.statuscounts[3] = this.tickets.filter(ticket => ticket.status_id==3).length;
+            this.statuscounts[0] = this.tickets.filter(ticket => ticket.status_id==1).length;
+            this.statuscounts[1] = this.tickets.filter(ticket => ticket.status_id==2).length;
+            this.statuscounts[2] = this.tickets.filter(ticket => ticket.status_id==3).length;
+            this.statuscounts[3] = this.tickets.filter(ticket => ticket.status_id==4).length;
             this.statusdata.datasets[0].data = this.statuscounts;
 
             this.prioritycounts[0] = this.tickets.filter(ticket => ticket.priority_id==1).length;

@@ -42,8 +42,9 @@ async function initDb() {
         type_id int NOT NULL DEFAULT 1,
         priority_id int NOT NULL DEFAULT 1,
         createdAt DATETIME NOT NULL DEFAULT current_timestamp(),
-        updatedAt DATETIME,
-        resolvedAt DATETIME,
+        updatedAt DATETIME NULL DEFAULT NULL,
+        resolvedAt DATETIME NULL DEFAULT NULL,
+        dueAt DATETIME NULL DEFAULT NULL,
         PRIMARY KEY(id),
         CONSTRAINT creator
             FOREIGN KEY (user_id)
@@ -135,7 +136,7 @@ async function initDb() {
             ["Open"],
             ["In Progress"],
             ["Blocked"],
-            ["Closed"]
+            ["Resolved"]
         ]
         sql = `INSERT INTO ticket_status (status) VALUES ?`;
         db.query(sql, [statuses], (err, res) => {
@@ -144,7 +145,6 @@ async function initDb() {
             console.log("ticket statuses inserted!");
         });
     });
-
 
 
 
@@ -173,7 +173,6 @@ async function initDb() {
             console.log("Ticket types inserted!");
         });
     });
-   
     
 
    sql = `CREATE TABLE ticket_priority(

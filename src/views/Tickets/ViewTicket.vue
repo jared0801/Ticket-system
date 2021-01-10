@@ -36,6 +36,13 @@
                             <h3 v-html="ticket.title"></h3>
                         </div>
                         <p class="mb-7" v-html="ticket.description"></p>
+                        <p class="mb-7">Due Date: 
+                            <span v-if="ticket.dueAt" :class="isPastDue ? 'red--text' : ''">{{ ticket.dueAt | dateToHuman }}
+                            </span>
+                            <span v-else>
+                                None
+                            </span>
+                        </p>
                         <p>Type: <v-chip color="primary" class="ma-1">{{ ticket.type }}</v-chip></p>
                         <div v-if="isAssignedUser">
                             <v-select
@@ -81,6 +88,7 @@ import ProjectService from '@/api/ProjectService';
 import EditTicket from '@/components/Tickets/EditTicket';
 import CommentForm from '@/components/Comments/CommentForm';
 import Header from '@/components/Header';
+import dateMixin from '@/mixins/dateMixin';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -90,6 +98,9 @@ export default {
         CommentForm,
         EditTicket
     },
+    mixins: [
+        dateMixin,
+    ],
     data() {
         return {
             loading: false,
@@ -100,15 +111,15 @@ export default {
             statuses: [
                 {
                     text: "Open",
-                    value: 0
-                },
-                {
-                    text: "In Progress",
                     value: 1
                 },
                 {
-                    text: "Blocked",
+                    text: "In Progress",
                     value: 2
+                },
+                {
+                    text: "Blocked",
+                    value: 3
                 },
             ],
             priorities: [
@@ -139,6 +150,9 @@ export default {
         },
         isAssignedUser() {
             return this.ticket.users.some(t => t.id === this.getUser().id);
+        },
+        isPastDue() {
+            return this.ticket.dueAt ? new Date(this.ticket.dueAt) < new Date() : false;
         }
     },
     async created() {

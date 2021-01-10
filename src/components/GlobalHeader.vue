@@ -5,7 +5,7 @@
         dark
         >
       <div>
-        <v-btn text class="button home-button ml-2 mr-2 primary" :to="isLoggedIn ? '/dashboard' : '/'">
+        <v-btn text active-class="active-home" class="button ml-2 mr-2 primary" :to="isLoggedIn ? '/dashboard' : '/'">
             <h1 class="title white--text">Ticket System</h1>
         </v-btn>
       </div>
@@ -75,7 +75,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .icon-wrapper {
     overflow: hidden;
     width: 18px;
@@ -89,5 +89,13 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 1rem 0;
+}
+
+// Prevents home button from always being active when at the dashboard
+.active-home::before {
+    opacity: 0 !important;
+}
+.active-home:hover:before {
+    opacity: 0.18 !important;
 }
 </style>

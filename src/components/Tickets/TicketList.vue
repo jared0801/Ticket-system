@@ -51,6 +51,12 @@
                 <template v-slot:[`item.createdAt`]="{ item }">
                     <span>{{ item.createdAt | dateToHuman }}</span>
                 </template>
+                <template v-slot:[`item.dueAt`]="{ item }">
+                    <span v-if="item.dueAt">{{ item.dueAt | dateToHuman }}</span>
+                    <span v-else>
+                        None
+                    </span>
+                </template>
                 <template v-slot:[`item.description`]="{ item }">
                     <div v-html="item.description" class="text-truncate" style="max-width: 300px"></div>
                 </template>
@@ -60,6 +66,7 @@
 </template>
 
 <script>
+import dateMixin from '@/mixins/dateMixin';
 import TicketService from '@/api/TicketService';
 
 export default {
@@ -78,12 +85,9 @@ export default {
             this.$router.push(`/projects/${this.$route.params.id}/tickets/${ticket.id}`)
         }
     },
-    filters: {
-        dateToHuman(t) {
-            t = new Date(t);
-            return `${t.getMonth()+1}/${t.getDate()}/${t.getFullYear()}`;
-        }
-    },
+    mixins: [
+        dateMixin,
+    ],
     data() {
         return {
             resolved_tab: 0,
@@ -117,10 +121,25 @@ export default {
                     value: 'submitter'
                 },
                 {
-                    text: this.resolved_tab ? 'Completed' : 'Created',
-                    value: this.resolved_tab ? 'resolvedAt' : 'createdAt'
+                    text: 'Created',
+                    value: 'createdAt'
+                },
+                {
+                    text: 'Due',
+                    value: 'dueAt'
                 }
             ]
+        }
+    },
+    watch: {
+        resolved_tab(res) {
+            if(res) {
+                this.headers[6].text = 'Completed';
+                this.headers[6].value = 'resolvedAt';
+            } else {
+                this.headers[6].text = 'Created';
+                this.headers[6].value = 'createdAt';
+            }
         }
     },
     async mounted() {
@@ -164,6 +183,10 @@ export default {
 
 .data-table >>> tbody tr:hover {
   cursor: pointer;
+}
+
+.data-table >>> thead tr th {
+  white-space: nowrap;
 }
 
 .tabs > ul {

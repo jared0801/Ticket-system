@@ -175,7 +175,8 @@ router.post('/', authMiddleware, [
         project_id: req.body.project_id,
         type_id: req.body.type_id,
         priority_id: req.body.priority_id,
-        createdAt: new Date()
+        createdAt: new Date(),
+        dueAt: req.body.dueAt ? new Date(req.body.dueAt).toISOString() : ''
     }
     // Add creator as a user by default
     //let seenLead = false;
@@ -253,7 +254,8 @@ router.post('/:id', authMiddleware, [
         status_id: req.body.status_id,
         priority_id: req.body.priority_id,
         type_id: req.body.type_id,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        dueAt: req.body.dueAt ? new Date(req.body.dueAt).toISOString() : ''
     }
     console.log(ticket);
     const users = req.body.users.map(u => u.id);

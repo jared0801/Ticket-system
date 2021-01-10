@@ -66,6 +66,20 @@
                     </v-autocomplete>
                 </v-col>
             </v-row>
+            <v-row>
+                <v-col>
+                    <v-text-field
+                        label="Set A Deadline"
+                        v-model="dueAt"
+                        :rules="deadlineRules"
+                        clearable
+                    ></v-text-field>
+                </v-col>
+                <v-col>
+                    <v-date-picker @select="selectDate" v-model="dueAt">
+                    </v-date-picker>
+                </v-col>
+            </v-row>
 
             
             <v-row>
@@ -149,6 +163,7 @@ export default {
             userSearch: '',
             assignedUsers: [],
             users: [],
+            dueAt: '',
             loading: false,
             activeModal: false,
             type_id: 1,
@@ -156,6 +171,17 @@ export default {
             titleRules: [
                 t => !!t || "A title is required.",
                 t => (t.length > 2 && t.length < 255) || "Title must be between 3 and 254 characters long."
+            ],
+            datePattern: /^(\d){4}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])/g,
+            deadlineRules: [
+                d => {
+                    const m = d.match(this.datePattern);
+                    if(m !== null) {
+                        this.dueAt = m[0];
+                        return true;
+                    }
+                    return "Date must be in YYYY-MM-DD format."
+                }
             ],
             descRules: [
                 d => !!d || "A description is required."
@@ -217,9 +243,6 @@ export default {
             this.users = p.users;
         }
     },
-    components: {
-        //Modal
-    },
     async mounted() {
         this.loading = true;
         try {
@@ -229,12 +252,12 @@ export default {
                 this.assignedUsers = this.ticket.users;
                 this.type_id = this.ticket.type_id;
                 this.priority_id = this.ticket.priority_id;
+                this.dueAt = this.ticket.dueAt ? this.ticket.dueAt.substring(0, this.ticket.dueAt.indexOf('T')) : '';
             }
             let autocompleteInput = this.$refs.autocomplete.$refs.input;
             autocompleteInput.addEventListener('focus', this.onFocus, true);
             //const userArray = await UserService.getUsers();
             this.users = this.project.users;
-            console.log(this.users);
             this.loading = false;
         } catch(err) {
             this.loading = false;
@@ -244,6 +267,9 @@ export default {
     methods: {
         ...mapActions('tickets', ['getAppData']),
         ...mapGetters('user', ['getUser']),
+        selectDate(e) {
+            console.log(e);
+        },
         toggleModal() {
             this.activeModal = !this.activeModal;
         },
@@ -267,7 +293,8 @@ export default {
                 username: this.getUser().username,
                 status_id: 0,
                 type_id: this.type_id,
-                priority_id: this.priority_id
+                priority_id: this.priority_id,
+                dueAt: this.dueAt
             }
             TicketService.createTicket(ticket).then(() => {
                 this.loading = false;
@@ -299,6 +326,7 @@ export default {
                 type_id: this.type_id,
                 priority_id: this.priority_id,
                 id: this.ticket.id,
+                dueAt: this.dueAt
             }
             TicketService.updateTicket(ticket).then(() => {
                 this.loading = false;

@@ -118,6 +118,10 @@ export default {
   cursor: pointer;
 }
 
+.data-table >>> thead tr th {
+  white-space: nowrap;
+}
+
 @media only screen and (max-width: 760px) {
 
     .project-description {
