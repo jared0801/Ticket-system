@@ -1,18 +1,43 @@
 const db = require('../connection');
 
 async function initDb() {
-/*
+
+    /*
+    let sql = `CREATE TABLE temp_users(
+        username VARCHAR(255) UNIQUE NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255),
+        confPasswordToken VARCHAR(255),
+        confPasswordExpires DATETIME,
+        PRIMARY KEY(email)
+    )`;
+
+    db.query(sql, (err, res) => {
+        if(err) {
+            console.log("Temp user table failed to be created!");
+            throw err;
+        }
+        console.log(res);
+        console.log("Temp user table created!");
+
+    });
+
     // User table
     let sql = `CREATE TABLE users(
         id int AUTO_INCREMENT,
         username VARCHAR(255) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255),
+        resetPasswordToken VARCHAR(255),
+        resetPasswordExpires DATETIME,
         PRIMARY KEY(id)
     )`;
-    await db.query(sql);
-    
-    console.log("User table created!");
+    try {
+        await db.query(sql);
+        console.log("User table created!");
+    } catch (err) {
+        console.log("User table failed to be created!");
+    }
     
 
     sql = `CREATE TABLE projects(
@@ -27,8 +52,12 @@ async function initDb() {
             FOREIGN KEY (lead)
             REFERENCES users(id)
     )`;
-    await db.query(sql);
-    console.log("Projects table created!");
+    try {
+        await db.query(sql);
+        console.log("Projects table created!");
+    } catch (err) {
+        console.log("Projects table failed to be created!");
+    }
 
 
 
@@ -54,9 +83,12 @@ async function initDb() {
             REFERENCES projects(id)
             ON DELETE CASCADE
     )`;
-    await db.query(sql);
-
-    console.log('Tickets table created');
+    try {
+        await db.query(sql);
+        console.log("Tickets table created!");
+    } catch (err) {
+        console.log("Tickets table failed to be created!");
+    }
 
 
     sql = `CREATE TABLE comments(
@@ -76,8 +108,12 @@ async function initDb() {
             REFERENCES users(id)
             ON DELETE CASCADE
         )`;
-    await db.query(sql);
-    console.log("Comments table created!");
+    try {
+        await db.query(sql);
+        console.log("Comments table created!");
+    } catch (err) {
+        console.log("Commentst table failed to be created!");
+    }
 
     
 

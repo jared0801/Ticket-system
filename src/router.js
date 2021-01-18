@@ -25,6 +25,27 @@ const router = new Router({
             meta: { public: true }
         },
         {
+            path: '/login/:token',
+            name: 'login',
+            // route level code-splitting
+            // this generates a separate chunk (ticket.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () => import(/* webpackChunkName: "auth" */ './views/Login.vue'),
+            meta: { public: true }
+        },
+        {
+            path: '/forgot',
+            name: 'forgot',
+            component: () => import(/* webpackChunkName: "profile" */ './views/User/Forgot.vue'),
+            meta: { public: true }
+        },
+        {
+            path: '/reset/:token',
+            name: 'reset',
+            component: () => import(/* webpackChunkName: "profile" */ './views/User/Reset.vue'),
+            meta: { public: true }
+        },
+        {
             path: '/profile',
             name: 'profile',
             component: () => import(/* webpackChunkName: "profile" */ './views/User/Profile.vue')

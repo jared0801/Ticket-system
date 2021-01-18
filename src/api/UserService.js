@@ -30,10 +30,32 @@ class UserService {
         });
     }
 
-    // Create users
+    static confUser(token) {
+        const registerUrl = `${url}/login/${token}`;
+        return axios.get(registerUrl);
+    }
+
+    // Update users
     static updateUser(user) {
         const updateUrl = `${url}/update`;
         return axios.post(updateUrl, user);
+    }
+
+    // Forgot password
+    static forgotPassword(email) {
+        const forgotUrl = `${url}/forgot`;
+        return axios.post(forgotUrl, email);
+    }
+
+    // Reset password
+    static resetUserToken(token) {
+        const resetUrl = `${url}/reset/${token}`;
+        return axios.get(resetUrl);
+    }
+
+    static resetPass(token, pass) {
+        const resetUrl = `${url}/reset/${token}`;
+        return axios.post(resetUrl, pass);
     }
 
     static loginUser(user) {

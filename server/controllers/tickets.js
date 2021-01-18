@@ -165,7 +165,7 @@ router.post('/', authMiddleware, [
     if(!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    if(req.body.username.includes('demo')) {
+    if(req.user.username.includes('demo')) {
         return res.status(403).json({ error: "You cannot create a ticket as the demo user." })
     }
     let ticket = {

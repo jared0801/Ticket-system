@@ -7,6 +7,15 @@
 
             <v-form ref="form">
                 <v-container>
+                    
+                    <v-row>
+                        <v-col v-if="error" class="red lighten-2 mb-4 ma-1">
+                            <span class="white--text">{{error}}</span>
+                        </v-col>
+                        <v-col v-else-if="success" class="blue lighten-2 mb-4 ma-1">
+                            <span class="white--text">{{success}}</span>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col>
                             <v-text-field
@@ -34,11 +43,6 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row v-if="error" class="red lighten-2 mb-4 ma-1">
-                        <v-col>
-                            <span class="white--text">{{error}}</span>
-                        </v-col>
-                    </v-row>
                     <v-row>
                         <v-col>
                             <v-btn @click.prevent="checkForm" class="primary">Submit</v-btn>
@@ -53,6 +57,11 @@
                     <v-row>
                         <v-col>
                             Just taking a look? <v-btn text @click="demoLogin">Demo login</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            Forgot password? <v-btn text to="/forgot">Reset Password</v-btn>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -79,6 +88,7 @@ export default {
     data() {
         return {
             error: '',
+            success: '',
             username: '',
             password: '',
             showPass: false,
@@ -95,6 +105,14 @@ export default {
     mounted() {
         if(this.isLoggedIn) {
             this.$router.push('/dashboard');
+        } else if(this.$route.params.token) {
+            UserService.confUser(this.$route.params.token).then(res => {
+                if(res.status == 200) {
+                    this.success = res.data;
+                }
+            }).catch(err => {
+                this.error = err.response.data.error;
+            });
         }
     },
     watch: {

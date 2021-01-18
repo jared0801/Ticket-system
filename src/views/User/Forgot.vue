@@ -1,7 +1,7 @@
 <template>
     <v-container>
 
-        <Header title="Profile" backlinkText="Go Back" />
+        <Header title="Forgot Password" backlinkText="Go Back" />
 
         <v-row>
             <v-col v-if="error" class="red lighten-2 mb-4 ma-1">
@@ -16,9 +16,9 @@
             <v-row>
                 <v-col>
                     <v-text-field
-                        v-model="username"
-                        label="Username"
-                        :rules="usernameRules"
+                        v-model="email"
+                        label="Email"
+                        :rules="emailRules"
                         required
                     ></v-text-field>
                 </v-col>
@@ -26,25 +26,11 @@
 
             <v-row>
                 <v-col>
-                    <p>{{ email }}</p>
-                </v-col>
-            </v-row>
-            
-            <!-- <v-row>
-                <v-col>
-                    <v-btn
-                        to="/reset"
-                    >Reset Password</v-btn>
-                </v-col>
-            </v-row> -->
-
-            <v-row>
-                <v-col>
                     <v-btn
                         class="primary"
-                        :class="{ 'is-loading' : loading }"
-                        @click.prevent="updateProfile"
-                    >Update Profile</v-btn>
+                        :disabled="loading"
+                        @click.prevent="forgotPassword"
+                    >Reset Password</v-btn>
                 </v-col>
             </v-row>
         </v-form>
@@ -54,61 +40,44 @@
 <script>
 import Header from '@/components/Header';
 import UserService from '@/api/UserService';
-import { mapGetters, mapMutations } from 'vuex';
 
 export default {
-    name: 'Profile',
+    name: 'Forgot',
     data() {
         return {
-            username: '',
             email: '',
             error: '',
             success: '',
             loading: false,
-            usernameRules: [
-                u => !!u || "Username is required.",
-                u => (u.length > 3 && u.length < 33) || "Username must be between 4 and 32 characters long."
+            emailRules: [
+                v => !!v || 'E-mail is required',
+                v => /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'E-mail must be valid',
             ]
         }
     },
     components: {
         Header
     },
-    created() {
-        this.username = this.getUser().username;
-        this.email = this.getUser().email;
-    },
     methods: {
-        ...mapGetters('user', ['getUser']),
-        ...mapMutations('user', ['updateUser']),
-        updateProfile() {
+        forgotPassword() {
             if(!this.$refs.form.validate()) return;
             this.loading = true;
-            if(this.username === this.getUser().username) {
-                // No changes were made
-                this.loading = false;
-                return;
-            }
-            const newProfile = {
-                username: this.username
-            }
-            UserService.updateUser(newProfile).then((res) => {
+
+            UserService.forgotPassword({ email: this.email }).then((res) => {
                 console.log(res);
                 if(res.status === 200) {
-                    this.updateUser(res.data);
-                    this.success = "Your profile was succesfully updated.";
-                } 
+                    this.success = res.data;
+                }
                 this.loading = false;
                 this.error = '';
             }).catch((err) => {
                 this.loading = false;
-                console.log(err);
+                console.log(err.response);
                 if(err.response.data.error) {
                     this.error = err.response.data.error;
                 } else {
                     this.error = err;
                 }
-                this.username = this.getUser().username;
             });
         }
     }
