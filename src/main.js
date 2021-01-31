@@ -4,8 +4,6 @@ import store from './store';
 import router from './router';
 import vuetify from './plugins/vuetify';
 
-//require('./assets/styles/styles.scss');
-
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 

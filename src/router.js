@@ -6,13 +6,11 @@ import UserService from './api/UserService';
 Vue.use(Router);
 
 const router = new Router({
-    mode: 'history',
-    base: '/projects/ticketsystem',
     routes: [
         {
             path: '/',
             name: 'login',
-            component: () => import(/* webpackChunkName: "auth" */ './views/Login.vue'),
+            component: () => import('./views/Login.vue'),
             meta: { public: true } // Logging in is not required
         },
         {
@@ -21,64 +19,69 @@ const router = new Router({
             // route level code-splitting
             // this generates a separate chunk (ticket.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import(/* webpackChunkName: "auth" */ './views/Register.vue'),
+            component: () => import('./views/Register.vue'),
             meta: { public: true }
         },
         {
             path: '/login/:token',
-            name: 'login',
+            name: 'tokenLogin',
             // route level code-splitting
             // this generates a separate chunk (ticket.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import(/* webpackChunkName: "auth" */ './views/Login.vue'),
+            component: () => import('./views/Login.vue'),
             meta: { public: true }
         },
         {
             path: '/forgot',
             name: 'forgot',
-            component: () => import(/* webpackChunkName: "profile" */ './views/User/Forgot.vue'),
+            component: () => import('./views/User/Forgot.vue'),
             meta: { public: true }
         },
         {
             path: '/reset/:token',
             name: 'reset',
-            component: () => import(/* webpackChunkName: "profile" */ './views/User/Reset.vue'),
+            component: () => import('./views/User/Reset.vue'),
             meta: { public: true }
         },
         {
             path: '/profile',
             name: 'profile',
-            component: () => import(/* webpackChunkName: "profile" */ './views/User/Profile.vue')
+            component: () => import('./views/User/Profile.vue')
         },
         {
             path: '/dashboard',
             name: 'dashboard',
-            component: () => import(/* webpackChunkName: "project" */ './views/Dashboard.vue')
+            component: () => import('./views/Dashboard.vue')
         },
         {
             path: '/projects',
             name: 'projects',
-            component: () => import(/* webpackChunkName: "project" */ './views/Projects/Projects.vue')
+            component: () => import('./views/Projects/Projects.vue')
         },
         {
             path: '/projects/create',
             name: 'create-project',
-            component: () => import(/* webpackChunkName: "project" */ './views/Projects/CreateProject.vue')
+            component: () => import('./views/Projects/CreateProject.vue')
         },
         {
             path: '/projects/:id',
             name: 'view-project',
-            component: () => import(/* webpackChunkName: "project" */ './views/Projects/ViewProject.vue')
+            component: () => import('./views/Projects/ViewProject.vue')
+        },
+        {
+            path: '/projects/:id/conf/:token',
+            name: 'view-ticket-conf',
+            component: () => import('./views/Projects/ViewProject.vue')
         },
         {
             path: '/projects/:id/create',
             name: 'create-ticket',
-            component: () => import(/* webpackChunkName: "project" */ './views/Tickets/CreateTicket.vue')
+            component: () => import('./views/Tickets/CreateTicket.vue')
         },
         {
             path: '/projects/:pid/tickets/:tid',
             name: 'view-ticket',
-            component: () => import(/* webpackChunkName: "project" */ './views/Tickets/ViewTicket.vue')
+            component: () => import('./views/Tickets/ViewTicket.vue')
         }
     ],
 });

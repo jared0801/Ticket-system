@@ -3,7 +3,7 @@
     <GlobalHeader />
 
     <v-main>
-      <router-view/>
+      <router-view />
     </v-main>
   </v-app>
 </template>
@@ -14,9 +14,6 @@ export default {
   name: 'App',
   components: {
     GlobalHeader,
-  },
-  data: () => ({
-    //
-  }),
+  }
 };
 </script>
