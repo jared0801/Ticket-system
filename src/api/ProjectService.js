@@ -27,6 +27,12 @@ class ProjectService {
         });
     }
 
+    // Remove a project user
+    static removeProjUser(projId, userId) {
+        const confUrl = `${url}/${projId}/leave`;
+        return axios.post(confUrl, { user: userId });
+    }
+
     // Create a project
     static createProject(project) {
         return axios.post(url, project);

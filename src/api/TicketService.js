@@ -29,10 +29,7 @@ class TicketService {
             axios.get(`${url}/all`).then((res) => {
                 let tickets = [];
                 if(res.data) {
-                    tickets = res.data.map(ticket => ({
-                        ...ticket,
-                        resolvedAt: ticket.resolvedAt ? ticket.resolvedAt : ''
-                    }));
+                    tickets = res.data;
                 }
                 resolve(tickets);
             }).catch((err) => {
@@ -46,10 +43,7 @@ class TicketService {
         return new Promise((resolve, reject) => {
             axios.get(`${url}/${pid}/ticket/${tid}`).then((res) => {
                 const ticket = res.data;
-                resolve({
-                    ...ticket,
-                    resolvedAt: ticket.resolvedAt ? ticket.resolvedAt : ''
-                });
+                resolve(ticket);
             }).catch((err) => {
                 reject(err);
             })
@@ -58,16 +52,12 @@ class TicketService {
 
     // Create a ticket
     static createTicket(ticket) {
-        return axios.post(url, {
-            ...ticket
-        });
+        return axios.post(url, ticket);
     }
 
     // Update a ticket
     static updateTicket(ticket) {
-        return axios.post(`${url}/${ticket.id}`, {
-            ...ticket
-        });
+        return axios.post(`${url}/${ticket.id}`, ticket);
     }
 
     static resolveTicket(ticket) {
@@ -89,16 +79,14 @@ class TicketService {
         return new Promise((resolve, reject) => {
             axios.get(`${url}/unres/${id}`).then((res) => {
                 const ticketInfo = res.data;
-                resolve({
-                    ...ticketInfo,
-                });
+                resolve(ticketInfo);
             }).catch((err) => {
                 reject(err);
             })
         });
     }
 
-    // Delete tickets
+    // Delete a ticket by id
     static deleteTicket(id) {
         return axios.delete(`${url}/${id}`);
     }

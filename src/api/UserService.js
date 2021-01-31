@@ -5,20 +5,6 @@ const url = process.env.VUE_APP_API + '/users';
 axios.defaults.withCredentials = true;
 
 class UserService {
-    // Get a single user
-    /*static getUser(id) {
-        return new Promise((resolve, reject) => {
-            axios.get(url + `/${id}`).then((res) => {
-                const user = res.data;
-                resolve({
-                    ...user,
-                    createdAt: new Date(user.createdAt)
-                });
-            }).catch((err) => {
-                reject(err);
-            })
-        });
-    }*/
 
     // Create users
     static insertUser(user) {
@@ -30,6 +16,7 @@ class UserService {
         });
     }
 
+    // Confirm a newly registered user
     static confUser(token) {
         const registerUrl = `${url}/login/${token}`;
         return axios.get(registerUrl);
@@ -53,11 +40,13 @@ class UserService {
         return axios.get(resetUrl);
     }
 
+    // Reset password with a reset token
     static resetPass(token, pass) {
         const resetUrl = `${url}/reset/${token}`;
         return axios.post(resetUrl, pass);
     }
 
+    // Login a user
     static loginUser(user) {
         const loginUrl = `${url}/login`;
         return axios.post(loginUrl, {
@@ -66,6 +55,7 @@ class UserService {
         });
     }
 
+    // Login the demo account
     static loginDevUser() {
         const loginUrl = `${url}/login`;
         return axios.post(loginUrl, {
@@ -74,11 +64,13 @@ class UserService {
         });
     }
 
+    // Return the current authenticated user
     static getCurrentUser() {
         const loginUrl = `${url}/user`;
         return axios.get(loginUrl);
     }
 
+    // Get list of users
     static getUsers() {
         return new Promise((resolve, reject) => {
             axios.get(url).then((res) => {
@@ -90,9 +82,16 @@ class UserService {
         });
     }
 
+    // Logout a user
     static logoutUser() {
         const logoutUrl = `${url}/logout`;
         return axios.get(logoutUrl);
+    }
+
+    // Delete a user account
+    static removeUser(pass) {
+        const removeUrl = `${url}/remove`;
+        return axios.post(removeUrl, { password: pass });
     }
 }
 
