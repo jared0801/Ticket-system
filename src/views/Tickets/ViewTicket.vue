@@ -1,85 +1,89 @@
 <template>
-    <v-container class="ticket">
+    <div class="ticket">
             
-        <Header :title="`${project.title} Tickets`" backlinkText="Project" :backlink="`/projects/${ticket.project_id}`" />
+        <Header :title="project.title ? `${project.title} Tickets` : ''" backlinkText="Project" :backlink="`/projects/${ticket.project_id}`" />
 
-
-        <v-row v-if="error" class="red lighten-2 mb-4 ma-1">
-            <v-col>
-                <span class="white--text">{{error}}</span>
-            </v-col>
-        </v-row>
-
-        <span v-if="loading">
-            <i class="fas fa-spinner fa-pulse"></i> Loading...
-        </span>
-
-        <div v-else-if="editing">
-            <EditTicket :ticket="ticket" :project="project" v-on:close-ticket="editTicket" />
-        </div>
-        <div v-else>
-            <v-row>
-                <v-col v-if="isSubmitter">
-                    <v-btn @click="editTicket" class="editButton">Edit Ticket</v-btn>
-                </v-col>
-                <v-col v-if="isAssignedUser" class="text-right">
-                    <v-btn v-if="ticket.resolvedAt" class="red lighten-2" v-on:click="unresolveTicket">Mark As Incomplete</v-btn>
-                    <v-btn v-else class="primary resolveButton" v-on:click="resolveTicket">Mark As Complete</v-btn>
+        <v-container v-if="loading">
+            <v-row justify="center">
+                <v-col class="flex-grow-0">
+                    <v-progress-circular indeterminate />
                 </v-col>
             </v-row>
-
-            <v-row>
+        </v-container>
+        <v-container v-else>
+            <v-row v-if="error" class="red lighten-2 mb-4 ma-1">
                 <v-col>
-                <v-card class="ticket-info">
-                    <v-card-text class="text--primary">
-                        <div class="title text-center mb-7">
-                            <h3 v-html="ticket.title"></h3>
-                        </div>
-                        <p class="mb-7" v-html="ticket.description"></p>
-                        <p class="mb-7">Due Date: 
-                            <span v-if="ticket.dueAt" :class="isPastDue ? 'red--text' : ''">{{ ticket.dueAt | dateToHuman }}
-                            </span>
-                            <span v-else>
-                                None
-                            </span>
-                        </p>
-                        <p>Type: <v-chip color="primary" class="ma-1">{{ ticket.type }}</v-chip></p>
-                        <div v-if="isAssignedUser">
-                            <v-select
-                                v-model="setStatus"
-                                :items="statuses"
-                                label="Status"
-                            ></v-select>
-                        </div>
-                        <p v-else>
-                            Status: <v-chip color="secondary" class="ma-1">{{ ticket.status }}</v-chip>
-                        </p>
-                        <div v-if="isAssignedUser">
-                            <v-select
-                                v-model="setPriority"
-                                :items="priorities"
-                                label="Priority"
-                            ></v-select>
-                        </div>
-                        <p v-else>
-                            Priority: <v-chip color="tertiary" class="ma-1">{{ ticket.priority }}</v-chip>
-                        </p>
-                        <p>Submitter: <v-chip color="primary" class="ma-1">{{ ticket.submitter }}</v-chip></p>
-                        <p>Assigned Users: <v-chip v-for="user in ticket.users" :key="user.id" color="secondary" class="ma-1">{{user.username}}</v-chip></p>
-                    </v-card-text>
-
-
-                    
-                </v-card>
+                    <span class="white--text">{{error}}</span>
                 </v-col>
             </v-row>
+
+            <div v-else-if="editing">
+                <EditTicket :ticket="ticket" :project="project" v-on:close-ticket="editTicket" />
+            </div>
+            <div v-else>
+                <v-row>
+                    <v-col v-if="isSubmitter">
+                        <v-btn @click="editTicket" class="edit-button">Edit Ticket</v-btn>
+                    </v-col>
+                    <v-col v-if="isAssignedUser" class="text-right">
+                        <v-btn v-if="ticket.resolvedAt" class="red lighten-2 unresolve-button" v-on:click="unresolveTicket">Mark As Incomplete</v-btn>
+                        <v-btn v-else class="primary resolve-button" v-on:click="resolveTicket">Mark As Complete</v-btn>
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <v-col>
+                    <v-card class="ticket-info">
+                        <v-card-text class="text--primary">
+                            <div class="title text-center mb-7">
+                                <h3 v-html="ticket.title"></h3>
+                            </div>
+                            <p class="mb-7" v-html="ticket.description"></p>
+                            <p class="mb-7">Due Date: 
+                                <span v-if="ticket.dueAt" :class="isPastDue ? 'red--text' : ''">{{ ticket.dueAt | dateToHuman }}
+                                </span>
+                                <span v-else>
+                                    None
+                                </span>
+                            </p>
+                            <p>Type: <v-chip color="primary" class="ma-1">{{ ticket.type }}</v-chip></p>
+                            <div v-if="isAssignedUser">
+                                <v-select
+                                    v-model="setStatus"
+                                    :items="statuses"
+                                    label="Status"
+                                ></v-select>
+                            </div>
+                            <p v-else>
+                                Status: <v-chip color="secondary" class="ma-1">{{ ticket.status }}</v-chip>
+                            </p>
+                            <div v-if="isAssignedUser">
+                                <v-select
+                                    v-model="setPriority"
+                                    :items="priorities"
+                                    label="Priority"
+                                ></v-select>
+                            </div>
+                            <p v-else>
+                                Priority: <v-chip color="tertiary" class="ma-1">{{ ticket.priority }}</v-chip>
+                            </p>
+                            <p>Submitter: <v-chip color="primary" class="ma-1">{{ ticket.submitter }}</v-chip></p>
+                            <p>Assigned Users: <v-chip v-for="user in ticket.users" :key="user.id" color="secondary" class="ma-1">{{user.username}}</v-chip></p>
+                        </v-card-text>
+
+
+                        
+                    </v-card>
+                    </v-col>
+                </v-row>
+            
+            </div>
+            <div>
+                <CommentForm />
+            </div>
+        </v-container>
         
-        </div>
-        <div>
-            <CommentForm />
-        </div>
-        
-    </v-container>
+    </div>
 </template>
 
 <script>
@@ -149,7 +153,7 @@ export default {
             return this.ticket.user_id === this.getUser().id;
         },
         isAssignedUser() {
-            return this.ticket.users.some(t => t.id === this.getUser().id);
+            return this.ticket.users?.some(t => t.id === this.getUser().id);
         },
         isPastDue() {
             return this.ticket.dueAt ? new Date(this.ticket.dueAt) < new Date() : false;
@@ -282,5 +286,9 @@ export default {
 
 .ticket > .content > .box {
     min-width: 90%;
+}
+
+.resolve-button, .unresolve-button, .edit-button {
+    margin: 1em;
 }
 </style>

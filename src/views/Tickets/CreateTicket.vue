@@ -29,7 +29,6 @@ export default {
     },
     async created() {
         this.project = await ProjectService.getProject(this.$route.params.id);
-        console.log(this.project);
     },
 };
 </script>
