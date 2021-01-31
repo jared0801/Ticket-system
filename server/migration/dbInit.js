@@ -51,6 +51,7 @@ async function initDb() {
         CONSTRAINT lead
             FOREIGN KEY (lead)
             REFERENCES users(id)
+            ON DELETE CASCADE
     )`;
     try {
         await db.query(sql);
@@ -77,7 +78,8 @@ async function initDb() {
         PRIMARY KEY(id),
         CONSTRAINT creator
             FOREIGN KEY (user_id)
-            REFERENCES users(id),
+            REFERENCES users(id)
+            ON DELETE CASCADE,
         CONSTRAINT project
             FOREIGN KEY (project_id)
             REFERENCES projects(id)
@@ -115,9 +117,6 @@ async function initDb() {
         console.log("Commentst table failed to be created!");
     }
 
-    
-
-
 
     sql = `CREATE TABLE project_users(
         project_id int,
@@ -130,6 +129,7 @@ async function initDb() {
         CONSTRAINT users
             FOREIGN KEY (user_id)
             REFERENCES users(id)
+            ON DELETE CASCADE
     )`;
     db.query(sql, (err, res) => {
         if(err) throw err;
@@ -149,6 +149,7 @@ async function initDb() {
         CONSTRAINT ticketusers
             FOREIGN KEY (user_id)
             REFERENCES users(id)
+            ON DELETE CASCADE
     )`;
     db.query(sql, (err, res) => {
         if(err) throw err;
