@@ -74,7 +74,7 @@ router.post('/register', [
                     to: req.body.email,
                     from: process.env.GMAIL_USER,
                     subject: "TicketSystem Email Confirmation",
-                    text: `You are receiving this email because you (or someone else) have created a TicketSystem account. Please navigate to the following link to complete registration:\n${process.env.FE_ORIGIN}/login/${token}\n\nIf you did not create this account, please ignore this email.`
+                    text: `You are receiving this email because you (or someone else) have created a TicketSystem account. Please navigate to the following link to complete registration:\n${process.env.FE_ORIGIN}#/login/${token}\n\nIf you did not create this account, please ignore this email.`
                 }
                 smtpTransport.sendMail(mailOptions, function(err) {
                     if(err) {
@@ -91,7 +91,7 @@ router.post('/register', [
     });
 });
 
-
+// Confirm a users first login
 router.get('/login/:token', (req, res) => {
     let sql = `SELECT * FROM temp_users WHERE confPasswordToken = ? AND confPasswordExpires >= current_timestamp()`;
     db.query(sql, req.params.token, (err, result) => {
@@ -129,34 +129,19 @@ router.get('/login/:token', (req, res) => {
 
 
 /* Private Routes - with middleware applied */
-/*
-if(middleware) {
-    middleware.forEach(mw => router.use(mw));
-}*/
 
-// Returns a list of all usernames
+// Returns a list of all users
 router.get('/', authMiddleware, async (req, res) => {
     let sql = 'SELECT username, id FROM users';
     db.query(sql, (err, result) => {
         if(err) throw err;
-        //result = result.map(r => r.username);
         res.send(result);
-    })
-    /*User.find({}, async (err, doc) => {
-        if(err) throw err;
-        if(doc) {
-            const userArray = doc.map(user => user.username);
-            res.json(userArray);
-        }
-    });*/
+    });
 });
 // Return a specific user
 router.get('/user/:id', authMiddleware, async (req, res) => {
-    let info = {
-        id: req.params.id
-    }
-    let sql = `SELECT id, username, email FROM users WHERE ?`;
-    db.query(sql, info, (err, result) => {
+    let sql = `SELECT id, username, email FROM users WHERE id = ?`;
+    db.query(sql, req.params.id, (err, result) => {
         if(err) {
             throw err;
         } else {
@@ -347,8 +332,50 @@ router.post('/update', authMiddleware, [
     }
 });
 
+// Remove a user account
+router.post('/remove', authMiddleware, (req, res) => {
+    let info = {
+        username: req.user.username,
+    }
+
+    // Delete user
+    let sql = `SELECT * FROM users WHERE ?`;
+    db.query(sql, info, (err, result) => {
+        if(err || result.length !== 1) {
+            res.status(400).json({error: "User not found."});
+        } else {
+            if(result.length) {
+                const user = result[0];
+
+                bcrypt.compare(req.body.password, user.password, (err, response) => {
+                    if(err || !response) {
+                        res.status(400).json({error: "Incorrect password."});
+                    }
+                    else if(response === true) {
+                        // Delete account
+                        sql = 'DELETE FROM users WHERE ?';
+                        db.query(sql, info, (err, response) => {
+                            if(err) {
+                                console.log(err);
+                                res.status(400).json({error: "User could not be deleted. Try again later."});
+                            }
+                            else {
+                                //res.send("User successfully deleted");
+                                req.logout();
+                                req.session.destroy();
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
+});
+
 // Validate a user session
-router.get('/user', authMiddleware, (req, res) => {
+router.get('/user', authMiddleware, [
+    body('password').isLength({ min: 6, max: 32 }).withMessage("Password length must be between 6 and 32 characters.").trim().escape()
+], (req, res) => {
     res.send(req.user);
 });
     

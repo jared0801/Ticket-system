@@ -45,6 +45,10 @@ app.use(session({
     }
 }));
 
+if(process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
+
 // Add passport middleware & configuration
 app.use(passport.initialize());
 app.use(passport.session());
@@ -73,7 +77,7 @@ app.use('/api/comments', comments);
 // Start server
 app.listen(port, async (err) => {
     if(err) return console.log(err);
-    console.log(`Server has started on port ${port}...`);
+    console.log(`Server has started on port ${port} in ${process.env.NODE_ENV} mode...`);
 
     // Don't uncomment unless you know what you're doing!
     // await initDb();
