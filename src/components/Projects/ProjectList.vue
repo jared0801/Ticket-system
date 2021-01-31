@@ -5,7 +5,8 @@
         <div class="project-container">
             <v-data-table
                 :headers="headers"
-                :items="getData.projects"
+                :loading="loading"
+                :items="projects"
                 :items-per-page="10"
                 class="elevation-1 data-table"
                 @click:row="selectProj"
@@ -17,34 +18,13 @@
                     <span>{{ item.createdAt | dateToHuman }}</span>
                 </template>
             </v-data-table>
-            <!-- <table class="table is-hoverable is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Lead</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="project in getData.projects" v-bind:key="project.id">
-                        <td>
-                            <router-link :to="`/projects/${project.id}`">{{ project.title }}</router-link>
-                        </td>
-                        <td class="project-description">{{ project.description }}</td>
-                        <td>{{ project.lead }}</td>
-                        <td>{{ `${project.createdAt.getMonth()+1}/${project.createdAt.getDate()}/${project.createdAt.getFullYear()}` }}</td>
-                    </tr>
-                </tbody>
-            </table> -->
-
-            <div v-if="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>
         </div>
     </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import ProjectService from '@/api/ProjectService';
+import DateMixin from '@/mixins/dateMixin';
 
 export default {
     name: "ProjectList",
@@ -52,6 +32,7 @@ export default {
         return {
             error: '',
             loading: false,
+            projects: [],
             headers: [
                 {
                     text: 'Title',
@@ -72,26 +53,20 @@ export default {
             ]
         }
     },
-    filters: {
-        dateToHuman(t) {
-            t = new Date(t);
-            return `${t.getMonth()+1}/${t.getDate()}/${t.getFullYear()}`;
-        }
-    },
-    computed: {
-        ...mapGetters('tickets', ['getData']),
-        /*items() {
-            return this.getData.projects.map(p => p);
-        }*/
-    },
+    mixins: [
+        DateMixin,
+    ],
     methods: {
-        ...mapActions('tickets', ['getAppData']),
         selectProj(proj) {
             this.$router.push(`/projects/${proj.id}`)
         }
     },
     async created() {
-        await this.getAppData();
+        ProjectService.getProjects().then(res => {
+            this.projects = res;
+        }).catch(() => {
+            this.error = "There was an error loading your projects. Try again later.";
+        });
     }
     
 }

@@ -24,6 +24,7 @@
                 <v-col>
                     <v-text-field
                         v-model="description"
+                        :rules="descRules"
                         label="Project Description"
                         required
                     ></v-text-field>
@@ -122,6 +123,7 @@
 <script>
 import ProjectService from '@/api/ProjectService';
 import UserService from '@/api/UserService';
+import rulesMixin from '@/mixins/rulesMixin';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -136,13 +138,6 @@ export default {
             userSearch: '',
             loading: false,
             activeModal: false,
-            titleRules: [
-                t => !!t || "A title is required.",
-                t => (t.length > 2 && t.length < 255) || "Title must be between 3 and 254 characters long."
-            ],
-            descRules: [
-                d => !!d || "A description is required."
-            ],
         }
     },
     props: {
@@ -150,6 +145,9 @@ export default {
             type: Object
         }
     },
+    mixins: [
+        rulesMixin,
+    ],
     async mounted() {
         this.loading = true;
         try {
@@ -195,8 +193,6 @@ export default {
             }
             ProjectService.createProject(project).then((res) => {
                 if(res.status == 201) {
-                    this.title = '';
-                    this.description = '';
                     this.users = [];
                     const route = `/projects/${res.data.id}`;
                     ProjectService.getProjects().then(() => {
@@ -227,9 +223,6 @@ export default {
             }
             ProjectService.updateProject(proj).then(() => {
                 this.loading = false;
-                this.title = '';
-                this.description = '';
-                this.users = [];
                 this.$router.go(0);
             }).catch((err) => {
                 this.loading = false;
