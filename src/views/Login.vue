@@ -75,7 +75,8 @@
 <script>
 import UserService from '@/api/UserService';
 import Header from '@/components/Header';
-import { mapState, mapMutations, mapActions } from 'vuex';
+import rulesMixin from '@/mixins/rulesMixin';
+import { mapState, mapMutations } from 'vuex';
 
 export default {
     name: 'Login',
@@ -91,17 +92,10 @@ export default {
             success: '',
             username: '',
             password: '',
-            showPass: false,
-            usernameRules: [
-                u => !!u || "Username is required.",
-                u => (u.length > 3 && u.length < 33) || "Username must be between 4 and 32 characters long."
-            ],
-            passwordRules: [
-                p => !!p || "Password is required.",
-                p => (p.length > 5 && p.length < 33) || "Password must be between 6 and 32 characters long."
-            ]
+            showPass: false
         }
     },
+    mixins: [ rulesMixin ],
     mounted() {
         if(this.isLoggedIn) {
             this.$router.push('/dashboard');
@@ -124,12 +118,11 @@ export default {
     },
     methods: {
         ...mapMutations('user', ['storeUser']),
-        ...mapActions('tickets', ['getAppData']),
         demoLogin() {
             UserService.loginDevUser().then(res => {
                 if(res.status === 200) {
                     this.storeUser(res.data);
-                    this.getAppData();
+                    //this.getAppData();
                     //this.$router.push('/dashboard');
                 }
             })
@@ -144,7 +137,7 @@ export default {
                 }).then(res => {
                     if(res.status === 200) {
                         this.storeUser(res.data);
-                        this.getAppData();
+                        //this.getAppData();
                         //this.$router.push('/dashboard');
                     }
                 }).catch(err => {
