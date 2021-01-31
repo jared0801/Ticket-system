@@ -187,20 +187,4 @@ export default {
 .card-header-icon {
     padding: 0;
 }
-
-
-.submit-control {
-    text-align: right;
-    margin: 1em 0;
-}
-
-.edit {
-    color: lightgray;
-}
-/*.edit:hover {
-    color: $grey-light;
-}
-.selected {
-    color: $blue;
-}*/
 </style>

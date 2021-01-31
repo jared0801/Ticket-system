@@ -16,14 +16,10 @@
                 <div>
                     <v-textarea hide-details="auto" outlined v-model="text" label="Leave a comment on this ticket" />
 
-                    <v-btn class="primary mt-2" :class="{ 'is-loading' : loading }" @click.prevent="createComment">Submit</v-btn>
+                    <v-btn class="primary mt-2" :loading="loading" @click.prevent="createComment">Submit</v-btn>
                 </div>
-                
-                <span v-if="loading">
-                    <i class="fas fa-spinner fa-pulse"></i> Loading...
-                </span>
 
-                <div class="mt-5" v-else>
+                <div class="mt-5">
                     <Comment v-for="comment in comments" :comment=comment :key="comment.id" />
                 </div>
             </v-col>
