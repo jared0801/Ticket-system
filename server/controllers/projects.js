@@ -46,8 +46,10 @@ router.get('/:id', authMiddleware, async (req, res) => {
             proj.lead = u.id
         WHERE
             proj.id = ?
+        AND
+            ? IN (SELECT user_id FROM project_users pu WHERE pu.project_id=proj.id)
     `;
-    db.query(sql, req.params.id, (err, result) => {
+    db.query(sql, [req.params.id, req.user.id], (err, result) => {
         if(err) {
             throw err;
         } else if(result.length) {
@@ -73,13 +75,12 @@ router.get('/:id', authMiddleware, async (req, res) => {
                     throw err;
                 } else {
                     project.users = userResult;
-                    //console.log(project);
                     res.send(project);
                 }
 
             });
         } else {
-            res.send({});
+            res.status(400).json({error: "Project not found."});
         }
 
     });
@@ -165,6 +166,36 @@ router.post('/', authMiddleware, [
 });
 
 
+// Remove a user from a project
+router.post('/:id/leave', authMiddleware, [
+    body('user').isNumeric().withMessage("A user field containing a user id is required.")
+],
+ async (req, res) => {
+     
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    if(req.user.username.includes('demo')) {
+        return res.status(403).json({ error: "You cannot leave a project as the demo user." })
+    }
+    let sql = 'SELECT * FROM projects WHERE ? AND ?';
+    db.query(sql, [{id: req.params.id}, {lead: req.body.user}], (err, result) => {
+        if(err) throw err;
+        if(result.length > 0) {
+            res.status(400).json({ error: "You cannot leave a project that you lead. You may delete the project by selecting 'Edit Project'." })
+        } else {
+            sql = 'DELETE FROM project_users WHERE ? AND ?';
+            db.query(sql, [{project_id: req.params.id}, {user_id: req.body.user}], (err, result) => {
+                if(err) throw err;
+                res.send("You've been removed from the project");
+            });
+        }
+
+    });
+})
+
+
 // Edit a project
 router.post('/:id', authMiddleware, [
     body('title').not().isEmpty().withMessage("A title is required to create a project.").trim().escape(),
@@ -180,16 +211,7 @@ router.post('/:id', authMiddleware, [
         description: req.body.description,
         updatedAt: new Date()
     }
-    //console.log(project);
-    /*let seenLead = false;
-    console.log('UPDATE')
-    console.log(req.body.users);
-    const users = req.body.users.map(u => {
-        if(u.username == project.lead) seenLead = true;
-        return u.id
-    });
-    if(!seenLead) users.push(project.lead);
-    console.log(users);*/
+
     const users = req.body.users.map(u => u.id);
     // Update project data
     const sql = 'UPDATE projects SET ? WHERE ?';
