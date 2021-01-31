@@ -18,28 +18,11 @@
             <v-btn @click="logout" text>Logout</v-btn>
         </div>
     </v-app-bar>
-    <!--
-    <header class="header">
-
-        <router-link class="button home-button" :to="isLoggedIn ? '/dashboard' : '/'">
-            <div class="icon-wrapper">
-                <i class="fas fa-trademark fa-2x"></i>
-            </div>
-        </router-link>
-
-        <span class="button-group" v-if="isLoggedIn">
-            <p class="welcome-user">Welcome back, {{ username }}</p>
-            <router-link class="button" to="/profile">Profile</router-link>
-            <button @click="logout" class="button" href="/logout">Logout</button>
-        </span>
-
-    </header>
-    -->
 </template>
 
 <script>
 import UserService from '../api/UserService';
-import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
+import { mapState, mapMutations, mapGetters } from 'vuex';
 
 export default {
     name: "GlobalHeader",
@@ -51,7 +34,6 @@ export default {
     },
     methods: {
         ...mapMutations('user', ['removeUser', 'storeUser']),
-        ...mapActions('tickets', ['getAppData']),
         logout() {
             this.removeUser();
             UserService.logoutUser().then((res) => {
@@ -66,30 +48,13 @@ export default {
             if(res.data && 'username' in res.data) {
                 const user = res.data;
                 this.storeUser(user);
-                await this.getAppData();
             }
-        }).catch(() => {
-            // User not logged in
         });
     }
 }
 </script>
 
 <style scoped lang="scss">
-.icon-wrapper {
-    overflow: hidden;
-    width: 18px;
-    color: white;
-}
-
-.header {
-    background: #00171F;
-    color: white;
-    text-align: center;
-    display: flex;
-    justify-content: space-between;
-    padding: 1rem 0;
-}
 
 // Prevents home button from always being active when at the dashboard
 .active-home::before {
