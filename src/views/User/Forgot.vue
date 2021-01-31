@@ -40,6 +40,7 @@
 <script>
 import Header from '@/components/Header';
 import UserService from '@/api/UserService';
+import rulesMixin from '@/mixins/rulesMixin';
 
 export default {
     name: 'Forgot',
@@ -48,16 +49,13 @@ export default {
             email: '',
             error: '',
             success: '',
-            loading: false,
-            emailRules: [
-                v => !!v || 'E-mail is required',
-                v => /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'E-mail must be valid',
-            ]
+            loading: false
         }
     },
     components: {
         Header
     },
+    mixins: [ rulesMixin ],
     methods: {
         forgotPassword() {
             if(!this.$refs.form.validate()) return;

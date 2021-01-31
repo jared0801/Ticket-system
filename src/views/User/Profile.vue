@@ -19,6 +19,7 @@
                         v-model="username"
                         label="Username"
                         :rules="usernameRules"
+                        :disabled="getUser().username == 'demo'"
                         required
                     ></v-text-field>
                 </v-col>
@@ -29,22 +30,74 @@
                     <p>{{ email }}</p>
                 </v-col>
             </v-row>
-            
-            <!-- <v-row>
-                <v-col>
-                    <v-btn
-                        to="/reset"
-                    >Reset Password</v-btn>
-                </v-col>
-            </v-row> -->
 
             <v-row>
                 <v-col>
                     <v-btn
                         class="primary"
-                        :class="{ 'is-loading' : loading }"
+                        :loading="loading"
                         @click.prevent="updateProfile"
+                        :disabled="getUser().username == 'demo'"
                     >Update Profile</v-btn>
+                    
+
+                    <v-dialog
+                        v-model="confirmDelete"
+                        width="500"
+                    >
+                        <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            color="red lighten-2"
+                            class="ml-3"
+                            dark
+                            :disabled="getUser().username == 'demo'"
+                            v-bind="attrs"
+                            v-on="on"
+                            :loading="loading"
+                        >
+                            Delete Profile
+                        </v-btn>
+                        </template>
+                
+                        <v-card>
+                        <v-card-title class="headline grey lighten-2">
+                            Delete Your Account?
+                        </v-card-title>
+                
+                        <v-card-text class="mt-2">
+                            Type in your password below if you are sure you would like to delete your account and all projects that you lead. This action cannot be undone.
+                        </v-card-text>
+
+                        <v-form ref="passForm">
+                            <v-container>
+                                <v-text-field
+                                    v-model="password"
+                                    :rules="passwordRules"
+                                    label="Password"
+                                    required
+                                    autocomplete="current-password"
+                                    :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                                    @click:append="showPass = !showPass"
+                                    :type="showPass ? 'text' : 'password'"
+                                >                    
+                                </v-text-field>
+                            </v-container>
+                        </v-form>
+                
+                        <v-divider></v-divider>
+                
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                color="red lighten-2"
+                                dark
+                                @click="deleteProfile"
+                            >
+                            Delete Profile
+                            </v-btn>
+                        </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-col>
             </v-row>
         </v-form>
@@ -54,6 +107,7 @@
 <script>
 import Header from '@/components/Header';
 import UserService from '@/api/UserService';
+import rulesMixin from '@/mixins/rulesMixin';
 import { mapGetters, mapMutations } from 'vuex';
 
 export default {
@@ -63,14 +117,14 @@ export default {
             username: '',
             email: '',
             error: '',
+            confirmDelete: false,
             success: '',
             loading: false,
-            usernameRules: [
-                u => !!u || "Username is required.",
-                u => (u.length > 3 && u.length < 33) || "Username must be between 4 and 32 characters long."
-            ]
+            showPass: false,
+            password: ''
         }
     },
+    mixins: [ rulesMixin ],
     components: {
         Header
     },
@@ -80,7 +134,7 @@ export default {
     },
     methods: {
         ...mapGetters('user', ['getUser']),
-        ...mapMutations('user', ['updateUser']),
+        ...mapMutations('user', ['updateUser', 'removeUser']),
         updateProfile() {
             if(!this.$refs.form.validate()) return;
             this.loading = true;
@@ -110,6 +164,30 @@ export default {
                 }
                 this.username = this.getUser().username;
             });
+        },
+        deleteProfile() {
+            if(!this.$refs.passForm.validate()) return;
+            UserService.removeUser(this.password).then(res => {
+                this.removeUser();
+                this.confirmDelete = false;
+                if(res.status === 200) {
+                    UserService.logoutUser().then((res) => {
+                        if(res.status == 200) {
+                            this.$router.push('/');
+                        }
+                    });
+                } else {
+                    this.err = res.data;
+                }
+            }).catch((err) => {
+                console.log(err.response);
+                if(err.response.status) {
+                    this.error = err.response.data.error;
+                } else {
+                    this.error = "There was an error deleting your account. Please try again later."
+                }
+                this.confirmDelete = false;
+            })
         }
     }
 };

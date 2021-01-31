@@ -63,6 +63,7 @@
 <script>
 import Header from '@/components/Header';
 import UserService from '@/api/UserService';
+import rulesMixin from '@/mixins/rulesMixin';
 
 export default {
     name: 'Reset',
@@ -74,20 +75,13 @@ export default {
             success: '',
             loading: false,
             showPass: false,
-            showCPass: false,
-            passwordRules: [
-                p => !!p || "Password is required.",
-                p => (p.length > 5 && p.length < 33) || "Password must be between 6 and 32 characters long."
-            ],
-            confPasswordRules: [
-                p => !!p || "Password confirmation is required.",
-                p => p === this.password || "Password confirmation must match your password."
-            ]
+            showCPass: false
         }
     },
     components: {
         Header
     },
+    mixins: [ rulesMixin ],
     mounted() {
         UserService.resetUserToken(this.$route.params.token).then((res) => {
             console.log(res);
