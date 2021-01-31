@@ -151,7 +151,8 @@
 
 <script>
 import TicketService from '@/api/TicketService';
-import { mapGetters, mapActions } from 'vuex';
+import rulesMixin from '@/mixins/rulesMixin';
+import { mapGetters } from 'vuex';
 
 export default {
     name: 'EditTicket',
@@ -168,30 +169,6 @@ export default {
             activeModal: false,
             type_id: 1,
             priority_id: 1,
-            titleRules: [
-                t => !!t || "A title is required.",
-                t => (t.length > 2 && t.length < 255) || "Title must be between 3 and 254 characters long."
-            ],
-            datePattern: /^(\d){4}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])/g,
-            deadlineRules: [
-                d => {
-                    const m = d.match(this.datePattern);
-                    if(m !== null) {
-                        this.dueAt = m[0];
-                        return true;
-                    }
-                    return "Date must be in YYYY-MM-DD format."
-                }
-            ],
-            descRules: [
-                d => !!d || "A description is required."
-            ],
-            typeRules: [
-                d => !!d || "A type is required."
-            ],
-            priorityRules: [
-                d => !!d || "A priority is required."
-            ],
             types: [
                 {
                     text: "Bug / Error",
@@ -238,6 +215,9 @@ export default {
             type: Object
         }
     },
+    mixins: [
+        rulesMixin,
+    ],
     watch: {
         project(p) {
             this.users = p.users;
@@ -256,7 +236,6 @@ export default {
             }
             let autocompleteInput = this.$refs.autocomplete.$refs.input;
             autocompleteInput.addEventListener('focus', this.onFocus, true);
-            //const userArray = await UserService.getUsers();
             this.users = this.project.users;
             this.loading = false;
         } catch(err) {
@@ -265,7 +244,6 @@ export default {
         }
     },
     methods: {
-        ...mapActions('tickets', ['getAppData']),
         ...mapGetters('user', ['getUser']),
         selectDate(e) {
             console.log(e);
@@ -291,18 +269,14 @@ export default {
                 project_id: this.$route.params.id,
                 resolvedAt: '',
                 username: this.getUser().username,
-                status_id: 0,
+                status_id: 1,
                 type_id: this.type_id,
                 priority_id: this.priority_id,
                 dueAt: this.dueAt
             }
             TicketService.createTicket(ticket).then(() => {
                 this.loading = false;
-                this.description = '';
-                this.title = '';
-                this.getAppData().then(() => {
-                    this.$router.push(`/projects/${this.$route.params.id}`);
-                })
+                this.$router.push(`/projects/${this.$route.params.id}`);
             }).catch((err) => {
                 this.loading = false;
                 if(err.response?.data?.error) {
@@ -379,5 +353,9 @@ export default {
 
 .textarea {
     margin-bottom: 10px;
+}
+
+.container {
+    padding: 3em;
 }
 </style>

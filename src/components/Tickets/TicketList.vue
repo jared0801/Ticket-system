@@ -15,30 +15,15 @@
                     <span>Completed Tickets</span>
                 </v-tab>
             </v-tabs>
-            <!-- <ul>
-                <li class="tab" :class="{'is-active' : resolved_tab === false}">
-                    <a @click="resolved_tab = false">
-                        <span class="icon is-small"><i class="fas fa-ticket-alt" aria-hidden="true"></i></span>
-                        <span>Open Tickets</span>
-                    </a>
-                </li>
-                <li class="tab" :class="{'is-active' : resolved_tab === true}">
-                    <a @click="resolved_tab = true">
-                        <span class="icon is-small"><i class="far fa-check-square" aria-hidden="true"></i></span>
-                        <span>Completed Tickets</span>
-                    </a>
-                </li>
-            </ul> -->
         </div>
 
         <div class="ticket-container">
 
-            <div v-if="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>
             <v-data-table
-                v-else
                 :headers="headers"
                 :items="items"
                 :items-per-page="10"
+                :loading="loading"
                 class="elevation-1 data-table"
                 @click:row="selectTicket"
             >
@@ -46,9 +31,12 @@
                     <div v-html="item.title"></div>
                 </template>
                 <template v-slot:[`item.priority_id`]="{ item }">
-                    <div>{{item.priority}}</div>
+                    <div>{{ item.priority }}</div>
                 </template>
                 <template v-slot:[`item.createdAt`]="{ item }">
+                    <span>{{ item.createdAt | dateToHuman }}</span>
+                </template>
+                <template v-slot:[`item.resolvedAt`]="{ item }">
                     <span>{{ item.createdAt | dateToHuman }}</span>
                 </template>
                 <template v-slot:[`item.dueAt`]="{ item }">
