@@ -7,16 +7,6 @@ const { body, validationResult } = require('express-validator');
 const router = express.Router();
 
 
-
-/*router.get('/', async (req, res) => {
-    let sql = 'SELECT * FROM tickets';
-    db.query(sql, (err, result) => {
-        if(err) throw err;
-        //console.log(result);
-        res.send(result);
-    });
-});*/
-
 // Returns all tickets associated with a user
 router.get('/all', authMiddleware, async (req, res) => {
     let sql = `
@@ -52,23 +42,22 @@ router.get('/all', authMiddleware, async (req, res) => {
 // Returns all tickets associated with a project
 router.get('/:id', authMiddleware, async (req, res) => {
     let sql = `
-        SELECT
-            tickets.*,
-            ticket_status.status AS status,
-            ticket_type.type AS type,
-            ticket_priority.priority AS priority,
-            users.username AS submitter
+        SELECT DISTINCT
+            t.*,
+            ts.status AS status,
+            tt.type AS type,
+            tp.priority AS priority,
+            u.username AS submitter
         FROM
-            project_users
-        JOIN users ON users.id = user_id
-        JOIN tickets ON tickets.project_id = project_users.project_id
-        JOIN ticket_status ON tickets.status_id = ticket_status.id
-        LEFT JOIN ticket_type ON tickets.type_id = ticket_type.id
-        LEFT JOIN ticket_priority ON tickets.priority_id = ticket_priority.id
+            tickets t
+        JOIN users u ON u.id = user_id
+        JOIN ticket_status ts ON t.status_id = ts.id
+        LEFT JOIN ticket_type tt ON t.type_id = tt.id
+        LEFT JOIN ticket_priority tp ON t.priority_id = tp.id
         WHERE
-            users.id = ?
+        	? IN (SELECT user_id FROM project_users pu WHERE pu.project_id=t.project_id)
         AND
-            tickets.project_id = ?
+            t.project_id = ?
         ORDER BY
             createdAt DESC
     `
@@ -175,17 +164,14 @@ router.post('/', authMiddleware, [
         project_id: req.body.project_id,
         type_id: req.body.type_id,
         priority_id: req.body.priority_id,
-        createdAt: new Date(),
-        dueAt: req.body.dueAt ? new Date(req.body.dueAt).toISOString() : ''
+        status_id: req.body.status_id,
+        createdAt: new Date()
     }
-    // Add creator as a user by default
-    //let seenLead = false;
-    /*const users = req.body.users.map(u => {
-        if(u.id == project.lead) seenLead = true;
-        return u.id
-    });
-    if(!seenLead) users.push(project.lead);
-    */
+
+    if(req.body.dueAt) {
+        ticket.dueAt = new Date(req.body.dueAt).toISOString().slice(0, 19).replace('T', ' ')
+    }
+
     let ticketId = 0;
     const users = req.body.users;
 
@@ -193,15 +179,20 @@ router.post('/', authMiddleware, [
     db.query(sql, ticket, (err, result) => {
         ticketId = result.insertId;
         if(err) throw err;
-        //console.log(result.insertId);
-        let promises = [];
-        for(user of users) {
-            const sql2 = `INSERT INTO ticket_users SET ticket_id=${ticketId}, user_id=?`;
-            promises.push(db.query(sql2, user.id));
-        }
-        Promise.all(promises).then((values) => {
+
+        if(users.length > 0) {
+            let sql2 = "INSERT INTO ticket_users VALUES"
+            for(let i = 0; i < users.length; i++) {
+                sql2 += ` (${ticketId}, ${users[i].id})`;
+                if(i < users.length-1) sql2 += ',';
+            }
+            db.query(sql2, (err, result) => {
+                if(err) throw err;
+                res.status(201).json({ ticket_id: ticketId, project_id: ticket.project_id });
+            });
+        } else {
             res.status(201).json({ ticket_id: ticketId, project_id: ticket.project_id });
-        });
+        }
     })
 });
 
@@ -212,7 +203,8 @@ router.get('/res/:id', authMiddleware, async (req, res) => {
         return res.status(403).json({ error: "You cannot resolve a ticket as the demo user." })
     }
     const ticket = {
-        resolvedAt: new Date()
+        resolvedAt: new Date(),
+        status_id: 4
     }
     const sql = 'UPDATE tickets SET ? WHERE ?';
     db.query(sql, [ticket, {id: req.params.id}], (err, result) => {
@@ -228,7 +220,8 @@ router.get('/unres/:id', authMiddleware, async (req, res) => {
         return res.status(403).json({ error: "You cannot unresolve a ticket as the demo user." })
     }
     const project = {
-        resolvedAt: null
+        resolvedAt: null,
+        status_id: 1
     }
     
     const sql = 'UPDATE tickets SET ? WHERE ?';
@@ -255,9 +248,8 @@ router.post('/:id', authMiddleware, [
         priority_id: req.body.priority_id,
         type_id: req.body.type_id,
         updatedAt: new Date(),
-        dueAt: req.body.dueAt ? new Date(req.body.dueAt).toISOString() : ''
+        dueAt: req.body.dueAt ? new Date(req.body.dueAt).toISOString().slice(0, 19).replace('T', ' ') : ''
     }
-    console.log(ticket);
     const users = req.body.users.map(u => u.id);
     // Update ticket data
     const sql = 'UPDATE tickets SET ? WHERE ?';
@@ -284,19 +276,14 @@ router.post('/:id', authMiddleware, [
 // Delete a ticket
 router.delete('/:id', authMiddleware, async (req, res) => {
     if(req.user.username.includes('demo')) {
-        return res.status(403).json({ error: "You cannot delete a ticket as the demo user." })
+        return res.status(403).json({ error: "You cannot delete a ticket as the demo user." });
     }
-    // First delete ticket_users references
-    let sql = 'DELETE FROM ticket_users WHERE ?';
-        db.query(sql, {ticket_id: req.params.id}, (err, result) => {
-            if(err) throw err;
-            // Then delete the ticket itself
-            sql = 'DELETE FROM tickets WHERE ?';
-            db.query(sql, {id: req.params.id}, (err, result) => {
-                if(err) throw err;
-                res.status(200).send();
-            })
-        });
+
+    sql = `DELETE FROM tickets WHERE id = ? AND user_id = ?`;
+    db.query(sql, [req.params.id, req.user.id], (err, result) => {
+        if(err) throw err;
+        res.status(200).send();
+    });
 });
     
 module.exports = router;
