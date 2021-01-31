@@ -5,64 +5,79 @@
             
             <Header title="Dashboard" />
 
-            <v-container>
-                <v-row justify="space-between">
-                    <v-col cols="12" md="4">
-                        <v-select v-model="selectedProj" :items="projItems" label="Select a Project"></v-select>
-                    </v-col>
-
-                    <v-col class="text-right">
-                        <v-btn to="/projects">Go to Projects</v-btn>
-                    </v-col>
-                </v-row>
-                <v-row>
-
-                    <v-col>
-                        
-                        <v-card elevation="1" tile class="pa-3">
-                            <v-card-title>Tickets By Type</v-card-title>
-                            <PieChart class="ticket-chart" v-if="!loading" :chart-data="typedata" :options="options" />
-                        </v-card>
-                    </v-col>
-                    <v-col>
-                        
-                        <v-card elevation="1" tile class="pa-3">
-                            <v-card-title>Tickets By Status</v-card-title>
-                            <PieChart class="ticket-chart" v-if="!loading" :chart-data="statusdata" :options="options" />
-                        </v-card>
-                    </v-col>
-                    <v-col>
-
-                        <v-card elevation="1" tile class="pa-3">
-                            <v-card-title>Tickets By Priority</v-card-title>
-                            <PieChart class="ticket-chart" v-if="!loading" :chart-data="prioritydata" :options="options" />
-                        </v-card>
-                    </v-col>
-                    <v-col>
-
-                        <v-card elevation="1" tile class="pa-3">
-                            <v-card-title>Tickets Resolved Over Time</v-card-title>
-                            <LineChart class="ticket-chart" v-if="!loading" :chart-data="tickettimedata" :options="lineoptions" />
-                        </v-card>
+            <v-container v-if="loading">
+                <v-row justify="center">
+                    <v-col class="flex-grow-0">
+                        <v-progress-circular indeterminate />
                     </v-col>
                 </v-row>
             </v-container>
-            <v-card elevation="1" tile class="pa-3 text-center">
-                <v-card-title class="justify-center">More Charts Coming Soon</v-card-title>
-                <v-card-text class="text-center">Thank you for your patience</v-card-text>
-            </v-card>
+
+            <v-container v-else-if="projects.length == 0">
+                <v-row justify="center" align="center" style="height: 400px">
+                    <v-btn to="/projects/create" text>Create</v-btn> or be invited to a project in order to visualize progress here!
+                </v-row>
+            </v-container>
+
+            <div v-else>
+                <v-container>
+                    <v-row justify="space-between">
+                        <v-col cols="12" md="4">
+                            <v-select v-model="selectedProj" :items="projItems" label="Select a Project"></v-select>
+                        </v-col>
+
+                        <v-col class="text-right">
+                            <v-btn to="/projects" class="primary">Go to Projects</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+
+                        <v-col>
+                            
+                            <v-card elevation="1" tile class="pa-3">
+                                <v-card-title>Tickets By Type</v-card-title>
+                                <PieChart class="ticket-chart" v-if="!loading" :chart-data="typedata" :options="options" />
+                            </v-card>
+                        </v-col>
+                        <v-col>
+                            
+                            <v-card elevation="1" tile class="pa-3">
+                                <v-card-title>Tickets By Status</v-card-title>
+                                <PieChart class="ticket-chart" v-if="!loading" :chart-data="statusdata" :options="options" />
+                            </v-card>
+                        </v-col>
+                        <v-col>
+
+                            <v-card elevation="1" tile class="pa-3">
+                                <v-card-title>Tickets By Priority</v-card-title>
+                                <PieChart class="ticket-chart" v-if="!loading" :chart-data="prioritydata" :options="options" />
+                            </v-card>
+                        </v-col>
+                        <v-col>
+
+                            <v-card elevation="1" tile class="pa-3">
+                                <v-card-title>Tickets Resolved Over Time</v-card-title>
+                                <LineChart class="ticket-chart" v-if="!loading" :chart-data="tickettimedata" :options="lineoptions" />
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-container>
+                <v-card elevation="1" tile class="pa-3 text-center">
+                    <v-card-title class="justify-center">More Charts Coming Soon!</v-card-title>
+                </v-card>
+            </div>
         </div>
         
     </div>
 </template>
 
 <script>
-//import UserService from '@/api/UserService';
+import ProjectService from '@/api/ProjectService';
 import TicketService from '@/api/TicketService';
 import Header from '@/components/Header';
 import PieChart from '@/components/PieChart';
 import LineChart from '@/components/LineChart';
-import { mapState, mapGetters, mapActions } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
     name: 'Dashboard',
@@ -144,14 +159,7 @@ export default {
                     display: false
                 },
                 responsive: true,
-                maintainAspectRatio: false,
-                /*animation: {
-                    onProgress: function(animation) {
-                        console.log(this.value);
-                        this.value = animation.animationObject.currentStep / animation.animationObject.numSteps;
-                        if(this.value >= 1) this.value = 0;
-                    }.bind(this)
-                }*/
+                maintainAspectRatio: false
             },
             lineoptions: {
                 legend: {
@@ -185,7 +193,6 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('tickets', ['getData']),
         ...mapState('user', ['isLoggedIn']),
         projItems() {
             let projs = [
@@ -204,7 +211,6 @@ export default {
         }
     },
     methods: {
-        ...mapActions('tickets', ['getAppData']),
         updateCounts() {
             this.typecounts[0] = this.tickets.filter(ticket => ticket.type_id==1).length;
             this.typecounts[1] = this.tickets.filter(ticket => ticket.type_id==2).length;
@@ -231,7 +237,7 @@ export default {
             }
             this.tickettimedata.datasets[0].data = this.tickettimecounts;
         },
-        async getAllProjects() {
+        async getAllTickets() {
             this.loading = true;
             try {
                 const tickets = await TicketService.getAllTickets();
@@ -270,7 +276,7 @@ export default {
     watch: {
         async selectedProj(val) {
             if(val === -1) {
-                await this.getAllProjects();
+                await this.getAllTickets();
             } else {
                 await this.getSelectedProject();
             }
@@ -278,7 +284,6 @@ export default {
     },
     async mounted() {
         this.loading = true;
-        const last12 = []
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         for(let i = 0; i < 12; i++) {
             let now = new Date().getMonth();
@@ -288,10 +293,10 @@ export default {
             let year = time.getFullYear();
             this.tickettimedata.labels[11 - i] = months[month] + ' ' + year;
         }
-        console.log(last12);
-        await this.getAppData();
-        this.projects = this.getData.projects;
-        await this.getAllProjects();
+        ProjectService.getProjects().then(res => {
+            this.projects = res;
+        });
+        await this.getAllTickets();
     }
 };
 </script>
