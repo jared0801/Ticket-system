@@ -55,7 +55,6 @@ router.post('/register', [
         confPasswordToken: token,
         confPasswordExpires: expires
     };
-    console.log(newUser);
     let sql = 'INSERT INTO temp_users SET ?';
     db.query(sql, newUser, (err, result) => {
         if(err) {
@@ -100,7 +99,6 @@ router.get('/login/:token', (req, res) => {
         } else {
             const user = result[0];
             // Insert into real user db
-            console.log(user);
             const newUser = {
                 username: user.username,
                 email: user.email,
@@ -170,13 +168,10 @@ router.post('/forgot', [
                 if(err || result.length < 1) {
                     res.status(400).json({ error: "That email isn't associated with a user." });
                 } else {
-                    console.log(result);
                     // Store password reset token
                     const user = result[0];
                     const date = new Date();
                     const expires = new Date(date.getTime() + 3600000 + date.getTimezoneOffset() * 60000);
-                    console.log(date);
-                    console.log(expires);
                     const resetToken = {
                         resetPasswordToken: token,
                         resetPasswordExpires: expires
@@ -207,7 +202,6 @@ router.post('/forgot', [
                                 text: `You are receiving this email because you (or someone else) have requested a password reset for your TicketSystem account. Please navigate to the following link to complete the process:\n${process.env.FE_ORIGIN}/reset/${token}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.`
                             }
                             smtpTransport.sendMail(mailOptions, function(err) {
-                                console.log('email sent');
                                 console.log(err);
                                 res.send("An email has been sent to " + req.body.email + " for further instructions.");
                             });
@@ -228,8 +222,6 @@ router.post('/forgot', [
 router.get('/reset/:token', (req, res) => {
     let sql = `SELECT id, username, email FROM users WHERE resetPasswordToken = ? AND resetPasswordExpires >= current_timestamp()`;
     db.query(sql, req.params.token, (err, result) => {
-        console.log(result);
-        console.log(req.params.token);
         if(err || result.length !== 1) {
             res.status(400).json({ error: "Password reset token is invalid or has expired." })
         } else {

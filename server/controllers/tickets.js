@@ -51,7 +51,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
         FROM
             tickets t
         JOIN users u ON u.id = user_id
-        JOIN ticket_status ts ON t.status_id = ts.id
+        LEFT JOIN ticket_status ts ON t.status_id = ts.id
         LEFT JOIN ticket_type tt ON t.type_id = tt.id
         LEFT JOIN ticket_priority tp ON t.priority_id = tp.id
         WHERE
