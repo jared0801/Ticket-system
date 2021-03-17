@@ -50,6 +50,7 @@
                             <div v-if="isAssignedUser">
                                 <v-select
                                     v-model="setStatus"
+                                    v-if="!ticket.resolvedAt"
                                     :items="statuses"
                                     label="Status"
                                 ></v-select>

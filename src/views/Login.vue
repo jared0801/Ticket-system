@@ -122,8 +122,6 @@ export default {
             UserService.loginDevUser().then(res => {
                 if(res.status === 200) {
                     this.storeUser(res.data);
-                    //this.getAppData();
-                    //this.$router.push('/dashboard');
                 }
             })
         },
@@ -137,8 +135,6 @@ export default {
                 }).then(res => {
                     if(res.status === 200) {
                         this.storeUser(res.data);
-                        //this.getAppData();
-                        //this.$router.push('/dashboard');
                     }
                 }).catch(err => {
                     if(err.response.status === 401) {
