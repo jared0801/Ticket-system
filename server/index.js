@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const passport = require('passport');
@@ -20,8 +19,8 @@ const db = require('./connection');
 const sessionStore = new MySQLStore({}, db);
 
 // Apply standard global middleware for parsing request body, cookies, and handling CORS
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(process.env.SESS_SECRET));
 app.use(cors({
     credentials: true,
