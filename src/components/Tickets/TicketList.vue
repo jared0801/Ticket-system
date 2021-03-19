@@ -28,7 +28,7 @@
                 @click:row="selectTicket"
             >
                 <template v-slot:[`item.title`]="{ item }">
-                    <div v-html="item.title"></div>
+                    <div v-html="item.title" id="title" class="text-truncate" style="max-width: 200px"></div>
                 </template>
                 <template v-slot:[`item.priority_id`]="{ item }">
                     <div>{{ item.priority }}</div>
@@ -46,7 +46,7 @@
                     </span>
                 </template>
                 <template v-slot:[`item.description`]="{ item }">
-                    <div v-html="item.description" class="text-truncate" style="max-width: 300px"></div>
+                    <div v-html="item.description" id="description" class="text-truncate" style="max-width: 300px"></div>
                 </template>
             </v-data-table>
         </div>
@@ -192,22 +192,20 @@ export default {
     box-shadow: none;
 }
 
-@media only screen and (max-width: 925px) {
-
-    .ticket-description {
-        max-width: none;
+@media only screen and (max-width: 600px) {
+    #title {
+        max-width: none !important;
     }
-	
-	/*
-	Label the data
-	*/
-	td:nth-of-type(1):before { content: "Title"; }
-	td:nth-of-type(2):before { content: "Type"; }
-	td:nth-of-type(3):before { content: "Priority"; }
-	td:nth-of-type(4):before { content: "Status"; }
-	td:nth-of-type(5):before { content: "Description"; }
-	td:nth-of-type(6):before { content: "Submitter"; }
-	td.created:nth-of-type(7):before { content: "Created"; }
-	td.completed:nth-of-type(7):before { content: "Completed"; }
+    .data-table >>> tbody td {
+        height: 48px !important;
+        justify-content: initial;
+    }
+    .data-table >>> tbody td > div:first-child {
+        width: 90px;
+    }
+    .data-table >>> tbody tr > td:first-child > div:first-child {
+        font-size: 1.3rem;
+    }
+    
 }
 </style>

@@ -97,18 +97,21 @@ export default {
   white-space: nowrap;
 }
 
-@media only screen and (max-width: 760px) {
 
-    .project-description {
-        max-width: none;
+@media only screen and (max-width: 600px) {
+    #title {
+        max-width: none !important;
     }
-	
-	/*
-	Label the data
-	*/
-	td:nth-of-type(1):before { content: "Title"; }
-	td:nth-of-type(2):before { content: "Description"; }
-	td:nth-of-type(3):before { content: "Lead"; }
-	td:nth-of-type(4):before { content: "Created"; }
+    .data-table >>> tbody td {
+        height: 48px !important;
+        justify-content: initial;
+    }
+    .data-table >>> tbody td > div:first-child {
+        width: 90px;
+    }
+    .data-table >>> tbody tr > td:first-child > div:first-child {
+        font-size: 1.3rem;
+    }
+    
 }
 </style>
