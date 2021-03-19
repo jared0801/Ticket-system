@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header title="Create A Ticket" backlinkText="View Tickets" />
+            <PageHeader title="Create A Ticket" backlinkText="View Tickets" />
 
             <EditTicket :project=project />
 
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import EditTicket from '@/components/Tickets/EditTicket';
 import ProjectService from '@/api/ProjectService';
 
@@ -24,7 +24,7 @@ export default {
         }
     },
     components: {
-        Header,
+        PageHeader,
         EditTicket
     },
     async created() {

@@ -1,7 +1,7 @@
 <template>
     <div class="ticket">
             
-        <Header :title="project.title ? `${project.title} Tickets` : ''" backlinkText="Project" :backlink="`/projects/${ticket.project_id}`" />
+        <PageHeader :title="project.title ? `${project.title} Tickets` : ''" backlinkText="Project" :backlink="`/projects/${ticket.project_id}`" />
 
         <v-container v-if="loading">
             <v-row justify="center">
@@ -92,14 +92,14 @@ import TicketService from '@/api/TicketService';
 import ProjectService from '@/api/ProjectService';
 import EditTicket from '@/components/Tickets/EditTicket';
 import CommentForm from '@/components/Comments/CommentForm';
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import dateMixin from '@/mixins/dateMixin';
 import { mapGetters } from 'vuex';
 
 export default {
     name: 'ViewTicket',
     components: {
-        Header,
+        PageHeader,
         CommentForm,
         EditTicket
     },

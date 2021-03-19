@@ -2,7 +2,7 @@
     <div>
         <div class="content">
             
-            <Header title="Create a project" backlink="/projects" backlinkText="Projects" />
+            <PageHeader title="Create a project" backlink="/projects" backlinkText="Projects" />
 
             <EditProject />
             
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import EditProject from '@/components/Projects/EditProject';
 
 export default {
@@ -21,7 +21,7 @@ export default {
         }
     },
     components: {
-        Header,
+        PageHeader,
         EditProject
     },
     methods: {

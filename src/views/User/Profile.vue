@@ -1,7 +1,7 @@
 <template>
     <v-container>
 
-        <Header title="Profile" backlinkText="Go Back" />
+        <PageHeader title="Profile" backlinkText="Go Back" />
 
         <v-row>
             <v-col v-if="error" class="red lighten-2 mb-4 ma-1">
@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import UserService from '@/api/UserService';
 import rulesMixin from '@/mixins/rulesMixin';
 import { mapGetters, mapMutations } from 'vuex';
@@ -126,7 +126,7 @@ export default {
     },
     mixins: [ rulesMixin ],
     components: {
-        Header
+        PageHeader
     },
     created() {
         this.username = this.getUser().username;

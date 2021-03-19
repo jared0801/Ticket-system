@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header title="Projects" backlink="/dashboard" backlinkText="Dashboard" />
+            <PageHeader title="Projects" backlink="/dashboard" backlinkText="Dashboard" />
 
             <v-container>
                 <v-row>
@@ -23,13 +23,13 @@
 
 <script>
 import ProjectList from '@/components/Projects/ProjectList';
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 
 export default {
     name: 'Projects',
     components: {
         ProjectList,
-        Header
+        PageHeader
     }
 };
 </script>

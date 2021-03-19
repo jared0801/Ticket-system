@@ -2,7 +2,7 @@
     <v-container>
 
             
-        <Header title="Registration" backlink="/" backlinkText="Go Back" />
+        <PageHeader title="Registration" backlink="/" backlinkText="Go Back" />
     
         <v-row>
             <v-col v-if="error" class="red lighten-2 mb-4 ma-1">
@@ -86,14 +86,14 @@
 
 <script>
 import UserService from '@/api/UserService';
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import rulesMixin from '@/mixins/rulesMixin';
 import { mapState, mapMutations } from 'vuex';
 
 export default {
     name: 'Register',
     components: {
-        Header
+        PageHeader
     },
     data() {
         return {

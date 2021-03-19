@@ -1,7 +1,7 @@
 <template>
     <v-container>
 
-        <Header title="Forgot Password" backlinkText="Go Back" />
+        <PageHeader title="Forgot Password" backlinkText="Go Back" />
 
         <v-row>
             <v-col v-if="error" class="red lighten-2 mb-4 ma-1">
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import UserService from '@/api/UserService';
 import rulesMixin from '@/mixins/rulesMixin';
 
@@ -53,7 +53,7 @@ export default {
         }
     },
     components: {
-        Header
+        PageHeader
     },
     mixins: [ rulesMixin ],
     methods: {

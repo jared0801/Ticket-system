@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header title="Welcome to The Ticket System" />
+            <PageHeader title="Welcome to The Ticket System" />
 
             <v-form ref="form">
                 <v-container>
@@ -74,14 +74,14 @@
 
 <script>
 import UserService from '@/api/UserService';
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import rulesMixin from '@/mixins/rulesMixin';
 import { mapState, mapMutations } from 'vuex';
 
 export default {
     name: 'Login',
     components: {
-        Header
+        PageHeader
     },
     computed: {
         ...mapState('user', ['isLoggedIn']),

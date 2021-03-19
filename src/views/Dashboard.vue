@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header title="Dashboard" />
+            <PageHeader title="Dashboard" />
 
             <v-container v-if="loading">
                 <v-row justify="center">
@@ -74,7 +74,7 @@
 <script>
 import ProjectService from '@/api/ProjectService';
 import TicketService from '@/api/TicketService';
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import PieChart from '@/components/PieChart';
 import LineChart from '@/components/LineChart';
 import { mapState } from 'vuex';
@@ -82,7 +82,7 @@ import { mapState } from 'vuex';
 export default {
     name: 'Dashboard',
     components: {
-        Header,
+        PageHeader,
         PieChart,
         LineChart
     },

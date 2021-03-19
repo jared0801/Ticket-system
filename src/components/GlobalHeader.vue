@@ -49,8 +49,7 @@ export default {
                 { title: "Home", action: () => this.$router.push('/') },
                 { title: "Profile", action: () => this.$router.push('/profile') },
                 { title: "Logout", action: () => this.logout() }
-            ],
-            selected: '',
+            ]
         }
     },
     computed: {
@@ -75,12 +74,6 @@ export default {
                 this.storeUser(user);
             }
         });
-    },
-    watch: {
-        $route: function() {
-            console.log('change');
-            this.selected = null;
-        }
     }
 }
 </script>
@@ -93,9 +86,6 @@ export default {
 }
 .active-home:hover:before {
     opacity: 0.18 !important;
-}
-.select {
-    margin-top: 1.5em !important;
 }
 
 </style>

@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <Header title="Project Tickets" backlinkText="Projects" backlink="/projects" />
+            <PageHeader title="Project Tickets" backlinkText="Projects" backlink="/projects" />
 
             <v-container v-if="loading">
                 <v-row justify="center">
@@ -110,14 +110,14 @@
 import TicketList from '@/components/Tickets/TicketList';
 import EditProject from '@/components/Projects/EditProject';
 import ProjectService from '@/api/ProjectService';
-import Header from '@/components/Header';
+import PageHeader from '@/components/PageHeader';
 import { mapGetters } from 'vuex';
 
 export default {
     name: 'ViewProject',
     components: {
         TicketList,
-        Header,
+        PageHeader,
         EditProject
     },
     data() {
