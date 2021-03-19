@@ -73,6 +73,14 @@ app.use('/api/tickets', tickets);
 const comments = require('./controllers/comments.js');
 app.use('/api/comments', comments);
 
+// Static folder
+app.use(express.static(__dirname + '/public'));
+
+//Forward routing to Vue
+app.get(/.*/, (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
+
 
 // Start server
 app.listen(port, async (err) => {

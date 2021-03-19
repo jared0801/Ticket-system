@@ -12,18 +12,13 @@ async function initDb() {
         PRIMARY KEY(email)
     )`;
 
-    db.query(sql, (err, res) => {
-        if(err) {
-            console.log("Temp user table failed to be created!");
-            throw err;
-        }
-        console.log(res);
-        console.log("Temp user table created!");
-
+    await db.query(sql, (err, result) => {
+        if(err) console.log("Temp user table failed to be created!");
+        else console.log("Temp user table created!");
     });
 
     // User table
-    let sql = `CREATE TABLE users(
+    sql = `CREATE TABLE users(
         id int AUTO_INCREMENT,
         username VARCHAR(255) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -32,12 +27,11 @@ async function initDb() {
         resetPasswordExpires DATETIME,
         PRIMARY KEY(id)
     )`;
-    try {
-        await db.query(sql);
-        console.log("User table created!");
-    } catch (err) {
-        console.log("User table failed to be created!");
-    }
+
+    await db.query(sql, (err, result) => {
+        if(err) console.log("User table failed to be created!");
+        else console.log("User table created!");
+    });
     
 
     sql = `CREATE TABLE projects(
@@ -53,12 +47,10 @@ async function initDb() {
             REFERENCES users(id)
             ON DELETE CASCADE
     )`;
-    try {
-        await db.query(sql);
-        console.log("Projects table created!");
-    } catch (err) {
-        console.log("Projects table failed to be created!");
-    }
+    await db.query(sql, (err, result) => {
+        if(err) console.log("Projects table failed to be created!");
+        else console.log("Projects table created!");
+    });
 
 
 
@@ -85,12 +77,10 @@ async function initDb() {
             REFERENCES projects(id)
             ON DELETE CASCADE
     )`;
-    try {
-        await db.query(sql);
-        console.log("Tickets table created!");
-    } catch (err) {
-        console.log("Tickets table failed to be created!");
-    }
+    await db.query(sql, (err, result) => {
+        if(err) console.log("Tickets table failed to be created!");
+        else console.log("Tickets table created!");
+    });
 
 
     sql = `CREATE TABLE comments(
@@ -110,12 +100,10 @@ async function initDb() {
             REFERENCES users(id)
             ON DELETE CASCADE
         )`;
-    try {
-        await db.query(sql);
-        console.log("Comments table created!");
-    } catch (err) {
-        console.log("Commentst table failed to be created!");
-    }
+    await db.query(sql, (err, result) => {
+        if(err) console.log("Comments table failed to be created!");
+        else console.log("Comments table created!");
+    });
 
 
     sql = `CREATE TABLE project_users(
@@ -131,10 +119,9 @@ async function initDb() {
             REFERENCES users(id)
             ON DELETE CASCADE
     )`;
-    db.query(sql, (err, res) => {
-        if(err) throw err;
-        console.log(res);
-        console.log("Project_users table created!");
+    await db.query(sql, (err, result) => {
+        if(err) console.log("Project_users table failed to be created!");
+        else console.log("Project_users table created!");
     });
     
 
@@ -151,10 +138,9 @@ async function initDb() {
             REFERENCES users(id)
             ON DELETE CASCADE
     )`;
-    db.query(sql, (err, res) => {
-        if(err) throw err;
-        console.log(res);
-        console.log("ticket_users table created!");
+    await db.query(sql, (err, result) => {
+        if(err) console.log("ticket_users table failed to be created!");
+        else console.log("ticket_users table created!");
     });
     
 
@@ -163,28 +149,24 @@ async function initDb() {
         status VARCHAR(255),
         PRIMARY KEY(id)
     )`;
-    db.query(sql, (err, res) => {
-        if(err) throw err;
-        console.log(res);
-        console.log("ticket_status table created!");
-
-            
-        const statuses = [
-            ["Open"],
-            ["In Progress"],
-            ["Blocked"],
-            ["Resolved"]
-        ]
-        sql = `INSERT INTO ticket_status (status) VALUES ?`;
-        db.query(sql, [statuses], (err, res) => {
-            if(err) throw err;
-            console.log(res);
-            console.log("ticket statuses inserted!");
-        });
+    
+    await db.query(sql, async (err, result) => {
+        if(err) console.log("ticket_status table failed to be created!");
+        else {
+            console.log("ticket_status table created!");
+            const statuses = [
+                ["Open"],
+                ["In Progress"],
+                ["Blocked"],
+                ["Resolved"]
+            ]
+            sql = `INSERT INTO ticket_status (status) VALUES ?`;
+            await db.query(sql, [statuses], (err, result) => {
+                if(err) console.log("ticket statuses failed to be inserted!");
+                else console.log("ticket statuses inserted!");
+            });
+        }
     });
-
-
-
 
 
     sql = `CREATE TABLE ticket_type(
@@ -192,24 +174,25 @@ async function initDb() {
         type VARCHAR(255),
         PRIMARY KEY(id)
     )`;
-    db.query(sql, (err, res) => {
-        if(err) throw err;
-        console.log(res);
-        console.log("ticket_type table created!");
-
-        const types = [
-            ["Bug / Error"],
-            ["Feature Request"],
-            ["Project Proposal"],
-            ["Training"]
-        ]
-        sql = `INSERT INTO ticket_type (type) VALUES ?`;
-        db.query(sql, [types], (err, res) => {
-            if(err) throw err;
-            console.log(res);
-            console.log("Ticket types inserted!");
-        });
+    
+    await db.query(sql, async (err, result) => {
+        if(err) console.log("ticket_type table failed to be created!");
+        else {
+            console.log("ticket_type table created!");
+            const types = [
+                ["Bug / Error"],
+                ["Feature Request"],
+                ["Project Proposal"],
+                ["Training"]
+            ]
+            sql = `INSERT INTO ticket_type (type) VALUES ?`;
+            await db.query(sql, [types], (err, result) => {
+                if(err) console.log("ticket types failed to be inserted!");
+                else console.log("ticket types inserted!");
+            });
+        }
     });
+
     
 
    sql = `CREATE TABLE ticket_priority(
@@ -217,24 +200,27 @@ async function initDb() {
         priority VARCHAR(255),
         PRIMARY KEY(id)
     )`;
-    db.query(sql, (err, res) => {
-        if(err) throw err;
-        console.log(res);
-        console.log("ticket_priority table created!");
 
-        const priorities = [
-            ["Low"],
-            ["Medium"],
-            ["High"],
-            ["Urgent"]
-        ]
-        sql = `INSERT INTO ticket_priority (priority) VALUES ?`;
-        db.query(sql, [priorities], (err, res) => {
-            if(err) throw err;
-            console.log(res);
-            console.log("Ticket priorities inserted!");
-        });
+    
+    
+    await db.query(sql, async (err, result) => {
+        if(err) console.log("ticket_priority table failed to be created!");
+        else {
+            console.log("ticket_priority table created!");
+            const priorities = [
+                ["Low"],
+                ["Medium"],
+                ["High"],
+                ["Urgent"]
+            ]
+            sql = `INSERT INTO ticket_priority (priority) VALUES ?`;
+            await db.query(sql, [priorities], (err, result) => {
+                if(err) console.log("ticket priorities failed to be inserted!");
+                else console.log("ticket priorities inserted!");
+            });
+        }
     });
+
     */
 };
 
