@@ -1,4 +1,4 @@
-# Ticket system / Bug Tracker
+# Ticketr
 
 A ticketing system that can be used to track bugs, projects, and requests. Built by Jared Jacobson using Vue, MySQL, and Express.
 

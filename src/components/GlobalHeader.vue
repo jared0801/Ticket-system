@@ -6,7 +6,7 @@
         >
         <div>
             <v-btn text active-class="active-home" class="button ml-2 mr-2 primary" :to="isLoggedIn ? '/dashboard' : '/'">
-                <h1 class="title white--text">Ticket System</h1>
+                <h1 class="title white--text">Ticketr</h1>
             </v-btn>
         </div>
 
@@ -57,7 +57,7 @@ export default {
         ...mapGetters('user', ['getUser']),
     },
     methods: {
-        ...mapMutations('user', ['removeUser', 'storeUser']),
+        ...mapMutations('user', ['removeUser']),
         logout() {
             this.removeUser();
             UserService.logoutUser().then((res) => {
@@ -66,14 +66,6 @@ export default {
                 }
             });
         }
-    },
-    created() {
-        UserService.getCurrentUser().then(async (res) => {
-            if(res.data && 'username' in res.data) {
-                const user = res.data;
-                this.storeUser(user);
-            }
-        });
     }
 }
 </script>
