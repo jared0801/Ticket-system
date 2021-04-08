@@ -166,7 +166,7 @@ router.post('/forgot', [
             let sql = `SELECT id, username, email FROM users WHERE ?`;
             db.query(sql, {email: req.body.email }, (err, result) => {
                 if(err || result.length < 1) {
-                    res.status(400).json({ error: "That email isn't associated with a user." });
+                    res.send("An email has been sent to " + req.body.email + " for further instructions.");
                 } else {
                     // Store password reset token
                     const user = result[0];

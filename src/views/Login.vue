@@ -3,7 +3,7 @@
 
         <div class="content">
             
-            <PageHeader title="Welcome to The Ticketr" />
+            <PageHeader title="Welcome to Ticketr" />
 
             <v-form ref="form">
                 <v-container>
