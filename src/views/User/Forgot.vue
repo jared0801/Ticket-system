@@ -62,7 +62,6 @@ export default {
             this.loading = true;
 
             UserService.forgotPassword({ email: this.email }).then((res) => {
-                console.log(res);
                 if(res.status === 200) {
                     this.success = res.data;
                 }
@@ -70,7 +69,6 @@ export default {
                 this.error = '';
             }).catch((err) => {
                 this.loading = false;
-                console.log(err.response);
                 if(err.response.data.error) {
                     this.error = err.response.data.error;
                 } else {

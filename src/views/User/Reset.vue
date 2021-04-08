@@ -84,7 +84,6 @@ export default {
     mixins: [ rulesMixin ],
     mounted() {
         UserService.resetUserToken(this.$route.params.token).then((res) => {
-            console.log(res);
             if(res.status === 200) {
                 this.success = `User found`;
             }
@@ -108,7 +107,6 @@ export default {
                 confPassword: this.confPassword
             }
             UserService.resetPass(this.$route.params.token, pass).then((res) => {
-                console.log(res);
                 if(res.status === 200) {
                     this.success = `Password successfully reset.`;
                 }

@@ -147,7 +147,6 @@ export default {
                 username: this.username
             }
             UserService.updateUser(newProfile).then((res) => {
-                console.log(res);
                 if(res.status === 200) {
                     this.updateUser(res.data);
                     this.success = "Your profile was succesfully updated.";

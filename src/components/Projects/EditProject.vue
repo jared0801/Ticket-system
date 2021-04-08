@@ -164,7 +164,6 @@ export default {
         } catch(err) {
             this.loading = false;
             this.error = err;
-            console.log(err);
             /*if(err.response.data.error) {
                 this.error = err.response.data.error;
             } else {

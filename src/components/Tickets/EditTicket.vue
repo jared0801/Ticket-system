@@ -76,7 +76,7 @@
                     ></v-text-field>
                 </v-col>
                 <v-col>
-                    <v-date-picker @select="selectDate" v-model="dueAt">
+                    <v-date-picker v-model="dueAt">
                     </v-date-picker>
                 </v-col>
             </v-row>
@@ -245,9 +245,6 @@ export default {
     },
     methods: {
         ...mapGetters('user', ['getUser']),
-        selectDate(e) {
-            console.log(e);
-        },
         toggleModal() {
             this.activeModal = !this.activeModal;
         },
